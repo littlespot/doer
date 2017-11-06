@@ -1,0 +1,554 @@
+{
+  "SLOGAN":"WHERE DREAMS COME TRUE",
+  "HEADERS":{
+    "projects":"DISCOVER",
+    "create":"CREATE",
+    "videos":"VIDEOS"
+  },
+  "TITLES":{
+    "best":"BEST SELECTION",
+    "latest":"LATEST UPDATE",
+    "catalogue":"CATALOGUE",
+    "videos":"VIDEOS"
+  },
+  "MENU":{
+    "person":"Account management",
+    "profile":"Personal page",
+    "preparations":"Preparations",
+    "untitled":"Untitled",
+    "signout":"Sign out"
+  },
+  "HOME":{
+    "header":"HI! <a class='link' href='#/profile/<%userid%>' ><%username%></a>.<br/>Welcome to Zoomov<br/>Fields of wonder",
+    "count":"You have <span class='link'><%cnt%></span> projects on going.",
+    "start":"Your new project is on the way.",
+    "slogan":"Allez! Come to advance your big idea!",
+    "create":"CREATE A NEW PROJECT",
+    "manage":"MANAGE YOUR PROJECT",
+    "all":"SEE ALL"
+  },
+  "PANEL":{
+    "header":"Look for something interesting?",
+    "div1":"Projects&nbsp;sorted by&nbsp;",
+    "div2":"&nbsp;in need of&nbsp;",
+    "div3":"located in"
+  },
+  "genre":{
+    "All":"ALL",
+    "Catalogue":"CATALOGUES",
+    "Fiction":"FICTION",
+    "Music": "MUSIC",
+    "Art":"ART",
+    "Animation":"ANIMATION",
+    "Documentary":"DOCUMENTARY",
+    "Explormence":"EXPLORMENCE"
+  },
+  "location":{
+    "city":"City",
+    "department":"Department/State",
+    "!!":"Everywhere"
+  },
+  "login":{
+    "Complete":"Complete",
+    "Next": "NEXT",
+    "Login": "LOGIN",
+    "Signin": "Login with account",
+    "Remember":"Remember me",
+    "Forget": "Forget your password?",
+    "Another":"Change to another account",
+    "New":"Create a new account",
+    "Help":"Need help?",
+    "Code": "Obtain invitation code",
+    "Condition":"I confirm to have read, understand and accepted the <a class='title' href='contracts' target='_blank'>Contractual Terms</a> and <a class='title' href='terms' target='_blank'>conditions</a> which I will respect.",
+    "PLACES":{
+      "username":"Input user name.",
+      "email":"Input your email.",
+      "email2":"Repeat your email.",
+      "pwd":"Input your password.",
+      "pwd2":"Repeat your password.",
+      "code":"Input your invitation code"
+    },
+    "ERRORS":{
+      "require":{
+        "Code":"Please input your invitation code.",
+        "Email":"Please input a valid email.",
+        "Pwd":"Please input a valid password.",
+        "Email2":"Please repeat your email.",
+        "Pwd2":"Please repeat your password.",
+        "Presentation":"Please present yourself."
+      },
+      "invalid":{
+        "Email":"No user registered with this email.",
+        "Pwd":"Wrong password.",
+        "Email2":"The email does not match.",
+        "Pwd2":"The password does not match.",
+        "Username":"Username can only be modified once 30 days"
+      },
+      "regex":{
+        "Pwd":"Password must contain upper and lower letter, number and special character."
+      },
+      "minlength":{
+        "Username": "User name must have at least 2 letters.",
+        "Pwd":"Password must have at least 6 characters.",
+        "Presentation":"Presentation must have at least 20 letters."
+      },
+      "maxlength":{
+        "Username": "User name has at most 40 letters.",
+        "Pwd":"Password has at most 16 letters.",
+        "Presentation":"Presentation has at most 200 letters."
+      },
+      "unique":{
+        "Email": "This email is already taken!"
+      },
+      "pending":{
+        "Email":"Checking if this email is available..."
+      }
+    }
+  },
+  "script":
+  {
+    "title": "Story",
+    "PLACES":{
+      "title": "Title",
+      "link": "Link Address",
+      "description":"Description",
+      "author":"Author",
+      "date":"Publication date"
+    }
+  },
+  "report":
+  {
+    "title": "Title",
+    "synopsis": "Synopsis",
+    "content":"Content",
+    "lover":"<%value%> favorites",
+    "add":"Add Report",
+    "ERRORS":{
+      "require":{
+        "Title":"Please input title",
+        "Synopsis":"Please input synopsis",
+        "Content":"Please input content"
+      },
+      "minlength":{
+        "Title": "Report's title must have at least 4 letters.",
+        "Synopsis":"Report's synopsis must have at least 10 letters."
+      },
+      "maxlength":{
+        "Title": "Report's title has at most 100 letters.",
+        "Synopsis":"Report's synopsis has at most 400 letters."
+      }
+    }
+  },
+  "budget":
+  {
+    "title":"Budget Table",
+    "subject": "Item",
+    "sum": "Amount（¥）",
+    "comment": "Comment",
+    "total": "Total ¥<%sum%>.00",
+    "sponsor": "Funds Table",
+    "time": "Raised Date",
+    "success":"In place: ¥<%sum%>.00",
+    "inprogress":"Waiting: ¥<%sum%>.00",
+    "notification":"Details of founds are hidden to other users, only total amount will be shown."
+  },
+  "occupation":{
+    "Planner":"Planner",
+    "Writer":"Writer",
+    "Animation":"Animation maker",
+    "Continuity":"Continuity",
+    "Designer":"Art designer",
+    "Director":"Director",
+    "Editor":"Editor",
+    "Executive":"Executive producer",
+    "Gaffer":"Gaffer",
+    "Illustrator":"Illustrator",
+    "Musician":"Musician",
+    "Performer":"Performer",
+    "Photographer":"Photographer",
+    "Producer":"Producer",
+    "Programmer": "3D Model Artist",
+    "Prop": "Props maker",
+    "Sound":"Sound engineer",
+    "Stylist":"Stylist",
+    "Visual":"Visual effects supervisor"
+  },
+  "user":{
+    "!!":"Everyone",
+    "Relations":"Relations",
+    "Projects":"Back to Projects",
+    "Friends":"<%username%>'s friends",
+    "Idols":"<%username%> followed",
+    "Fans":"<%username%>'s followers",
+    "See":"SEE ",
+    "I": " | I ",
+    "M": " | He ",
+    "F": " | She ",
+    "S": " | S/He ",
+    "Order":" PROJECTS SORTED BY",
+    "Views":{
+      "All":"All",
+      "Friend":"Friends",
+      "Idol":"Following",
+      "Fan":"Followed"
+    },
+    "Project":{
+      "All":"All",
+      "Inprogress":"In-progress",
+      "Completed":"Completed",
+      "Out":"Un-Completed",
+      "updated_at":"Updated time",
+      "finished_at":"End time",
+      "created_at":"Started time",
+      "Popularity":"Popularity",
+      "Comments":"Comments",
+      "Followers":"Followers",
+      "Plan":"CREATED",
+      "Participate":"PARTICIPATES",
+      "Prepare":"PREPARING",
+      "Waiting":"Projects waiting to online"
+    },
+    "BUTTONS":{
+      "edit":"ACCOUNT",
+      "preparations":"Pre-Projects"
+    }
+  },
+  "comment":{
+    "subject":"Reply to <%user%>",
+    "reply":"Reply",
+    "placeholder":"Comment must have at least <%min%> and no more than <%max%> letters."
+  },
+  "application":{
+    "title": "Look Forward",
+    "header": "Motivation",
+    "waiting":"Return in due",
+    "accepted":"Is your role",
+    "refused":"Maybe next time",
+    "try":"Apply",
+    "retry":"Re-apply",
+    "subject":"<label><%username%></label> apply to join <label><%project%></label>: ",
+    "motivation":"Please represent yourself, and express your expectations of rewards for your talents.",
+    "recruit": "<%quantity%> persons",
+    "alert":"The description fo role can not be modified, please be careful.",
+    "occupation":"Role",
+    "person":"person",
+    "request":"Please articulate your needs for this role, and the rewards for talents."
+  },
+  "notification":{
+    "Untreated":"Untreated",
+    "Project": "Project",
+    "Inbox": "Inbox",
+    "Outbox": "Outbox",
+    "Sentbox": "Sent Invitations",
+    "Recruitment":"Sent Applications",
+    "Messages": "Messages",
+    "Notifications": "Notifications",
+    "Application": "Application",
+    "Invitation": "Invitation",
+    "Message": "Message",
+    "Group":"Group Message",
+    "Title": "Message",
+    "InvitationSubject":" invite you to join <label><%project%></label> as",
+    "OutSubject":"You invite <span class='title'><%username%></span> to join <label><%project%></label> as",
+    "ApplicationSubject":" apply to join <label><%project%></label> as",
+    "From":"From <a href='#/profile/<%user.id%>' class='title' target='_blank'><%user.username%></a>",
+    "To":"To <a href='#/profile/<%user.id%>' class='title' target='_blank'><%user.username%></a> ",
+    "Tos":"To ",
+    "open":"Read <%cnt%> messages",
+    "close":"Envelop older messages",
+    "refuse":"REFUSE",
+    "accept":"ACCEPT",
+    "refused":"REFUSED",
+    "accepted":"ACCEPTED",
+    "wait":"WAITING",
+    "mail":{
+      "receiver":"Receiver: ",
+      "subject":"Subject: ",
+      "invite":" invite as ",
+      "participate":" join the project"
+    },
+    "message": {
+      "i": "Your invitation is sent.",
+      "m": "Your message is sent.",
+      "error": {
+        "subject": "Message must have subject.",
+        "receiver": "This project has no other members yet.",
+        "messages": "Your message is not sent. Please try again later."
+      }
+    },
+    "ERRORS":{
+      "require":{
+        "Subject":"Report must have a title.",
+        "Invitation":"Input invitation.",
+        "Mail":"Input message.",
+        "Group":"Input mail."
+      },
+      "minlength":{
+        "Title": "Title must have at least 4 letters.",
+        "Synopsis":"Synopsis must have at least 10 letters."
+      },
+      "maxlength":{
+        "Title": "Title must have no more than 100 letters.",
+        "Synopsis":"Synopsis must have no more than 400 letters."
+      }
+    }
+  },
+  "event":{
+    "update": "updated project",
+    "team-add": "<label><%user%></label> joined as <%roles%>",
+    "team-remove": "<%roles%><label><%user%></label> left",
+    "script": "added script <a href='<%link%>' target='_blank'><%title%></a>",
+    "budget": "modified budget: <%type%> <%sum%>",
+    "report": "<%user%> wrote report <a href='#/reports/<%link%>' target='_blank'><%title%></a>",
+    "start": "Door to the new world"
+  },
+  "month":{
+    "01":"January",
+    "02":"February",
+    "03":"Mars",
+    "04":"April",
+    "05":"May",
+    "06":"June",
+    "07":"July",
+    "08":"August",
+    "09":"September",
+    "10":"October",
+    "11":"November",
+    "12":"December"
+  },
+  "project": {
+    "TAGS":{
+      "update":"updated <%date| limitTo :16%>",
+      "finish":"Finishes at：<%date | limitTo :10%>",
+      "team":"has <span class='link'><%cnt%></span> talents",
+      "recruitment":"waiting for <%cnt%> talents",
+      "participate":"Come to join us！",
+      "rest":"<%days%> days",
+      "recruited":"Team completed!",
+      "more":"Read more"
+    },
+    "CREATION":{
+      "Pitch":"Pitch",
+      "Description":"Description",
+      "Container":"Container",
+      "Team":"Team",
+      "UploadImg":"Upload poster",
+      "Degree":"<%value%>deg",
+      "Right":"Right",
+      "Left":"Left",
+      "R90":"Rotate 90 degrees",
+      "L90":"Rotate -90 degrees"
+    },
+    "Views":{
+      "Container":"Container",
+      "Team":"Team",
+      "Pitch":"Pitch",
+      "Recruitment":"Recruitment",
+      "Poster":"Poster",
+      "Updates":"Time Line",
+      "Comments":"Comments",
+      "qna":"Q & A"
+    },
+    "BUTTONS":{
+      "ask": "I have a question",
+      "edit":"Edit",
+      "submit":"Submit",
+      "finish":"Mission Completed",
+      "preview":"Preview",
+      "return":"Back to project"
+    },
+    "Answer":"MY OPINION",
+    "AnswerCnt":"<strong clsss='text-primary'><%cnt%></strong> answers",
+    "AnswerWait":"Be the first one to answer",
+    "MyAnswerWait":"To contribute your opinion",
+    "MyAnswersCnt": "You've contributed <strong clsss='text-primary'><%cnt%></strong> options",
+    "ToAnswer":"Your opinion",
+    "FollowerCnt":"<%cnt%> followers",
+    "FollowQuestion":"Follow this question",
+    "RelatedQuestions" : "<strong clsss='text-primary'><%cnt%></strong> related questions",
+    "Description": "Description",
+    "Synopsis":"Synopsis",
+    "Genre":"Genre",
+    "Target":"Finish at",
+    "New":"Create a new project",
+    "Help":"Help?",
+    "Agreement":"Submitting means you have read and agree on <a class='title' href=''>contract</a>",
+    "All":"All",
+    "PLACES":{
+      "title":"Title",
+      "location":"Location",
+      "finish":"Finish at",
+      "synopsis":"Synopsis",
+      "author":"Add author",
+      "subject":"Input the subject of your question",
+      "qtags": "Input tags of question, splitting by comma"
+    },
+    "MESSAGES":{
+      "update": "The information of project has been updated.",
+      "description": "Project must have a description no less than 200 letters.",
+      "answer":"Your opinion has been sent successfully.",
+      "deleteA": "Your answer has been deleted successfully",
+      "confirmA": "Are you sure to delete this answer ?",
+      "question":"Your question has been post."
+    },
+    "ERRORS":{
+      "require":{
+        "title":"Please input a title",
+        "location":"Please specify the location",
+        "finish":"Please specify the date of finish",
+        "synopsis":"Please input the synopsis",
+        "description":"Please input the description",
+        "motivation":"Please input your motivation",
+        "comment":"Please input comment",
+        "genre":"Please choose a genre",
+        "subject":"Question must have a subject",
+        "qtags": "Question must have at least one tag."
+      },
+      "invalid":{
+        "finish":"Invalid date"
+      },
+      "minlength":{
+        "title": "Title has at least 2 letters.",
+        "synopsis":"Synopsis has at least 20 letters.",
+        "description":"Description has at least 200 letters.",
+        "motivation":"Motivation must have at least {value} letters",
+        "comment":"Comment must have at least {value} letters.",
+        "subject":"Question subject must have at least {value} letters."
+      },
+      "maxlength":{
+        "title": "Title has at most 100 letters.",
+        "synopsis":"Synopsis has at most 200 letters.",
+        "subject":"Question subject must have at most {value} letters."
+      }
+    }
+  },
+  "personal":{
+    "title":"User Center",
+    "slogan":"Complete personal information",
+    "common":"Same favorites with <%username%>",
+    "cross":"<%username%> has same",
+    "friends":"friends",
+    "idols":"idols",
+    "fans":"fans",
+    "reports":"<%username%>'s reports",
+    "myreports":"My Reports",
+    "reports_cnt":"<%cnt%> reports",
+    "reports_comment":"<%cnt%> comments",
+    "sex":{
+      "S":"Secret",
+      "F":"Lady",
+      "M":"Gentleman"
+    },
+    "question":{
+      "title":"Q & A",
+      "ask": "ASKED",
+      "response": "ANSWERED",
+      "follow": "FOLLOWING",
+      "personal": "PERSONAL"
+    },
+    "message":{
+      "info":"Your personal information has updated",
+      "email":"Your email has updated.",
+      "pwd":"Your password has changed.",
+      "samepwd":"New password must be different with the old one.",
+      "errpwd":"Wrong password.",
+      "question":{
+        "sns":{
+          "delete":"Are you sure to delete this sns account?"
+        }
+      }
+    },
+    "SNS" :{
+      "m":"Sound",
+      "v":"Vision",
+      "c":"Beaux Arts",
+      "t":"Communication",
+      "p":"Circle",
+      "s":"Interests"
+    },
+    "PLACES":{
+      "username":"Username",
+      "talents":"Talents",
+      "location":"Location",
+      "occupation":"Add talent",
+      "sex":"Sex",
+      "birthday":"Birthday",
+      "site":"Costumer link",
+      "description":"Presentation",
+      "oldpwd":"Input current password",
+      "newpwd":"Input new password",
+      "newpwd2":"Repeat new password"
+    },
+    "birthday":{
+      "year":"YEAR",
+      "month":"MONTH",
+      "day":"DATE"
+    },
+    "tabs":{
+      "information":"Information",
+      "email":"Email",
+      "password":"Password",
+      "social":"Social Net",
+      "newsletter":"Newsletter"
+    },
+    "buttons":{
+      "common":"Interests",
+      "cross":"Friends",
+      "project":"Join In",
+      "message":"Message",
+      "invitation":"Invitation",
+      "reports":"Report",
+      "qna":"Q & A"
+    },
+    "ERRORS":{
+      "require": {
+        "Occupation":"We know you must have talents.",
+        "Location":"ET wants a loving place"
+      }
+    }
+  },
+  "qualification":{
+      "works": "Works",
+      "link" : "Input the link to your work",
+      "talent": "Input your roles in this works",
+      "message": "Your information has been successfully sent.",
+      "ERRORS":{
+        "require": "Please input the link of your work. ",
+        "repeat": "The link is already in the list. ",
+        "talent": "Please specify your roles in this achievement."
+      }
+  },
+  "FOOTER":{
+    "home":"Home",
+    "discover":"Discover",
+    "create":"Create",
+    "profile":"Profile",
+    "search":"Search",
+    "login": "Log in",
+    "register":"Register",
+    "faq":"FAQ",
+    "terms":"Terms",
+    "privacy":"Privacy",
+    "copyright":"Copyright",
+    "cookies":"Cookies",
+    "us":"About us",
+    "timeline":"Timeline",
+    "news":"News",
+    "contact":"Contact",
+    "join":"Join us",
+    "verification":"Business Verification",
+    "activities":"Activities",
+    "festival":"Festival",
+    "languages":"Languages",
+    "newsletter":"Newsletter",
+    "weibo":"Weibo",
+    "weixin":"Weixin",
+    "youku":"Youku",
+    "tencent":"Tencent",
+    "twitter":"Twitter",
+    "facebook":"Facebook",
+    "vimeo":"Vimeo",
+    "youtube":"Youtube",
+    "instagram":"Instagram"
+  }
+}

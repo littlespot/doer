@@ -1,0 +1,146 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User=> Jieyun
+ * Date=> 29/04/2017
+ * Time=> 10=>26
+ */
+
+return [
+    "SLOGAN"=>"梦想开始的地方",
+    "TITLES"=>[
+        "best"=>"最佳",
+        "latest"=>"最近",
+        "catalogue"=>"CATALOGUE",
+        "videos"=>"VIDEOS"
+    ],
+    "MENU"=>[
+        "discover"=>"发现",
+        "creation"=>"创建",
+        "videos"=>"视频",
+        "person"=>"帐户管理",
+        "profile"=>"个人主页",
+        "preparations"=>"未提交项目",
+        "untitled"=>"未命名",
+        "signout"=>"登出账户",
+        "search"=>"搜寻项目标题或创建者",
+        "all" => "全部",
+        "see" => "浏览",
+        "order" => "排序方式",
+        "searching" => "搜寻中...",
+        "none"=>"咣"
+    ],
+    "BUTTONS"=>[
+        "avatar" => "更换头像",
+        "continue" => "保存并继续",
+        "complete" => "完成",
+        "cancel" => "放弃",
+        "save_return" => "保存并返回项目主页",
+        "submit" =>"确认"
+    ],
+    "LABELS"=>[
+        "relations" => "所有关系",
+        "reports" => "手记",
+        "questions" => "问答",
+        "comments" => "留言",
+        "information" => "信息",
+        "sns" => "社交账号",
+        "preparations" => "未上线的",
+        "invite" => "邀请",
+        "me" => "我"
+    ],
+  "HOME"=>[
+        "traveler" => "游客只能使用<b>体验版</b>!<br>您必须注册成为用户才能正常使用ZOOMOV",
+        "header"=>"嗨！ <a class='text-important' href='/profile/:userid' >:username</a><br/>欢迎来到ZOOMOV<br/>梦想开始的地方",
+        "count"=>"您有",
+        "online"=>"<a href='/account' class='link'>:cnt</a>个项目待上线",
+        "projects"=>"<a href='/profile/me' class='link'>:cnt</a>个项目在线上",
+        "preparations"=>"<a href='/account' class='link'>:cnt</a>个草稿待提交",
+        "slogan"=>"快！勇敢的少年快去创造奇迹吧！",
+        "create"=>"创建新的项目",
+        "manage"=>"管理您的项目",
+        "start"=>"您的首个项目正在路上。",
+        "all"=>"查看所有"
+  ],
+    "TIP"=>[
+        "views" => "项目浏览次数",
+        "followers"=>"被收藏次数",
+        "follow"=>"收藏项目",
+        "unfollow"=>"取消收藏",
+        "lovers"=>"被点赞次数",
+        "love"=>"为项目点赞",
+        "unlove"=>"取消点赞"
+    ],
+  "PANEL"=>[
+    "header"=>"Look for something interesting?",
+    "div1"=>"Projects&nbsp;sorted by&nbsp;",
+    "div2"=>"&nbsp;in need of&nbsp;",
+    "div3"=>"located in&nbsp;"
+  ],
+    "EDITOR"=>[
+        "font"=>"字体",
+        "size"=>"字体大小",
+        "huge"=>"大",
+        "normal"=>"中",
+        "small"=>"小",
+        "add"=>"添加",
+        "bold"=>"粗体",
+        "italic"=>"斜体",
+        "strike"=>"中划线",
+        "underline"=>"下划线",
+        "bullet"=>"着重号",
+        "number"=>"序列号",
+        "reduce"=>"减少缩进",
+        "indent"=>"增加缩进",
+        "Left"=>"向左对齐",
+        "center"=>"剧中对齐",
+        "right"=>"向右对齐",
+        "justify"=>"两边对齐",
+        "hyperlink"=>"超链接",
+        "remove"=>"取消链接",
+        "picture"=>"添加图片",
+        "undo"=>"撤消",
+        "redo"=>"重做",
+        "image_original"=>"原图大小",
+        "image_max"=>"最大宽度",
+        "image_medium"=>"中等宽度",
+        "image_min"=>"最小宽度",
+        "image_width"=>"宽度:value",
+    ],
+    "FOOTER"=>[
+        "zoomov"=>"ZOOMOV是什么？",
+        "home"=>"主页",
+        "discover"=>"发现",
+        "create"=>"创建",
+        "profile"=>"人个页面",
+        "search"=>"搜索",
+        "login"=> "登录",
+        "register"=>"注册",
+        "faq"=>"常见问题",
+        "help"=>"项目操作手册",
+        "terms"=>"注册协议",
+        "rules"=>"社区行为规范",
+        "privacy"=>"隐私政策",
+        "copyright"=>"版权政策",
+        "cookies"=>"Cookie政策",
+        "us"=>"关于我们",
+        "timeline"=>"时间线",
+        "news"=>"最新动态",
+        "contact"=>"联系我们",
+        "join"=>"加入我们",
+        "verification"=>"商业认证",
+        "activities"=>"活动",
+        "festival"=>"节日",
+        "languages"=>"语言",
+        "newsletter"=>"收取新闻",
+        "weibo"=>"微博",
+        "weixin"=>"微信",
+        "youku"=>"优酷",
+        "tencent"=>"腾讯",
+        "twitter"=>"推特",
+        "facebook"=>"脸书",
+        "vimeo"=>"Vimeo",
+        "youtube"=>"油管",
+        "instagram"=>"Instagram"
+  ]
+];

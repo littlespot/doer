@@ -1,0 +1,113 @@
+/*
+.carousel-caption .btn {
+    text-shadow: none;
+}
+
+.carousel-inner{
+    position:absolute;
+    top:0;
+    left:0;
+    height: 100%;
+}
+.carousel-inner .container{
+    position: relative;
+    height: 100%;
+    padding-bottom: 0;
+}
+.carousel-control{
+    background: transparent none;
+}
+
+.carousel-inner img{
+    margin:auto;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    bottom: 20px;
+}
+*/
+.zooCarousel{
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.carousel-inner{
+    width: 100%;
+    padding-left: 10%;
+    padding-right: 10%;
+    vertical-align: bottom;
+}
+
+.carousel-inner img{
+    height: 100%;
+ }
+
+.carousel-header {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 10;
+    padding: 20px;
+    text-align: left;
+    text-shadow: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+@media (min-height: 1600px) {
+    .middle {
+        margin-top: 60px;
+    }
+}
+
+.header-slogan{
+    font-size:24px;
+    color:#293a4f;
+}
+
+.carousel-indicators {
+    top:100%;
+    margin-top: 0px;
+    margin-bottom: 0;
+}
+
+.carousel-indicators li {
+    background-color: rgba(42, 59, 81, 1);
+    border: none;
+    border-radius: 8px;
+    margin: 1px 3px;
+    width: 8px;
+    height: 8px;
+}
+
+.carousel-indicators .active {
+    width: 8px;
+    height: 8px;
+    margin: 1px 3px;
+    background-color: #999;
+}
+.closer{
+    border: 1px rgba(153, 153, 153,1) solid;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    float: right;
+    font-size: 16px;
+}
+.header-slogan{
+    line-height: 1.6em;
+    padding-bottom: 15px;
+}
+
+
+
+/* panel of projects*/
+#projects{
+    padding-top: 18px;
+}
+

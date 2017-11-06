@@ -1,0 +1,53 @@
+.poster{
+    width: 100%;
+    height: 100%;
+
+}
+.poster.has-error{
+    border: 1px solid #d77549;
+}
+
+.poster img{
+    width: 640px;
+    height: 360px;
+}
+
+.img-preview {
+    float: left;
+    margin-right: .5rem;
+    margin-bottom: .5rem;
+    overflow: hidden;
+}
+
+.picture-upload{
+    display: none;
+}
+
+.img-container{
+    display:none;
+}
+
+.preview-lg{
+    width:640px;
+    height:360px;
+}
+
+.preview-md{
+    width:320px;
+    height:180px;
+}
+
+.preview-sm{
+    width:128px;
+    height:72px;
+}
+
+#picture_wrapper{
+    width:640px;
+    height:360px;
+}
+
+#picture_wrapper img{
+    width:100%;
+    height:100%;
+}

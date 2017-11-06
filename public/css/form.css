@@ -1,0 +1,33 @@
+label{
+    display: inline-block;
+    text-align: justify;
+    position: relative;
+}
+
+label:before{
+    content: ' ';
+    position: absolute;
+    left:0;
+    width:20px;
+    text-wrap: none;
+}
+
+label.require:before{
+    content: '*';
+    color:rgb(215,116,89);
+}
+
+label:after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+}
+
+.tab-menu-bar{
+    display: flex;
+    justify-content: space-around;
+}
+
+.tab-menu-item{
+    width: 100%;
+}

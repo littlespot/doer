@@ -1,0 +1,686 @@
+{
+  "SLOGAN":"梦想开始的地方",
+  "NONE":"无",
+  "FAIL": "抱歉, 您的要求未能成功执行。请再试一次。",
+  "NEW": "今日",
+  "FOR": "致",
+  "TITLES":{
+    "catalogue":"类型",
+    "videos":"视频"
+  },
+  "MENU":{
+    "searching" : "搜寻中...",
+    "none":"咣"
+  },
+  "HOME":{
+    "wait": "若无特殊情况，项目将在一周内正式上线"
+  },
+  "PANEL":{
+    "header":"在找有趣的事情？",
+    "div1":"项目的顺序",
+    "div2":"项目的需求",
+    "div3":"位于"
+  },
+  "genre":{
+    "Catalogue":"类型",
+    "All":"所有",
+    "Fiction":"剧情",
+    "Music":"音乐",
+    "Art":"艺术",
+    "Animation":"动画",
+    "Documentary":"记录",
+    "Explormence":"行动家"
+  },
+  "location":{
+    "city":"城市",
+    "department":"省（直辖市）或地/特区",
+    "country":"国家",
+    "!!":"所有城市"
+  },
+  "login":{
+    "Complete":"完成",
+    "Next": "下一步",
+    "Login": "登录",
+    "Signin": "用已有账户登录",
+    "Remember":"记住我",
+    "Forget": "忘记密码？",
+    "Reset": "已将新密码发至您的邮箱",
+    "Another":"用另一个帐户登录",
+    "New":"创建一个新帐户",
+    "Help":"需要帮助？",
+    "Code": "获取邀请码",
+    "Register": "提交注册",
+    "Condition":"我已阅读并同意<a class='title' href='contracts' target='_blank'>《ZOOMOV网注册条款》</a>和<a class='title' href='terms' target='_blank'>隐私条款</a>",
+    "Confirmation":"ZOOMOV欢迎你!",
+    "Activation":"请尽快查看您的电邮。<br>您有<b>一个月</b>的时间通过我们发送到您邮箱的链接激活您的账号。",
+    "Unactivated": "激活号码不正确。请再次查看邮箱。",
+    "Lateactivated": "激活时间已过。请重新激活",
+    "Notactivated": "激活与用户不相符。",
+    "Activated": "账户已经激活。<br>现在去完善个人资料吧！",
+    "PLACES":{
+      "username":"请输入用户名",
+      "email":"请输入邮箱",
+      "email2":"请再次输入邮箱.",
+      "pwd":"请输入密码",
+      "pwd2":"请重复密码",
+      "code":"请输入邀请码"
+    },
+    "ERRORS":{
+      "require":{
+        "Code":"请输入邀请码",
+        "Email":"请输入正确的邮箱地址",
+        "Pwd":"输入的用户密码错误",
+        "Email2":"请再次输入邮箱地址.",
+        "Pwd2":"请再次输入密码",
+        "Presentation":"请填写简短的自我介绍",
+        "Username": "请填写用户名"
+      },
+      "invalid":{
+        "Email":"邮箱不正确",
+        "Pwd":"密码错误",
+        "Email2":"邮箱地址不一致",
+        "Pwd2":"密码不一致",
+        "Username":"用户名30天内只能修改一次"
+      },
+      "regex":{
+        "Pwd":"密码必须包含大小写字符，数字及特殊符号"
+      },
+      "minlength":{
+        "Username": "用户名最少要有2个字",
+        "Pwd":"密码最少要有6个字",
+        "Presentation":"自我介绍最少要有10个字符"
+      },
+      "maxlength":{
+        "Username": "用户名最多不能超过20个字",
+        "Pwd":"密码最多不能超过12个字",
+        "Presentation":"自我介绍最多不能超过800个字"
+      },
+      "unique":{
+        "Email": "此邮箱地址已被注册!"
+      },
+      "pending":{
+        "Email":"我们正在检查邮箱地址是否被占用"
+      },
+      "code":"邀请码错误"
+    }
+  },
+  "script":
+  {
+    "title": "故事",
+    "info": "作者信息",
+    "author": "请自觉保护版权，仔细填写以下信息",
+    "alert": "一旦立项，故事的作者（们）将自动成为项目的初始成员，并将收到一封确认邮件",
+    "confirm": "您确认要删除此版故事《<%title%>》么？",
+    "deleteauthor": "同时将作者（们）从项目成员中移除 (如果他/她们不是<strong>并非</strong>此项目其他故事的作者且在此项目中没有其他职能）",
+    "PLACES":{
+      "title": "故事标题",
+      "link": "故事的网址链接",
+      "description":"故事描述",
+      "author":"作者",
+      "date":"发表日期",
+      "name": "请填写作者的真实姓名或常用笔名",
+      "site": "作者的博客地址，个人网站或社交账号（选填）",
+      "email":"邮箱地址"
+    },
+    "ERRORS":{
+      "require":{
+        "Title":"故事必须有一个标题",
+        "Link":"故事必须有一个链接",
+        "Date":"请标明故事的发表日期 ",
+        "Description":"请为这版故事写一些标注以便您管理",
+        "Author": "请声明此版故事的作者（们）"
+      },
+      "unique":{
+        "Email":"此邮箱已被另一位用户占用！"
+      },
+      "minlength":{
+        "Link": "有这么短的链接么？",
+        "Email": "作者的邮箱地址不可少"
+      },
+      "maxlength":{
+        "Title": "故事的标题不能超过40个字符",
+        "Link":"有如此长的链接和？",
+        "Description":"简明扼要的标注即可，请控制在800字符以内"
+      }
+    }
+  },
+  "report":
+  {
+    "title": "输入手记标题",
+    "synopsis": "输入导语",
+    "content":"输入手记内容",
+    "lover":"<%value%>人收藏",
+    "add":"添加手记",
+    "ERRORS":{
+      "require":{
+        "Title":"请输入手记标题",
+        "Synopsis":"请输入手记导语",
+        "Content":"请输入手记内容"
+      },
+      "minlength":{
+        "Title": "手记标题最少要有4个字",
+        "Synopsis":"手记导语最少要有20个字"
+      },
+      "maxlength":{
+        "Title": "手记标题最多不能超过100个字",
+        "Synopsis":"手记导语最多不能超过400个字"
+      }
+    }
+  },
+  "budget":
+  {
+    "total": "总计: ¥<%sum%>.00",
+    "success":"到位: ¥<%sum%>.00",
+    "inprogress":"等待: ¥<%sum%>.00",
+    "MESSAGES":{
+      "confirmB": "您确定要删除此项预算么 ?",
+      "confirmS": "您确定要删除此笔资金么 ?"
+    },
+    "types":{
+      "1": "场地",
+      "2": "器材",
+      "3":"交通及运费",
+      "4":"饮食",
+      "5":"时薪及分红",
+      "6":"住宿及差旅",
+      "7":"杂项"
+    }
+  },
+  "occupation":{
+      "Planner":"企划",
+      "Writer":"作家",
+      "Animation":"动画",
+      "Continuity":"场记",
+      "Designer":"舞美",
+      "Director":"导演",
+      "Editor":"剪辑",
+      "Executive":"监制",
+      "Gaffer":"灯光",
+      "Illustrator":"插画",
+      "Musician":"音乐",
+      "Performer":"表演",
+      "Photographer":"摄影",
+      "Producer":"制片",
+      "Programmer": "电脑建模",
+      "Prop": "道具",
+      "Sound":"音效",
+      "Stylist":"造型",
+      "Visual":"视效"
+  },
+  "user":{
+    "!!":"所有人",
+    "Relations":"所有关系",
+    "Projects":"返回项目",
+    "Friends":"<%username%>的朋友",
+    "Idols":"<%username%>关注的用户",
+    "Fans":"关注<%username%>的用户",
+    "See":"浏览 ",
+    "I": " | 我 ",
+    "M": " | 他 ",
+    "F": " | 她 ",
+    "S": " | 伊 ",
+    "Order":" 的项目 | 排序方式",
+    "Views":{
+      "All":"所有",
+      "friends":"互关注",
+      "idols":"关注者",
+      "fans":"被关注"
+    },
+    "Project":{
+      "All":"所有",
+      "Inprogress":"进行中的",
+      "Completed":"已完成的",
+      "Out":"未完成的",
+      "updated_at":"更新日期",
+      "finish_at":"结束日期",
+      "created_at":"开始日期",
+      "Popularity":"热度",
+      "Duration": "时长",
+      "Comments":"评论数",
+      "Followers":"关注度",
+      "Plan":"发起的",
+      "Participate":"参与的",
+      "Prepare":"待完成的草稿",
+      "Waiting":"等待上线的项目"
+    },
+    "BUTTONS":{
+      "edit":"帐户管理",
+      "preparations":"待上线的"
+    }
+  },
+  "comment":{
+    "subject":"回复:",
+    "reply":"回复",
+    "placeholder":"请写至少<%min%>字，最多<%max%>字的回复。"
+  },
+  "application":{
+    "title": "征寻",
+    "header": "动机信",
+    "waiting":"等待答复",
+    "accepted":"已担任此职",
+    "refused":"下次再合作",
+    "try":"申请",
+    "retry":"重新申请",
+    "subject":"<label><%username%></label>申请参与项目<label><%project%></label>: ",
+    "motivation":"请说明您参与的动机，您渴望为项目做哪些贡献，得到如何的回馈。",
+    "recruit": "<%quantity%>位",
+    "alert":"位置和描述内容发布后将不可更改，请谨慎填写并确认",
+    "occupation":"选择职能",
+    "person":"位",
+    "request":"请说明您需要的才能，以及您愿为才华提供的回馈。"
+  },
+  "notification":{
+    "Reminder": "收到的提醒",
+    "OutMessages": "送出的小纸条",
+    "Invitations": "邀请函",
+    "Title": "小纸条",
+    "Read": "打开",
+    "Envelop": "折叠",
+    "Checked": "全部已阅",
+    "Unchecked": "尚有未阅者",
+    "Receivers": "指明这张小纸条的归宿",
+    "For": "<a href='/project/<%id%>' target='_black'><%title%></a>提醒其成员：",
+    "You": "您请 ",
+    "Quit": "退出项目 《<label><%project%></label>》",
+    "Member": " 的职位 ",
+    "Receiver": " 参与项目 《<label><%project%></label>》 作为",
+    "Re": "回复: ",
+    "Replies": "<strong><%cnt%></strong> 前文",
+    "div1": "您收到了",
+    "Sent": "送出了",
+    "Got" : "有",
+    "Set" : "设定",
+    "Replied": "已复",
+    "Applications": "申请信",
+    "Reminders": "提醒",
+    "Remind": "提醒其成员关于项目 ",
+    "Projects": "您名下 <strong class='text-important'><%cnt > 0 ? cnt : '无'%></strong> 项目需收取 <b>申请信</b>, <strong class='text-important'><%total > 0 ? total : '无'%></strong>项目需收到/设定<b>提醒</b>",
+    "Owns": "您名下 <strong class='text-important'><%cnt > 0 ? cnt : '无'%></strong> 项目可收取/寄出 <b>邀请函</b>",
+    "Untreated":"未处理",
+    "Project": "项目提醒",
+    "Inbox": "收件箱",
+    "Outbox": "发送的提醒",
+    "Sentbox": "发送的邀请",
+    "Recruitment":"发送的申请",
+    "Messages": "小纸条",
+    "Notifications": "通知",
+    "Application": "收到的申请",
+    "Invitation": "邀请函",
+    "Message": "小纸条",
+    "Group":"群信",
+    "InvitationSubject":"邀请您参与项目《<label><%project%></label>》，成为",
+    "QuitSubject":"请您退出项目《<label><%project%></label>》",
+    "OutSubject":"您邀请<span class='title'><%username%></span>参与项目《<%project%>》，成为",
+    "ApplicationSubject":"申请参与项目《<%project%>》，成为",
+    "From":"<a href='#/profile/<%user.id%>' class='title' target='_blank'><%user.username%></a>致您: ",
+    "To":"致<a href='#/profile/<%user.id%>' class='title' target='_blank'><%user.username%></a>: ",
+    "Tos":"致",
+    "open":"共<%cnt%>张小纸条，全部打开",
+    "close":"收起过去的纸条",
+    "refuse":"拒绝",
+    "accept":"接受",
+    "refused":"已拒绝",
+    "accepted":"已接受",
+    "wait":"等待中",
+    "mail":{
+      "receiver":"收件:",
+      "subject":"事由:",
+      "invite":"邀请",
+      "participate":"加入项目",
+      "as":"作为",
+      "reminder": "input the subject of reminder"
+    },
+    "message":{
+      "i":"邀请函已递达",
+      "m":"小纸条已送到",
+      "confirmA": "您确定要接受此封申请（发信方将即刻加入您的团队）？",
+      "confirmR": "您确定要拒绝此封申请 ？",
+      "confirmD": "您确定要删除此条申请？<br><div class='alert alert-danger' role='alert'>如果您尚未接受，此条申请将默认被拒绝</div>",
+      "confirmM": "您确定要删除此条申请？<br><div class='alert alert-danger' role='alert'>如果申请已被接受/拒绝，您的行为将不会对收件方造成任何影响</div>",
+      "confirmN": "您确定要接受此条通知？",
+      "confirmO": "您确定要接受此项邀请？",
+      "confirmP": "您确定要删除此张小纸条？",
+      "confirmQ": "您确定要删除此张小纸条及其前文（包括您送出的）么？",
+      "confirmT": "您确定要拒绝此项邀请么？",
+      "confirmI": "您确定要删除此项邀请么？<br><div class='alert alert-danger' role='alert'>如果您尚未接受，此项邀请将默认被拒绝</div>",
+      "confirmU": "您确定要删除此项邀请么？<br><div class='alert alert-danger' role='alert'>如果邀请已被接受/拒绝，您的行为将不会对收件方造成任何影响</div>",
+      "confirmS": "您确定要发送此条提醒么？",
+      "error":{
+        "subject":"小纸条得有一个标题",
+        "receiver":"这个项目尚无其他成员",
+        "messages":"小纸条没有成功发送。请稍后重试"
+      }
+    },
+    "ERRORS":{
+      "require":{
+        "Subject":"请输入手记标题",
+        "Invitation":"请输入邀请函内容",
+        "Mail":"请输入纸条内容",
+        "Group":"请输入群信内容",
+        "Reminder": "提醒不能为空"
+      },
+      "minlength":{
+        "Title": "手记标题最少要有4个字",
+        "Synopsis":"手记导语最少要有10个字符",
+        "Subject":"标题至少要有4个字符",
+        "Invitation":"邀请函至少要有10个字符",
+        "Reminder": "提醒至少要有10个字符",
+        "Message":"小纸条至少要有15个字符"
+      },
+      "maxlength":{
+        "Title": "手记标题最多不能超过100个字",
+        "Synopsis":"手记导语最多不能超过400个字符",
+        "Subject": "标题不能超过40个字符",
+        "Invitation":"邀请函不能超过2000个字符",
+        "Reminder": "提醒不能超过800个字符",
+        "Message":"小纸条不能超过2000个字符"
+      }
+    }
+  },
+  "event":{
+    "update": "更新项目内容",
+    "team-add": "<label><%user%></label>作为<%roles%>加入",
+    "team-remove": "<%roles%><label><%user%></label>离开项目",
+    "script": "添加剧本<a href='<%link%>' target='_blank'><%title%></a>",
+    "budget": "增改预算，用于<%type%>为<%sum%>",
+    "report": "<%user%>添加手记<a href='#/reports/<%link%>' target='_blank'><%title%></a>",
+    "start": "新世界的大门"
+  },
+  "month":{
+    "01":"一月",
+    "02":"二月",
+    "03":"三月",
+    "04":"四月",
+    "05":"五月",
+    "06":"六月",
+    "07":"七月",
+    "08":"八月",
+    "09":"九月",
+    "10":"十月",
+    "11":"十一月",
+    "12":"十二月",
+    "short":{
+      "01":"一月",
+      "02":"二月",
+      "03":"三月",
+      "04":"四月",
+      "05":"五月",
+      "06":"六月",
+      "07":"七月",
+      "08":"八月",
+      "09":"九月",
+      "10":"十月",
+      "11":"十一月",
+      "12":"十二月"
+    }
+  },
+  "project": {
+    "TAGS":{
+      "more":"阅读正文"
+    },
+    "CREATION":{
+      "Recruitment":"征寻",
+      "Degree":"<%value%>度",
+      "Right":"顺时针",
+      "Left":"逆时针",
+      "R90":"顺时针转90度",
+      "L90":"逆时针转90度"
+    },
+    "Views":{
+      "Container":"信息",
+      "Team":"团队",
+      "Pitch":"详述",
+      "Recruitment":"征召",
+      "Poster":"海报",
+      "Updates":"时间线",
+      "Comments":"留言",
+      "qna":"问答"
+    },
+    "BUTTONS":{
+      "edit":"编辑项目",
+      "delete":"删除草稿",
+      "submit":"正式立项",
+      "finish":"项目完成",
+      "preview":"预览项目",
+      "return":"返回项目",
+      "send":"发送",
+      "back": "回到<%name%>",
+      "discover": "发现更多项目",
+      "deleteAll":"全部删除",
+      "check": "已阅"
+   },
+    "Answer":"我来回答",
+    "AnswerCnt":"共有<strong clsss='text-primary'><%cnt%></strong>个回答",
+    "MyAnswersCnt": "您 一共提供了<strong clsss='text-primary'><%cnt%></strong>条意见",
+    "ToAnswer":"您的见解",
+    "RelateProject": "此题关于项目",
+    "FollowerCnt":"<%cnt%>收藏者",
+    "RelatedQuestions" : "<strong clsss='text-primary'><%cnt%></strong>个相关问题",
+    "Description": "内容",
+    "Synopsis":"简介",
+    "Genre":"类型",
+    "Target":"目标完成时间",
+    "New":"创建一个新项目",
+    "Preparation":"提交项目 《<strong><%title%></strong>》",
+    "Help":"需要帮助？",
+    "Agreement":"开始前请确保仔细阅读并同意<a class='title' href=''>用户协议</a>",
+    "All":"全部",
+    "Duration":"<%min%> 分钟",
+    "PLACES":{
+      "title":"标题",
+      "trequire":"标题不能超过100个字符",
+      "location":"执行地区",
+      "finish":"目标完成",
+      "synopsis":"项目简介需有至少40，至多256个字符",
+      "author":"添加作者",
+      "duration":"时长  ",
+      "genre": "类型",
+      "lang":"语言",
+      "newLang":"选择语言",
+      "budget":"选择名目",
+      "comment":"请写至少15字，最多5000字的回复。",
+      "invitation": "请写明原因"
+    },
+    "MESSAGES":{
+      "undelable": "如要删除已被回应过的问题，请联系客服",
+      "update": "项目的信息已成功修改。",
+      "description": "请检查项目内容。至少要有200字。",
+      "answer":"您的回答已经成功发送。",
+      "deleteA": "您的回答已经被删除",
+      "confirmA": "您确定要删除这条回答么 ？",
+      "confirmD": "您确定要删除这份手记么 ？",
+      "confirmE": "您确定要从时间线中删除此事件么 ？",
+      "confirmF": "您确定从此不再关注此条问题么 ？",
+      "confirmL": "您确定要将此份手记从您的收藏中移除么 ？",
+      "confirmM": "您确定要将 <%user%> 从项目中移除么 ？",
+      "confirmN": "您确定要求 <%user%> 从项目中 退出/担任 这些职能么 ？",
+      "confirmP": "您确定要删除这单项目么 ?",
+      "confirmS": "您确定要取消对此意想法的支持么 ?",
+      "confirmC": "您确定要删除这条留言么 ？",
+      "confirmO": "您确定要此项目已全部完成么 ？",
+      "confirmQ": "您确定要删除这个问题么 ？",
+      "confirmR": "您确定要取消对<u><%user%></u>的关注么 ？",
+      "confirmU": "您确定要放弃创建新项目么 ？",
+      "question":"您的问题已经成功发送。",
+      "poster":"在提交项目前必须上传一张项目海报",
+      "picture":"上传的图片不能超过2M",
+      "info":"在提交项目前必须填写所有基本信息",
+      "date": "请给您的项目预留至少一周的完成时间。",
+      "preparation": "草稿已成功保存.",
+      "title": "请确定一个不多于100字的标题先！",
+      "changeStep": "您确定要离开本页吗？",
+      "cancelEdit": "您的修改尚未保存，您确定要退出编辑模式吗？",
+      "completeEdit": "您确定要保存本页的修改并返回项目主页吗？",
+      "doubleM": "此成员已然在您的团队中。假使您想继续修改此团队成员的信息, 点击<span class='text-danger'>确认</span>",
+      "confirmJ": "您确定要删除此条征寻通知么？",
+      "confirmT": "您确定要将此成员从您的团队中移除么？",
+      "confirmV": "<p class='text-left'>在按下<span class='text-danger'>确认</span>键前，请注意以下事项： </p> <ul class='text-default text-left font-sm'><li>您将无法任性地修改项目标题，类型，简介或结束日期 </li><li>项目成员都会收到确认信。如果邮箱不正确，或者有成员提出异议，我们或将撤消您的项目</li><li>我们将审查项目。您将在最迟一周后收到我们的回复。</li></ul><p class='text-left'>您确认立项么？</p>",
+      "deleteT": "这是一或数版故事的作者，您不能将其从团队中移除",
+      "deleteY": "您不将自己从团队中移除",
+      "deleteP": "策划者即项目的创建者"
+    },
+    "ERRORS":{
+      "deleted": "此条留言已被移除",
+      "picture": {
+        "size": "上传文件的大小不能超过 ",
+        "partially": "文件未能全部上传",
+        "no": "没有选择文件上传",
+        "missing": "临时文件夹不存在",
+        "disk": "文件未能正常保存入服务器",
+        "extension": "不支持的文件类型"
+      },
+      "require":{
+        "title":"请输入项目标题",
+        "location":"请输入执行地区",
+        "finish":"请输入目标完成时间",
+        "synopsis":"请项目简介",
+        "description":"请项目内容",
+        "motivation":"请输入申请动机",
+        "comment":"请输入留言",
+        "genre":"请选择项目类型",
+        "subject":"问题必须要有一个标题",
+        "qtags": "至少添加一个标签",
+        "rRole":"选择一项您需要的技能",
+        "rQuantity":"填写您需要的人数",
+        "rDescription":"请简要介绍您的需求",
+        "duration":"请注明项目成品的大致播放时长"
+      },
+      "invalid":{
+        "finish":"目标完成时间不正确",
+        "language": "所选语言已在列表中"
+      },
+      "minlength":{
+        "synopsis":"项目简介最少要有20个字符",
+        "description":"项目内容最少要有200个字符",
+        "motivation":"申请动机最少要有{value}个字符",
+        "comment":"留言最少要有15个字符",
+        "subject":"问题的标题至少有{value}个字符",
+        "rDescription":"介绍至少需要15个字符.",
+        "invitation": "需要至少15个字符的理由"
+      },
+      "maxlength":{
+        "title": "项目标题最多不能超过40个字符",
+        "synopsis":"项目简介最多不能超过256个字符",
+        "motivation":"申请动机最多不能超过{value}个字符",
+        "comment":"留言最多不能超过800个字符",
+        "subject":"问题的标题不能超过{value}个字符",
+        "rDescription":"介绍不能超过400个字符",
+        "invitation": "理由不能超过800个字符"
+      }
+    }
+  },
+  "personal":{
+    "title":"用户中心",
+    "slogan":"完善个人信息，以待合作伙伴",
+    "common":"我和<%username%>共同的收藏",
+    "cross":"我和<%username%>共同的",
+    "friends":"朋友",
+    "idols":"关注的",
+    "fans":"关注者",
+    "reports":"<%username%>的手记",
+    "myreports":"我的手记",
+    "reports_cnt":"共<%cnt%>篇",
+    "reports_comment":"有<%cnt%>回复",
+    "sex":{
+      "S":"保密",
+      "F":"女士",
+      "M":"男士"
+    },
+    "question":{
+      "title":"问与答",
+      "ask": "提出的问题",
+      "response": "答过的问题",
+      "follow": "收藏的问题",
+      "personal": "关于用户"
+    },
+    "message":{
+      "info":"您的个人信息已修改",
+      "email":"您的邮箱已修改",
+      "pwd":"您的用户密码已修改",
+      "samepwd":"请设定一个与旧密码不同的密码",
+      "errpwd":"您所输入的旧密码错误",
+      "picture":"最大尺寸: 1M",
+      "active":"请填写本页的所有信息，才能激活您的账户",
+      "confirmS":"您确定要删除这个社交账号吗？"
+    },
+    "SNS" :{
+      "m":"乐音",
+      "v":"视像",
+      "c":"图绘",
+      "t":"讯通",
+      "p":"友圈",
+      "s":"取向"
+    },
+    "PLACES":{
+      "username":"用户名称",
+      "talents":"技能",
+      "location":"所处地区",
+      "occupation":"添加技能",
+      "sex":"性别",
+      "birthday":"生日",
+      "site":"个性域名",
+      "description":"个人简介",
+      "newEmail":"新邮箱",
+      "newEmail2":"再输一遍",
+      "oldpwd":"输入原来的密码",
+      "newpwd":"输入新密码",
+      "newpwd2":"再输一遍新密码",
+      "sns": "输入您的用户名"
+    },
+    "birthday":{
+      "year":"年",
+      "month":"月",
+      "day":"日"
+    },
+    "tabs":{
+      "information":"用户信息",
+      "email":"修改邮箱",
+      "password":"修改密码",
+      "social":"社交账号",
+      "newsletter":"修改订阅"
+    },
+    "buttons":{
+      "common":"相同趣味",
+      "cross":"共同朋友",
+      "project":"合作项目",
+      "message":"发射信息",
+      "invitation":"寄送邀请",
+      "reports":"手    记",
+      "qna":"问    答"
+    },
+    "ERRORS":{
+      "require": {
+          "Occupation":"技能项不许隐藏哦！",
+          "Location":"外星来客也要有地球的暂时住址哦"
+      }
+    }
+  },
+  "qualification":{
+    "works": "请给作品取个名字",
+    "link" : "请输入作品链接（如果有的话）",
+    "talent": "指明您在这件作品中的职务 ",
+    "message": "您的信息已寄出",
+    "experience": "您的作品集",
+    "description":"请简明地介绍这件作品 ",
+    "button":"添加作品",
+    "ERRORS":{
+      "require": {
+        "title": "作品需有标题",
+        "description": "作品需有介绍",
+        "work": "通过作品我们才能了解您"
+      },
+      "minlength":{
+        "title": "标题需干至少 <%min%> 个字符",
+        "description": "介绍需至少 <%min%> 个字符",
+        "url": "链接至少 <%min%> 个字符"
+      },
+      "maxlength":{
+        "title": "标题最多不超过 <%max%> 个字符",
+        "description": "介绍最多不超过 <%max%> 个字符",
+        "url": "链接最多不超过 <%max%> 个字符"
+      },
+      "repeat": "这个链接已经存在",
+      "talent": "请明确您在作品中的职责"
+    }
+  }
+}

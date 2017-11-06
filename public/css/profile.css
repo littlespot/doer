@@ -1,0 +1,197 @@
+.panel-content{
+    min-width: 120px;
+}
+
+.tab-pane{
+    background: #fff;
+    margin-left: 1px;
+    padding: 40px;
+}
+.panel-content img{
+    width: 120px;
+    height: 120px;
+    border: 2px solid #999;
+}
+
+.right-panel>div{
+    display: flex; /* contexte sur le parent */
+    flex-direction: column; /* direction d'affichage verticale */
+    justify-content: space-between; /* alignement vertical */
+    text-align: right;
+}
+
+.right-button-bar>div{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.relation-image{
+    width: 100px;
+}
+
+.relation-image img{
+    width: 100px;
+    height: 100px;
+    border:1px solid #999;
+}
+
+.relation-right{
+    margin-top: 12px;
+}
+.relation-circle{
+    margin-top: 5px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.relation-circle>div{
+    display: inline-block;
+    text-align: center;
+}
+
+.ifollow{
+    position: relative;
+    width: 39px;
+    text-align: center;
+    line-height: 1.8em;
+    font-size: 10px;
+    cursor: pointer;
+    border: 1px solid #999;
+    background: #fff;
+}
+
+.ifollow:after {
+    position: absolute;
+    top:-1px;
+    left:36px;
+    width: 10px;
+    line-height: 0.7em;
+    z-index: 10;
+    content: "\00a0";
+    cursor: pointer;
+    background: #fff;
+    border-top: 1px solid #999;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+}
+
+
+.followme{
+    margin-left: 10px;
+    position: relative;
+    width: 39px;
+    text-align: center;
+    line-height: 1.8em;
+    font-size: 10px;
+    cursor: hand;
+    background: #fff;
+    color: #293a4f;
+    border: 1px solid #293a4f;
+    -webkit-transition: 0.2s;
+}
+
+.followme:before{
+    position: absolute;
+    top:1.0em;
+    left:-10px;
+    width: 10px;
+    line-height: 0.7em;
+    z-index: 10;
+    content: "\00a0";
+    background: #fff;
+    border-top:1px solid #293a4f;
+    border-bottom: 1px solid #293a4f;
+    border-left: 1px solid #293a4f;
+    border-right: 1px solid #fff;
+    -webkit-transition: 0.2s;
+}
+
+.mySelf .ifollow{
+    color: #D77459;
+    background: white;
+    cursor: not-allowed;
+    border: 1px solid #D77459;
+}
+
+.mySelf .ifollow:after{
+    background: white;
+    cursor: not-allowed;
+    border-top: 1px solid #D77459;
+    border-right: 1px solid #D77459;
+    border-bottom: 1px solid #D77459;
+}
+
+.mySelf .followme{
+    color: #D77459;
+    border: 1px solid #D77459;
+    background: #fff;
+    cursor: not-allowed;
+}
+
+.mySelf .followme:before{
+    border-top:1px solid #D77459;
+    border-bottom: 1px solid #D77459;
+    border-left: 1px solid #D77459;
+}
+
+.my .ifollow,
+.myFan .ifollow{
+    background: white;
+}
+
+.myFan .ifollow:after,
+.my .ifollow:after{
+    background: white;
+}
+
+.myFan .ifollow:hover,
+.my .ifollow:hover{
+    background: #999;
+    color:#fff;
+}
+
+.myFan .ifollow:hover:after,
+.my .ifollow:hover:after{
+    background: #999;
+    color:#fff;
+}
+
+.myIdol .ifollow,
+.myFriend .ifollow{
+    background: #999;
+    color: #fff;
+}
+
+.myIdol .ifollow:after,
+.myFriend .ifollow:after{
+    background: #999;
+    color: #fff;
+ }
+
+.myIdol .ifollow:hover,
+.myFriend .ifollow:hover{
+    background: #fff;
+    color:#999;
+}
+
+.myIdol .ifollow:hover:after,
+.myFriend .ifollow:hover:after{
+    background: #fff;
+    color:#999;
+}
+
+.myFan .followme,
+.myFriend .followme{
+    color: white;
+    background: #293a4f;
+}
+
+.myFan .followme:before,
+.myFriend .followme:before{
+    background: #293a4f;
+    border-right: 1px solid #293a4f;
+}
+

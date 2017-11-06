@@ -1,0 +1,10 @@
+<?php
+
+namespace Zoomov;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class Administrator extends Authenticatable
+{
+    //
+}

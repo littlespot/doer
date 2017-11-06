@@ -1,0 +1,106 @@
+.hidden-bar{
+    padding: 0 10px 0 5px;
+    margin-top: -6px;
+}
+.hidden-bar>.btn{
+    visibility: hidden;
+}
+
+.comment-container {
+    position: relative;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.comment-container:hover > div >.hidden-bar>.btn,
+.comment-container:hover >.hidden-bar>.btn{
+    visibility: visible;
+}
+.comment-container > .right-btn{
+    position: absolute;
+    top:0;
+    right: -50px;
+    width: 40px;
+    height: 40px;
+    color: #ccc;
+}
+
+.comment-container > .right-btn:hover,
+.comment-container > .right-btn:focus,
+.comment-container > .right-btn.hover,
+.comment-container > .right-btn.focus{
+    color: #D77459;
+}
+
+.comment-container > .right-btn.disabled:hover,
+.comment-container > .right-btn.disabled:focus,
+.comment-container > .right-btn.disabled.hover,
+.comment-container > .right-btn.disabled.focus{
+    color: #eee;
+}
+.counter {
+    font-size: 9px;
+    margin-top: -8px;
+}
+
+.message-container{
+    position: relative;
+    padding: 12px;
+}
+
+.message-container.unchecked{
+    background: #eee;
+}
+
+.message-container.mine img{
+   opacity: 0.7;
+}
+
+.letter{
+    background: #f2f1e5;
+    color: #454640;
+    padding: 12px 20px;
+}
+
+.button-content{
+    position: absolute;
+    top:15px;
+    right: 0;
+}
+
+.reply-buttons{
+    visibility: hidden;
+    text-align: right;
+}
+
+.tab-content{
+    border-right: 1px solid #eee;
+    border-left: 1px solid #eee;
+    padding: 12px;
+}
+.calendar {
+    margin-top: 6px;
+    width: 70px !important;
+    text-align: center;
+}
+
+.calendar .calendar-header{
+    background: #947D77;
+    color: #FBEED2;
+    line-height: 34px;
+    font-size: 12px;
+}
+
+.calendar .calendar-body{
+    height: 40px;
+    color: #4B4D4E;
+    font-size: 20px;
+    border: 1px #947D77 solid;
+    border-top:none;
+}
+
+.calendar .calendar-footer{
+    font-size: 12px;
+}
