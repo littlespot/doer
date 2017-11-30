@@ -2,6 +2,7 @@
 
 return [
     "NOTE" =>"All fields marked with an asterisk (*) have to be filled in to submit the project.",
+    "PAGE" =>"This page has to be filled in to submit the project.",
     "TAGS"=>[
         "team"=>"HAS <span class='text-title'><strong>:cnt</strong></span> TALENTS",
         "recruitment"=>"WAITING <span class='text-danger'><strong>:cnt</strong></span> TO GO",
@@ -112,7 +113,7 @@ return [
         "location"=>"Main location to run this project",
         "finish"=>"When you plan to finish this project",
         "synopsis"=>"Write a synopsis (40 to 256 characters) about your project",
-        "description"=>"Present your project in details (> 200 characters): schedules, technologies, etc",
+        "description"=>"Present your project in details (> 200 characters): team, schedules, technologies, etc",
         "author"=>"Add author",
         "duration"=>"How many minutes the output lasts",
         "genre"=> "Choose a genre of your project",
@@ -126,8 +127,8 @@ return [
         "script_description"=>"Introduce this version of script in short words (4 to 400 characters)",
         "script_author"=>"Author(s)",
         "script_date"=>"Publication date",
-        "author_email"=>"Author's valid email address",
-        "author_name"=> "Author's real name or pseudonym.",
+        "author_email"=>"Compulsive. Author's valid email address",
+        "author_name"=> "Compulsive. Author's real name or pseudonym.",
         "author_site"=> "Optional. Author's blog, personal web, sns page, etc",
         "team_occupation" => "Add occupation for this team member",
         "team" => "Input username of your team member",
@@ -178,15 +179,18 @@ return [
             "motivation"=>"Oh, you must some motivation to join the team",
             "question_subject"=>"Subject is compulsive for a question.",
             "question_content"=>"Content is compulsive for a question.",
+            "question_tag"=>"Tag is compulsive for a question",
             "report_tag"=>"Tag is compulsive for a report",
             "report_title"=>"Title is compulsive for a report",
             "report_synopsis"=>"Synopsis is compulsive for a report",
-            "report_editor"=>"Content is compulsive for a report"
+            "report_editor"=>"Content is compulsive for a report",
+            "invitation" => "Content is compulsive for an invitation.",
         ],
         "invalid"=>[
             "finish"=>"Invalid date",
             "language"=>"This language is already in list.",
-            "quantity"=>"Please input a positive integer"
+            "quantity"=>"Please input a positive integer",
+            "question_content"=>"A text (15-4000 characters) is compulsive for a question"
         ],
         "unique"=>[
             "email"=>"User with the same email has already exists!"
@@ -203,7 +207,8 @@ return [
             "question_content"=>"Content must be at least :cnt characters.",
             "report_title"=>"Report title must be at least :cnt characters",
             "report_synopsis"=>"Report synopsis must be at least :cnt characters",
-            "report_editor"=>"Report content must be at least :cnt characters"
+            "report_editor"=>"Report content must be at least :cnt characters",
+            "invitation" => "Invitation must be at least :cnt characters.",
         ],
         "maxlength"=>[
             "title"=>"Title may not be greater than 40 characters.",
@@ -221,7 +226,8 @@ return [
             "question_content"=>"Content may not be greater than :cnt characters.",
             "report_title"=>"Report title may not be greater than :cnt characters",
             "report_synopsis"=>"Report synopsis may not be greater than :cnt characters",
-            "report_editor"=>"Report content may not be greater than :cnt characters"
+            "report_editor"=>"Report content may not be greater than :cnt characters",
+            "invitation" => "Invitation must may not be greater than :cnt characters.",
         ]
     ]
 ];

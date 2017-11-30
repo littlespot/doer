@@ -90,7 +90,7 @@
                                 <tbody>
                                 @foreach($project->scripts as $script)
                                     <tr>
-                                        <td width="200px"><a href="{{$script->link}}">{{$script->description}}</a></td>
+                                        <td width="200px"><a href="{{url('http://'.$script->link)}}" title="{{$script->description}}" target="_blank">{{$script->title}}</a></td>
                                         <td>
                                             @foreach($script->authors as $key=>$author)
                                                 @if(!is_null($author->user_id))

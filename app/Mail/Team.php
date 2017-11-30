@@ -10,18 +10,19 @@ class Team extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $link, $username, $title, $occupations;
+    public $link, $username, $title, $url, $occupations;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($link, $username, $title, $occupations)
+    public function __construct($link, $username, $project, $occupations)
     {
-        $this->link;
-        $this->username;
-        $this->title;
-        $this->occupations;
+        $this->link = $link;
+        $this->url = config('app.url').'/projects/'.$project->id;
+        $this->username = $username;
+        $this->title = $project->title;
+        $this->occupations = $occupations;
     }
 
     /**
@@ -31,7 +32,7 @@ class Team extends Mailable
      */
     public function build()
     {
-        return $this->subject(trans('messages.team', ['name' => Auth::user()->username, 'title'=>$this->title]))
+        return $this->subject(trans('messages.team', ['user' => Auth::user()->username, 'title'=>$this->title]))
             ->markdown('emails.team');
     }
 }

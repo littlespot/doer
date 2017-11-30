@@ -59,7 +59,7 @@ class UserController extends Controller
             return $author;
         }
         else{
-            return Response('Author with the same email has already exists!', 502);
+            return Response(trans('project.ERRORS.unique.author'), 502);
         }
     }
 
@@ -102,7 +102,7 @@ class UserController extends Controller
 
     public function projects()
     {
-        return Project::where('user_id', Auth::id())->where('active', 1)->select('id', 'title')->get();
+        return Project::where('user_id', Auth::id())->where('active',1)->select('id', 'title')->get();
     }
 
     public function sendMail($id, $content, $title)

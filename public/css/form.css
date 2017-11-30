@@ -22,12 +22,20 @@ label:after {
     display: inline-block;
     width: 100%;
 }
-
-.tab-menu-bar{
-    display: flex;
-    justify-content: space-around;
+.nav-top-menu{
+    border-top: 1px #ccc solid;border-left: 1px #ccc solid;
 }
 
-.tab-menu-item{
-    width: 100%;
+.nav-top-menu li{
+    border-top:0;
+    border-right: 1px #ccc solid;
+}
+
+.nav-top-menu li.active{
+    border: 0;
+}
+
+.nav-top-menu li.active a{
+    background: #293a4f;
+    color: #fff;
 }

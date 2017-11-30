@@ -32,6 +32,23 @@ return ["SLOGAN"=>"WHERE DREAMS COME TRUE",
     "searching" => "Searching...",
     "none"=>"No results found"
   ],
+    "LABELS"=>[
+        "relations" => "Relations",
+        "reports" => "Reports",
+        "questions" => "Q & A",
+        "comments" => "Commentaires",
+        "information" => "Information",
+        "sns" => "SNS",
+        "preparations" => "Pre-Project",
+        "invite" => "Invite",
+        "me" => "Je",
+        'zh' => "Chinois",
+        'en' => "Anglais",
+        'yes' => 'Oui',
+        'no' => 'Non',
+        'with' => 'Avec',
+        'without' => 'Sans'
+    ],
   "HOME"=>[
     "header"=>"HI! <a class='text-important' href='/profile/:userid' >:username</a><br/>Welcome to Zoomov<br/>Fields of wonder",
     "count"=>"You have ",

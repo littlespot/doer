@@ -5,12 +5,12 @@ appZooMov.controller("preparationCtrl", function($rootScope, $scope, $timeout, $
     $scope.init = function (project, users) {
         $scope.project =  angular.fromJson(project);
         $scope.users = angular.fromJson(users);
-        $http.get('/api/teams/' + $scope.project.id)
+       /* $http.get('/api/teams/' + $scope.project.id)
             .success(function (team) {
                 $scope.team = team.data;
                 $scope.pagination = $rootScope.setPage(team);
                 $rootScope.loaded();
-            })
+            })*/
     }
 
     $scope.loadTeam = function (page) {

@@ -14,7 +14,7 @@ class VideoController extends Controller
     {
         $languages = Language::select('id','name_'.Auth::user()->locale.' as name')->get();
 
-        $genres = Genre::select('id', DB::raw('name_'.Auth::user()->locale.' as name'), 'ordre')->orderBy('ordre')->get();
+        $genres = Genre::where('film', '<', 2)->select('id', DB::raw('name_'.Auth::user()->locale.' as name'), 'sequence as order')->orderBy('sequence')->get();
 
         return view('videos', ["languages"=>$languages, "genres"=>$genres]);
     }

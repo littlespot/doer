@@ -14,14 +14,14 @@
                 <span>{{ $errors->first('content') }}</span>
             </div>
         @else
-            <div class="error" role="alert" ng-class="{'visible':questionForm.content.$touched}">
+            <div class="error" role="alert" ng-class="{'visible':descriptionForm.content.$touched}">
                 <span ng-show="error.required">{{trans('project.ERRORS.require.question_content ')}}</span>
                 <span ng-show="error.maxlength">{{trans('project.ERRORS.maxlength.question_content', ['cnt'=>100])}}</span>
                 <span ng-show="error.minlength">{{trans('project.ERRORS.minlength.question_content', ['cnt'=>4])}}</span>
             </div>
         @endif
         <div class="flex-rows">
-            <div class="small text-danger">{{trans("project.NOTE")}}</div>
+            <div class="small text-danger">{{trans("project.PAGE")}}</div>
             <div>
                 <a class="btn btn-default" href="/admin/preparations/{{$project->id}}?step=0">
                     <span class="fa fa-arrow-left"></span>

@@ -86,7 +86,9 @@ class AccountController extends Controller
     }
 
     public function detail(){
-        $countries = Country::select('id', 'sortname', 'name_' . Auth::user()->locale . ' as name')->get();
+        $countries = Country::select('id', 'sortname', 'name_' . Auth::user()->locale . ' as name')
+            ->orderByRaw('convert(name_' . Auth::user()->locale .' using gbk) ASC')
+            ->get();
         $occupations = Occupation::where('name', '<>', 'Planner')
             ->leftJoin(DB::raw("(select 1 as old, occupation_id from user_occupations where user_id = '".Auth::id()."') as users"), function ($join){
                 $join->on('users.occupation_id', '=', 'occupations.id');

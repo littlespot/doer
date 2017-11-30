@@ -2,11 +2,10 @@
 
 namespace Zoomov\Http\Controllers;
 
-use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
-use Zoomov\Changement;
+use Zoomov\Project;
 use Zoomov\Event;
 use Zoomov\Occupation;
 use Zoomov\ProjectTeamOccupation;
@@ -27,9 +26,9 @@ class TeamController extends EventRelatedController
 
     public function show($id)
     {
-        $projet = $this->getProject($id);
+        $project = Project::select('id', 'user_id', 'title', 'active')->find($id);
 
-        if (is_null($projet)) {
+        if ((is_null($project->active) || $project->active ==0) && $project->user_id != Auth::id()) {
             return Response("NOT AUTHORIZED", 501);
         }
 

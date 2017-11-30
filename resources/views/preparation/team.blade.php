@@ -1,4 +1,4 @@
-@extends('preparation.top')
+ @extends('preparation.top')
 
 @section('tabcontent')
     <div class="content content-margin" ng-controller="preparationCtrl" ng-init="init('{{$project}}','{{$users}}')">

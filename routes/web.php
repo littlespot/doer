@@ -10,6 +10,29 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::group(['prefix' => 'film'], function() {
+    Route::get('/', function()
+    {
+        return View::make('film.card');
+    });
+    Route::get('/ti', 'FilmController@title');
+    Route::get('/du', 'FilmController@duration');
+    Route::get('/la', 'FilmController@language');
+    Route::get('/sh', 'FilmController@shooting');
+    Route::get('/sc', 'FilmController@screen');
+    Route::get('/ge', 'FilmController@genre');
+    Route::get('/sy', 'FilmController@synopsis');
+    Route::get('/di', 'FilmController@director');
+    Route::get('/pr', 'FilmController@producer');
+    Route::get('/ma', 'FilmController@seller');
+    Route::get('/cr', 'FilmController@credits');
+    Route::get('/ri', 'FilmController@rights');
+    Route::get('/at', 'FilmController@media');
+    Route::get('/up', 'FilmController@upload');
+
+    Route::post('/preview', 'FilmController@preview');
+});
+
 Route::get('contracts', function()
 {
     return View::make('condition');
@@ -239,7 +262,9 @@ Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
         array('only' => array('update','store', 'destroy')));
 
     Route::resource('preparations', 'PreparationController');
+
     Route::post('send', 'PreparationController@send');
+
     Route::post('preparation', 'PreparationController@description');
     Route::get('preparation/{id}', 'PreparationController@preview');
 

@@ -150,8 +150,8 @@
   "budget":
   {
     "total": "Total ¥<%sum%>.00",
-    "success":"In place: ¥<%sum%>.00",
-    "inprogress":"Waiting: ¥<%sum%>.00",
+    "success":"In place: ¥<%sum%>",
+    "inprogress":"Waiting: ¥<%sum%>",
     "MESSAGES":{
       "confirmB": "Are you sure to delete this budget ?",
       "confirmS": "Are you sure to delete this fund ?"
@@ -514,6 +514,8 @@
       "description": "Project must have a description no less than 200 letters.",
       "answer":"Your idea has been sent successfully.",
       "deleteA": "Your answer has been deleted successfully",
+      "notteam": "<p>At this step, you can only use stories written by team members.</p><p>Go to <a class='text-important' href='/profile/<%user_id%>' target='_blank'><%username%></a>'s profile page to invite first.</p>",
+      "notfriends": "<p>At this step, you can only add friends in your team.</p><p>Go to <a class='text-important' href='/profile/<%user_id%>' target='_blank'><%user_name%></a>'s profile page to make friends,</p>",
       "doubleM": "This member is already in your team. If you want to edit that member instead, click CONFIRM",
       "confirmA": "Are you sure to delete this answer ?",
       "confirmC": "Are you sure to delete this comment ?",

@@ -216,7 +216,7 @@
                         <div class="message-container row" ng-class="{'unchecked': !m.checked}">
                             <div class="col-md-1 col-sm-2 col-xs-3">
                                 <span ng-if="!m.replied" class="btn-sm btn-warning">
-                                     {{trans("notification.LABELS.wait")}}
+                                     {{trans("notification.LABELS.unreplied")}}
                                 </span>
                                 <span ng-if="m.replied" class="btn-sm btn-primary">
                                      {{trans("notification.LABELS.replied")}}

@@ -1,13 +1,14 @@
 /**
  * Created by Jieyun on 2016/12/1.
  */
-appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal) {
+appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $log) {
         return {
         restrict:'A',
         link: function (scope) {
             scope.addBudgetRow = function () {
                 scope.budgetNew = {id: 0, type: null, quantity: 100, project_id:scope.project.id, project:scope.submitted};
             }
+            scope.budgetRegex = /^[1-9][0-9]*$/;
 
             scope.switchEditBudget = function (budget, invalid) {
                 scope.budgetNew = null;
@@ -21,7 +22,9 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal) {
                     scope.saveEditBudget(budget.id);
             }
 
-            scope.saveEditBudget = function (id) {
+            scope.saveEditBudget = function (id, invalid) {
+                if(invalid)
+                    return false;
                 scope.budgets.loading = true;
                 scope.budgetEdit._token= $("body input[name='csrfmiddlewaretoken']").val();
                     $http.put('/admin/budgets/' + id, scope.budgetEdit)
@@ -72,7 +75,8 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal) {
             }
 
             scope.saveBudget = function (invalid) {
-
+                if(invalid)
+                    return false;
                 scope.budgets.loading = true;
                 scope.budgetNew._token= $("body input[name='csrfmiddlewaretoken']").val();
                 $http.post('/admin/budgets', scope.budgetNew)
@@ -110,7 +114,10 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal) {
                     scope.saveEditSponsor(sponsor.id);
             }
 
-            scope.saveEditSponsor = function (id) {
+            scope.saveEditSponsor = function (id, invalid) {
+                if(invalid)
+                    return false;
+
                 if(scope.sponsorInEdit.sponsor.title){
                     scope.sponsorInEdit.user_id = scope.sponsorInEdit.sponsor.originalObject.id;
                     scope.sponsorInEdit.username = scope.sponsorInEdit.sponsor.title;
@@ -167,7 +174,10 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal) {
                 });
             }
 
-            scope.saveSponsor = function (){
+            scope.saveSponsor = function (invalid){
+                if(invalid)
+                    return false;
+
                 if(scope.sponsorNew.sponsor.title){
                     scope.sponsorNew.user_id = scope.sponsorNew.sponsor.originalObject.id;
                     scope.sponsorNew.username = scope.sponsorNew.sponsor.title;

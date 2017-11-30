@@ -14,10 +14,13 @@ return [
         "catalogue"=>"CATALOGUE",
         "videos"=>"VIDEOS"
     ],
+    'ALERTS'=>[
+        'compulsive' => 'Compulsory fields are marked with an (<span class="text-important">*</span>).'
+    ],
     "MENU"=>[
         "discover"=>"DISCOVER",
         "creation"=>"CREATE",
-        "videos"=>"VIDEOS",
+        "videos"=>"VIDEO",
         "person"=>"Account management",
         "profile"=>"Personal page",
         "preparations"=>"Drafts",
@@ -47,7 +50,15 @@ return [
         "sns" => "SNS",
         "preparations" => "Pre-Project",
         "invite" => "Invite",
-        "me" => "I"
+        "me" => "I",
+        'zh' => "Chinese",
+        'en' => "English",
+        'yes' => 'Yes',
+        'no' => 'No',
+        'with' => 'With',
+        'without' => 'Without',
+        'year' => 'Year',
+        'month' => 'Month',
     ],
     "HOME"=>[
         "traveler" => "<b>PREVIEW</b> FOR Travelers!<br>You must register to access full functions of ZOOMOV",
@@ -70,6 +81,25 @@ return [
         "unfollow"=>"Un-follow this project",
         "love"=>"Love this project",
         "unlove"=>"Break up"
+    ],
+    "MONTH"=>[
+        '1'=>'January',
+        '2'=>'February',
+        '3'=>'Mars',
+        '4'=>'April',
+        '5'=>'May',
+        '6'=>'June',
+        '7'=>'July',
+        '8'=>'August',
+        '9'=>'September',
+        '10'=>'October',
+        '11'=>'November',
+        '12'=>'December',
+    ],
+    "TIME"=>[
+        'h'=>'hour',
+        'm'=>'min',
+        's'=>'sec'
     ],
   "PANEL"=>[
     "header"=>"Look for something interesting?",

@@ -1,30 +1,18 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Script {{$oldlink}} has been added to project {{$title}}</title>
-    </head>
-    <body style="background:#999;font-family:helvetica;line-height:1.8em;color:#293a4f;font-size:12px;height:100%">
-        <div style="width:480px; display: table;vertical-align: middle;margin:auto;">
-            <div style="text-align: left;padding:20px 40px;background:#fff;margin:50px auto;">
-                <h3>Hello, {{$guest}}</h3>
-                <P>{{$user}} as the administrator of project {{$title}} has removed script {{$oldlink}}, whose author is you.</p>
+@component('mail::message')
+    <P>项目 《{{$title}}》 的管理者 {{$user}} 将您创作的故事文本 {{$oldlink}} 从项目中删除。</p>
 
-                <p>If you have any objections or questions, please contact us as soon as possible.</p>
+    <p>若您对此一声明有疑问或意见，请尽快联系我们。</p>
 
-                <p>If you are not our member yet, keep the following link carefully to follow the progress of project.</p>
+    <p>如果您还不是ZOOMOV用户，请保存以下网址以便追踪项目的更新与进度。</p>
 
-                <p style="margin:18px auto">
-                    <a href="www.zoomov.com/guest/{{$link}}" target="_blank" style="background: rgba(42, 59, 81, 1);color:rgb(230,230,230);font-size: 14px;cursor: pointer;padding:12px 18px">
-                        {{$title}}
-                    </a>
-                </p>
+    @component('mail::button', ['url' => config('app.url').'/guest/'.urldecode($link)])
+        {{$title}}}
+    @endcomponent
 
-                <p>If you are one of us, simply login in and you can see more about this project.</p>
+    <p>如果您已经是ZOOMOV用户，只需登录，在您的项目列表中点击，便可一览项目全貌，并进一步参与项目。</p>
 
-                <p>Thanks for your attention. Have fun!</p>
+    {!! trans('email.team_footer') !!}
 
-                <p>ZOOMOVers</p>
-            </div>
-        </div>
-    </body>
-</html>
+    {{trans('email.salutation')}},<br>
+    {{ config('app.name') }}
+@endcomponent

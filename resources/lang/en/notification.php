@@ -26,8 +26,7 @@ return [
         "applications" => "APPLICATIONS",
         "reminders" => "REMINDERS",
         "remind" => "REMIND MEMBERS OF PROJECT ",
-        "projects" => "YOU HAVE <strong class='text-important'><%cnt > 0 ? cnt : 'NONE'%></strong> PROJECTS TO RECEIVE <b>APPLICATIONS</b>, AND <strong class='text-important'><%total > 0 ? total : 'NONE'%></strong> TO GET/SET <b>REMINDERS</b>",
-        "owns" => "YOU HAVE <strong class='text-important'><%cnt > 0 ? cnt : 'NONE'%></strong> PROJECTS TO RECEIVE/SEND <b>INVITATIONS</b>",
+        "unreplied" => "Un-replied"
     ],
     'title' =>  [
         'add_script'=>'A new script declared you as writer',

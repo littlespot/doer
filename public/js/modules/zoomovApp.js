@@ -167,7 +167,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
             }
         }
 
-        return total;
+        return total.toFixed(2);
     }
 
     $rootScope.differenceInDays = function(firstdate, seconddate) {

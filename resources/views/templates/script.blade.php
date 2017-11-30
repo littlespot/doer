@@ -3,7 +3,20 @@
         filter: alpha(opacity=50);
         opacity: .5;
     }
+
+    .angucomplete-holder{
+        width:100%;
+        min-width: 250px;
+    }
 </style>
+<script type="text/ng-template" id="script_alert.html">
+    <div class="modal-body" id="modal-body">
+        <h3 ng-bind-html="alert_message"></h3>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" type="button" ng-click="$dismiss()">OK</button>
+    </div>
+</script>
 <script type="text/ng-template" id="delete.html">
     <div class="modal-body">
         <h4 translate="script.confirm" translate-values="{title:title}"></h4>
@@ -105,7 +118,7 @@
         <tbody>
             <tr ng-repeat="s in scripts" ng-class="{'editing':scriptInEdit.id == s.id}">
                 <td>
-                    <a ng-href="<%s.link%>" ng-bind="s.title"></a>
+                    <a ng-href="<%s.link%>" ng-bind="s.title" target="_blank"></a>
                 </td>
                 <td>
                     <span ng-repeat="a in s.authors | orderBy:name">
@@ -172,30 +185,47 @@
                 </span>
             </div>
         </div>
+        <div>
+            <label>{{trans("project.LABELS.script_author")}}:</label>
+          <span ng-repeat="a in scriptInEdit.authors | orderBy:name">
+                <span ng-class="{'btn btn-link': a.email && a.email.length > 0}" ng-click="editAuthor(a)" ng-bind="a.name"></span>
+                <span class="btn text-danger fa fa-times"
+                      ng-click="removeAuthor(a.id)"></span>
+            </span>
+        </div>
         <div class="row">
-            <div class="col-lg-10 col-md-8 col-sm-6 col-xs-12">
-                 <span ng-repeat="a in scriptInEdit.authors | orderBy:name">
-                    <span ng-class="{'btn btn-link': a.email && a.email.length > 0}" ng-click="editAuthor(a)" ng-bind="a.name"></span>
-                    <span class="btn text-danger fa fa-times"
-                          ng-click="removeAuthor(a.id)"></span>
-                </span>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 flex-left">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 flex-left">
                 <angucomplete-alt id="author" input-name="author"
-                                  placeholder="{{trans("project.PLACES.script_author")}}"
+                                  placeholder="{{trans("project.PLACES.script_")}}"
                                   pause="100"
-                                  selected-object="authorSelected"
-                                  local-data="authors"
+                                  selected-object="userSelected"
+                                  local-data="{{$users}}"
                                   search-fields="username"
                                   title-field="username"
                                   description-field="location"
                                   image-uri="/context/avatars"
                                   image-field="id"
                                   minlength="1"
-                                  override-suggestions="true"
+                                  override-suggestions="false"
                                   clear-selected = "true"
                                   input-class="form-text"
                                   match-class="highlight"  text-no-results="{{trans('layout.MENU.none')}}"
+                                  text-searching="{{trans('layout.MENU.searching')}}"/>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 flex-left">
+                <angucomplete-alt id="author" input-name="author"
+                                  placeholder="{{trans("project.PLACES.script_author")}}"
+                                  pause="100"
+                                  selected-object="authorSelected"
+                                  local-data="{{$authors}}"
+                                  search-fields="username"
+                                  title-field="username"
+                                  description-field="location"
+                                  minlength="1"
+                                  override-suggestions="true"
+                                  clear-selected = "true"
+                                  input-class="form-text"
+                                  match-class="highlight"  text-no-results="{{trans('layout.MENU.add')}}"
                                   text-searching="{{trans('layout.MENU.searching')}}"/>
             </div>
         </div>

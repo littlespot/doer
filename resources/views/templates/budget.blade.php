@@ -63,9 +63,9 @@
                 <td class="text-right">
                     <span ng-if="budgetEdit.id != b.id" ng-bind="b.quantity"></span>
                     <div ng-if="budgetEdit.id == b.id">
-                        <input ng-model="budgetEdit.quantity" name="quantity" type="number" class="form-text" required />
+                        <input ng-model="budgetEdit.quantity" name="quantity" type="number" class="form-text" ng-pattern="budgetRegex" required />
                         <div role="alert" class="error" ng-class="{'visible':budgetForm.quantity.$touched || budgetForm.$submitted}">
-                            <span ng-show="budgetForm.quantity.$error.required || b.quantity < 1">
+                            <span ng-show="budgetForm.quantity.$error.required || budgetForm.quantity.$error.pattern">
                                {{trans('project.ERRORS.invalid.quantity')}}
                             </span>
                         </div>
@@ -112,9 +112,9 @@
                     </div>
                 </td>
                 <td class="text-right">
-                    <input ng-model="budgetNew.quantity" name="quantity" type="number" class="form-text" required />
+                    <input ng-model="budgetNew.quantity" name="quantity" type="number" class="form-text"  ng-pattern="budgetRegex"  required />
                     <div role="alert" class="error" ng-class="{'visible': errors.quantity || budgetForm.quantity.$touched || budgetForm.$submitted}">
-                        <span ng-show="budgetForm.quantity.$error.required || b.quantity < 1">
+                        <span ng-show="budgetForm.quantity.$error.required || budgetForm.quantity.$error.pattern">
                             {{trans('project.ERRORS.require.quantity')}}
                         </span>
                     </div>
@@ -207,9 +207,9 @@
                 <td class="text-right">
                     <span ng-if="sponsorInEdit.id != s.id" ng-bind="s.quantity"></span>
                     <div ng-if="sponsorInEdit.id == s.id">
-                        <input ng-model="sponsorInEdit.quantity" name="quantity" type="number" class="form-text" required />
+                        <input ng-model="sponsorInEdit.quantity" name="quantity" type="number"  ng-pattern="budgetRegex"  class="form-text" required />
                         <div role="alert" class="error" ng-class="{'visible':sponsorForm.quantity.$touched || sponsorForm.$submitted}">
-                            <span ng-show="sponsorForm.quantity.$error.required || b.quantity < 1">
+                            <span ng-show="sponsorForm.quantity.$error.required || sponsorForm.quantity.$error.pattern">
                                 {{trans('project.ERRORS.require.quantity')}}
                             </span>
                         </div>
@@ -270,9 +270,9 @@
                     </div>
                 </td>
                 <td class="text-right">
-                    <input ng-model="sponsorNew.quantity" name="new_quantity" type="number" class="form-text" required />
+                    <input ng-model="sponsorNew.quantity" name="new_quantity" type="number"  ng-pattern="budgetRegex" class="form-text" required />
                     <div role="alert" class="error" ng-class="{'visible':sponsorForm.new_quantity.$touched || sponsorForm.$submitted}">
-                        <span ng-show="sponsorForm.new_quantity.$error.required || b.quantity < 1">
+                        <span ng-show="sponsorForm.new_quantity.$error.required || sponsorForm.new_quantity.$error.pattern">
                             {{trans('project.ERRORS.require.quantity')}}
                         </span>
                     </div>
@@ -297,7 +297,7 @@
                     </div>
                 </td>
                 <td class="text-center">
-                    <span class="btn fa fa-check" ng-disabled="sponsorForm.$invalid" ng-click="saveSponsor();"></span>
+                    <span class="btn fa fa-check" ng-disabled="sponsorForm.$invalid" ng-click="saveSponsor(sponsorForm.$invalid);"></span>
                 </td>
                 <td class="text-center">
                     <span span class="btn fa fa-undo" ng-click="cancelSponsor()"></span>

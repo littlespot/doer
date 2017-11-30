@@ -169,9 +169,9 @@
   },
   "budget":
   {
-    "total": "总计: ¥<%sum%>.00",
-    "success":"到位: ¥<%sum%>.00",
-    "inprogress":"等待: ¥<%sum%>.00",
+    "total": "总计: ¥<%sum%>",
+    "success":"到位: ¥<%sum%>",
+    "inprogress":"等待: ¥<%sum%>",
     "MESSAGES":{
       "confirmB": "您确定要删除此项预算么 ?",
       "confirmS": "您确定要删除此笔资金么 ?"
@@ -416,6 +416,13 @@
   },
   "project": {
     "TAGS":{
+      "update":"更新于 <%date | limitTo :16%>",
+      "finish":"目标完成 ：<span class='text-primary'><strong><%date | limitTo :10%></strong></span>",
+      "team":"已有 <span class='text-title'><strong><%cnt%></strong></span> 成员",
+      "recruitment":"等待 <span class='text-danger font-sm'><strong><%cnt%></strong></span> 人加入",
+      "participate":"来加入我们吧！",
+      "rest":"<%days%> 天",
+      "recruited":"全员集合完毕！",
       "more":"阅读正文"
     },
     "CREATION":{
@@ -487,6 +494,8 @@
       "description": "请检查项目内容。至少要有200字。",
       "answer":"您的回答已经成功发送。",
       "deleteA": "您的回答已经被删除",
+      "notteam": "<p>现阶段您只能使用团队成员创作的故事。</p><p>前往<a class='text-important' href='/profile/<%user_id%>' target='_blank'><%username%></a> 的个人主页邀请加入团队先。</p>",
+      "notfriends": "<p>现阶段您只能将好友添加入团队。</p><p>前往<a class='text-important' href='/profile/<%user_id%>' target='_blank'><%username%></a> 的个人主页互相关注先。</p>",
       "confirmA": "您确定要删除这条回答么 ？",
       "confirmD": "您确定要删除这份手记么 ？",
       "confirmE": "您确定要从时间线中删除此事件么 ？",

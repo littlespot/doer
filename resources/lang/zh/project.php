@@ -2,6 +2,7 @@
 
 return [
     "NOTE" =>"填写所有星号(*)标记的页面中的所有栏目，才能提交项目",
+    "PAGE" =>"填写本页面的内容，才能提交项目",
     "TAGS"=>[
         "team"=>"已有 <span class='text-title'><strong>:cnt</strong></span> 人参与",
         "recruitment"=>"等待 <span class='text-danger'><strong>:cnt</strong></span> 人加入",
@@ -38,12 +39,12 @@ return [
     "ALERTS"=>[
         "online"=>"若无特殊情况，项目将在一周内正式上线",
         "funds"=>"筹资表仅项目管理者可见。项目页上不列所筹集的款项细则，只显示筹集到的总金额",
-        "team"=>"想将ZooMov用户加入团队，您得先向对方发送邀请，一旦对方接受邀请将自动成为您的伙伴。",
-        "author" => "想使用ZooMov用户的脚本，您得先邀请对方成为作者，待对方接受邀请后，您方可声明他/她为脚本作者。",
-        "member" => "您可添加非ZooMov用户，或您在ZooMov上的好友进入团队，待该项目上线后您才可邀请非好友成为伙伴",
-        "add_author"=>"您的脚本声明一作非ZooMov用户为作者。基于版权保护，请务必仔细填写下面内容。",
+        "team"=>"想将ZOOMOV用户加入团队，您得先向对方发送邀请，一旦对方接受邀请将自动成为您的伙伴。",
+        "author" => "想使用ZOOMOV用户的脚本，您得先邀请对方成为作者，待对方接受邀请后，您方可声明他/她为脚本作者。",
+        "member" => "您可添加非ZOOMOV用户，或您在ZOOMOV上的好友进入团队，待该项目上线后您才可邀请非好友成为伙伴",
+        "add_author"=>"您的脚本声明一作非ZOOMOV用户为作者。基于版权保护，请务必仔细填写下面内容。",
         "delete_author"=>"同时将作者从您的队伍中移除 (如果他/她不是其他项目脚本的作者，并且在项目中并不担任其他职能)",
-        "add_member"=>"您添加了一位非ZooMov用户进入队伍。基于权利保护，请务必仔细填写下面内容。",
+        "add_member"=>"您添加了一位非ZOOMOV用户进入队伍。基于权利保护，请务必仔细填写下面内容。",
         "recrutment" => "位置和描述内容发布后将不可更改，请谨慎填写并确认",
     ],
     "MESSAGES"=>[
@@ -69,7 +70,7 @@ return [
         "script"=> "脚本",
         "script_title"=> "脚本标题",
         "link"=> "链接地址",
-        "description"=>"介绍",
+        "description"=>"详介",
         "script_author"=>"脚本作者",
         "script_date"=>"发布日期",
         "email"=>"邮箱地址",
@@ -112,7 +113,7 @@ return [
         "location"=>"主持项目的基地",
         "finish"=>"目标在哪天完成项目",
         "synopsis"=>"写一段梗概 (40 到 256 个字符) 简要介绍项目",
-        "description"=>"详细地介绍项目(至少 200 个字符): 日程, 技术, 等等……",
+        "description"=>"详细地介绍项目(至少 200 个字符): 团队成员，拍摄日程, 使用技术, 等等……",
         "author"=>"Add author",
         "duration"=>"最终作品的展映时长",
         "genre"=> "为项目选择一个类型",
@@ -120,17 +121,18 @@ return [
         "poster"=>"最大尺寸: 2M",
         "budget"=>"款项的用途",
         "sponsor"=>"从列表中选择资助者",
-        "team"=>"要将ZooMov的用户加为成员，或需他/她（们）离开项目，必须先向他/她（们）发送站内信，并得到他/她（们）的同意。",
+        "team"=>"要将ZOOMOV的用户加为成员，或需他/她（们）离开项目，必须先向他/她（们）发送站内信，并得到他/她（们）的同意。",
         "tags"=>"添加标签，用英语的逗号分隔",
         "budget_type"=>"支出项的原因",
         "budget_comment"=> "添加备注以便管理预算",
         "script_title"=> "添加标题以区分脚本",
         "script_link"=> "保存脚本的网站或网盘的链接地址",
         "script_description"=>"简要推介这版脚本的亮点 (4 到 400 字符)",
-        "script_author"=>"脚本作者",
+        "script_"=>"添加ZOOMOVER作为脚本作者",
+        "script_author"=>"添加非ZOOMOVER作为脚本作者",
         "script_date"=>"脚本发表日期",
-        "author_email"=>"添加作者的邮箱，请确保其有效",
-        "author_name"=> "作者的姓名（笔名）",
+        "author_email"=>"必填。添加作者的邮箱，请确保其有效",
+        "author_name"=> "必填。作者的姓名（笔名）",
         "author_site"=> "选填。作者的博客，个人网站，社交网页",
         "team_occupation" => "为此枚伙伴添加队中职能",
         "team_role" => "为此枚伙伴添加队中职能",
@@ -178,18 +180,22 @@ return [
             "motivation"=>"请给一点理由好嘛",
             "question_subject"=>"问题必须要有一个标题",
             "question_content"=>"问题必须要有内容",
+            "question_tag"=>"问题必须有至少一个标签",
             "report_tag"=>"手记必须有至少一个标签",
             "report_title"=>"手记必须有标题",
             "report_synopsis"=>"手记必须有摘要",
-            "report_editor"=>"手记必须有内容"
+            "report_editor"=>"手记必须有内容",
+            "invitation" => "邀请必须有内容",
             ],
             "invalid"=>[
                 "finish"=>"这不是日期",
                 "language"=>"这种语言已经在项目中了",
-                "quantity"=>"请务必填写一个正整数 "
+                "quantity"=>"请务必填写一个正整数 ",
+                'question_content' => '问题须有字符数在15到4000字之内的文本'
             ],
             "unique"=>[
-                "email"=>"这个邮箱已经被人占了！"
+                "email"=>"这个邮箱已经被人占了！",
+                "author"=>"这个邮箱的主人已在本网注册，请在ZOOMOVER中寻找"
             ],
             "minlength"=>[
                 "synopsis"=>"项目必须有至少40字符的梗概。",
@@ -203,7 +209,8 @@ return [
                 "question_content"=>"请为问题填写至少:cnt个字的内容",
                 "report_title"=>"请为手记写至少:cnt个字的标题",
                 "report_synopsis"=>"请为手记写至少:cnt个字的简要",
-                "report_editor"=>"请为手记写至少:cnt个字的内容"
+                "report_editor"=>"请为手记写至少:cnt个字的内容",
+                "invitation" => "请为邀请写至少:cnt个字的内容",
                 ],
             "maxlength"=>[
                 "title"=>"项目的标题至多40个字符。起名是艺术。",
@@ -221,7 +228,8 @@ return [
                 "question_content"=>"问题内容不能超过:cnt个字符",
                 "report_title"=>"手记标题不能超过:cnt个字符",
                 "report_synopsis"=>"手记摘要不能超过:cnt个字符",
-                "report_editor"=>"手记内容不能超过:cnt个字符"
+                "report_editor"=>"手记内容不能超过:cnt个字符",
+                "invitation" => "邀请写不能超过:cnt个字的内容",
             ]
     ]
 ];

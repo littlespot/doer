@@ -123,25 +123,24 @@
 
 /*large device*/
 @media (min-width: 1200px) and (max-width: 1399px) {
-    .progress-text{
+   /* .progress-text{
         font-size: 10px;
     }
     .project-item.tri-first-item{
-        padding-right: 1%;
+        padding: 1%;
     }
 
     .project-item.tri-middle-item{
-        padding-left: 2%;
-        padding-right: 2%;
+        padding: 1%;
     }
 
     .project-item.tri-last-item{
-        padding-left: 1%;
-    }
+        padding: 1%;
+    }*/
 }
 
 @media (min-width: 1400px){
-    .project-item.tri-first-item{
+    /*.project-item.tri-first-item{
        padding-right: 6%;
     }
 
@@ -152,5 +151,5 @@
 
     .project-item.tri-last-item{
         padding-left: 6%;
-    }
+    }*/
 }

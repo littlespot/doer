@@ -9,7 +9,7 @@ appZooMov.controller("questionNewCtrl", function($sce,$rootScope, $scope, $filte
         else
             $scope.qtags = angular.fromJson(tags);
 
-        $scope.error = {require:false, maxlength:false, minlength:false};
+        $scope.error = {tags:false, editor:false};
 
         $scope.newTags = "";
 
@@ -67,7 +67,7 @@ appZooMov.controller("questionNewCtrl", function($sce,$rootScope, $scope, $filte
         $scope.newTags = "";
     }
 
-    $scope.save = function () {
+    $scope.save = function (invalid) {
     /*    var reg=new RegExp("/uploads/questions/\w+/","g"); //
         $("#editor img").each(function(i){
             var src = $(this).attr('src');
@@ -76,29 +76,32 @@ appZooMov.controller("questionNewCtrl", function($sce,$rootScope, $scope, $filte
             $(this).attr("src", src);
         });
         return*/
-        var length = $('#editor').text().length;
-        if(length < 15){
-            $scope.error.required = false;
-            $scope.error.maxlength = false;
-            $scope.error.minlength = true;
-        }
-        else if(length > 4000){
-            $scope.error.required = false;
-            $scope.error.maxlength = true;
-            $scope.error.minlength = false;
-        }
-        else{
-            $scope.error.required = false;
-            $scope.error.maxlength = false;
-            $scope.error.minlength = false;
-        }
-        if($scope.qtags.length > 0){
-            $rootScope.loading();
-            $('#editor-content').html($('#editor').html());
-            $("#questionForm").submit();
-        }
-        else{
+        if(invalid){
             return false;
         }
+
+        if($scope.qtags.length == 0){
+            $scope.error.tags = true;
+            invalid = true;
+        }
+        else{
+            $scope.error.tags = false;
+        }
+
+        var editor = $('#editor').text();
+        if(editor.length < 15 || editor.length > 4000){
+            $scope.error.editor = true;
+            invalid |= true;
+        }
+        else{
+            $scope.error.editor = false;
+        }
+
+        if(invalid)
+            return false;
+
+        $rootScope.loading();
+        $('#editor-content').html($('#editor').html());
+        $("#questionForm").submit();
     }
 });

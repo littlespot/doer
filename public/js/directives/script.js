@@ -55,6 +55,30 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                 })
             }
 
+            scope.userSelected = function (selected) {
+                scope.scripts.error = null;
+                if(!selected.title) {
+                }
+                else{
+                    if(selected.originalObject.love > 0){
+                        var already = $filter('getById')(scope.scriptInEdit.authors, selected.originalObject.id);
+                        if(!already)
+                            scope.scriptInEdit.authors.push({id:selected.originalObject.id, name:selected.title, email:selected.originalObject.location, link:selected.originalObject.link});
+                    }
+                    else{
+
+                        $uibModal.open({
+                            animation: true,
+                            templateUrl: 'script_alert.html',
+                            size: 'lg',
+                            controller: function ($scope) {
+                                $scope.alert_message = $filter('translate')(window.document.location.pathname.indexOf('projects') > 0 ? 'project.MESSAGES.notteam': 'project.MESSAGES.notfriends',
+                                    {'user_id': selected.originalObject.id, 'username': selected.title});
+                            }
+                        });
+                    }
+                }
+            }
             scope.authorSelected = function (selected) {
                 scope.scripts.error = null;
                 if(!selected.title) {
@@ -110,7 +134,14 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                                 }
                             })
                             .error(function (err) {
-                                alert(err);
+                                $uibModal.open({
+                                    animation: true,
+                                    templateUrl: 'script_alert.html',
+                                    size: 'lg',
+                                    controller: function ($scope) {
+                                        $scope.alert_message = err;
+                                    }
+                                });
                             });
                     })
                 }
@@ -200,7 +231,6 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                             scope.scripts.loading = false;
                         })
                         .error(function (err) {
-                            alert(err);
                             $log.error("failed to save script", err);
                             scope.scripts.loading = false;
                         });

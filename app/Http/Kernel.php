@@ -64,8 +64,6 @@ class Kernel extends HttpKernel
         'guest' => \Zoomov\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
-        'traveler' => \Zoomov\Http\Middleware\Traveler::class,
-        'professional' => \Zoomov\Http\Middleware\Professional::class,
-        'admin' => \Zoomov\Http\Middleware\Administration::class,
+        'professional' => \Zoomov\Http\Middleware\Professional::class
     ];
 }

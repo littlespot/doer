@@ -51,43 +51,9 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $data = $request->all();
-        $validator = $this->validator($data);
+        $this->validator($data)->validate();
 
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                $request, $validator
-            );
-        }
-
-        $invite_code = $data['code'];
-        if(strtolower($invite_code) == strtolower(config('constants.invite'))) {
-            event(new Registered($user = $this->create($data)));
-        }
-        else{
-            if(substr($invite_code, 0, 1) == 'u'){
-                $code = UserInvitation::where('invitation_code', $invite_code)->where('sent', null)->first();
-                if(is_null($code)){
-                    return redirect()->back()
-                        ->withInput($request->only('email'))
-                        ->withErrors(['code' => trans('auth.uninivted')]);
-                }
-            }
-            else{
-                $code = AdminInvitation::where('invitation_code', $invite_code)->where('sent', null)->first();
-                if(is_null($code)){
-                    return redirect()->back()
-                        ->withInput($request->only('email'))
-                        ->withErrors(['code' => trans('auth.uninivted')]);
-                }
-            }
-
-
-            event(new Registered($user = $this->create($data)));
-
-            $code['sent'] = 1;
-            $code['email'] = $user->email;
-            $code->save();
-        }
+        event(new Registered($user = $this->create($data)));
 
         $activation = UserActivation::create(['id'=>$user->id, 'code'=>$this->uuid()]);
         Mail::to($user->email)->send(new UserRegister($activation->code, $user));
@@ -150,7 +116,6 @@ class RegisterController extends Controller
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:6|max:16|confirmed',
             'password_confirmation' => 'required|same:password',
-            'code' => 'required|max:48',
             'remember' => 'in:on'
         ]);
     }

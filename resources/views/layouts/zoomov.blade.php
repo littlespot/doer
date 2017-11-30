@@ -260,7 +260,6 @@
                 <div><span>{{trans("layout.FOOTER.newsletter")}}</span></div>
                 <div>
                     <a href="weibo.com/zoomov" target="_blank"><img src="/images/icons/weibo.svg" /></a>
-
                 </div>
                 <div>
                     <a href="twitter.com/zoomov_com" target="_blank"><img src="/images/icons/twitter.svg" /></a>

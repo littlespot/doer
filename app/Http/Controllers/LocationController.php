@@ -4,6 +4,7 @@ namespace Zoomov\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use DB;
+use App;
 use Zoomov\Country;
 use Zoomov\Department;
 use Zoomov\City;
@@ -13,7 +14,18 @@ class LocationController extends Controller
     public function index()
     {
         return Country::select('id', 'name_'.Auth::user()->locale.' as name', 'sortname')
-            ->orderBy('name_'.Auth::user()->locale)
+            ->orderByRaw('convert(name_' . Auth::user()->locale .' using gbk) ASC')
+            ->get();
+    }
+
+    public function cities($id){
+        return City::whereExists(function ($query)  use ($id) {
+                $query->select(DB::raw(1))
+                    ->from('departments')
+                    ->whereRaw('departments.country_id = '.$id.' and cities.department_id = departments.id');
+            })
+            ->select('cities.id', DB::raw('cities.name_'.App::getLocale().' as name'))
+            ->orderByRaw('convert(cities.name_'.App::getLocale().' using gb2312)')
             ->get();
     }
 
@@ -49,7 +61,7 @@ class LocationController extends Controller
     {
         return City::where('department_id', $id)
             ->select('id', 'name_'.Auth::user()->locale.' as name')
-            ->orderBy('name_'.Auth::user()->locale)
+            ->orderByRaw('convert(name_'.Auth::user()->locale.' using gb2312)')
             ->get();
     }
 
@@ -63,7 +75,7 @@ class LocationController extends Controller
         $city = City::findOrFail($id);
 
         return Department::select('id', 'name_'.Auth::user()->locale.' as name', 'country_id')
-            ->orderBy('name_'.Auth::user()->locale)
+            ->orderByRaw('convert(name_'.Auth::user()->locale.' using gb2312)')
             ->find($city->department_id);
     }
 }

@@ -14,6 +14,9 @@ return [
         "catalogue"=>"CATALOGUE",
         "videos"=>"VIDEOS"
     ],
+    'ALERTS' =>[
+        'compulsive' => '带 (<span class="text-important">*</span>) 号的为必填栏。',
+    ],
     "MENU"=>[
         "discover"=>"发现",
         "creation"=>"创建",
@@ -28,7 +31,8 @@ return [
         "see" => "浏览",
         "order" => "排序方式",
         "searching" => "搜寻中...",
-        "none"=>"咣"
+        "none"=>"咣",
+        "add" => "点击回车添加"
     ],
     "BUTTONS"=>[
         "avatar" => "更换头像",
@@ -47,7 +51,15 @@ return [
         "sns" => "社交账号",
         "preparations" => "未上线的",
         "invite" => "邀请",
-        "me" => "我"
+        "me" => "我",
+        'zh' => "中文",
+        'en' => "英文",
+        'yes' => '是',
+        'no' => '否',
+        'with' => '有',
+        'without' => '无',
+        'year' => '年',
+        'month' => '月',
     ],
   "HOME"=>[
         "traveler" => "游客只能使用<b>体验版</b>!<br>您必须注册成为用户才能正常使用ZOOMOV",
@@ -71,12 +83,31 @@ return [
         "love"=>"为项目点赞",
         "unlove"=>"取消点赞"
     ],
-  "PANEL"=>[
-    "header"=>"Look for something interesting?",
-    "div1"=>"Projects&nbsp;sorted by&nbsp;",
-    "div2"=>"&nbsp;in need of&nbsp;",
-    "div3"=>"located in&nbsp;"
-  ],
+    "MONTH"=>[
+        '1'=>'一月',
+        '2'=>'二月',
+        '3'=>'三月',
+        '4'=>'四月',
+        '5'=>'五月',
+        '6'=>'六月',
+        '7'=>'七月',
+        '8'=>'八月',
+        '9'=>'九月',
+        '10'=>'十月',
+        '11'=>'十一月',
+        '12'=>'十二月',
+    ],
+    "TIME"=>[
+        'h'=>'时',
+        'm'=>'分',
+        's'=>'秒'
+    ],
+      "PANEL"=>[
+        "header"=>"Look for something interesting?",
+        "div1"=>"Projects&nbsp;sorted by&nbsp;",
+        "div2"=>"&nbsp;in need of&nbsp;",
+        "div3"=>"located in&nbsp;"
+      ],
     "EDITOR"=>[
         "font"=>"字体",
         "size"=>"字体大小",
