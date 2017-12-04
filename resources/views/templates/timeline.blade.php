@@ -75,7 +75,7 @@
                             <div><span ng-bind="mevent.month"></span>-<span ng-bind="devent.day"></span></div>
                             <div ng-repeat="p in event.events">
                                 <img src="/context/avatars/<%p.user_id%>.small.jpg" />
-                                <a class="title" href="/profile/<%p.user_id.id%>" ng-bind="p.username" target="_blank"></a>
+                                <a class="title" href="/profile/<%p.user_id%>" ng-bind="p.username" target="_blank"></a>
                                 <span translate="event.team-add"></span>
                                 <span ng-repeat="r in p.roles"><label ng-bind="r"></label><span ng-if="!$last">,&nbsp;</span></span>
                             </div>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div>
                                     <img src="/context/avatars/<%report.user_id%>.small.jpg" />
-                                    <a class="link" href="/profile/<%report.user_id%>" target="_blank" ng-bind="report.username"></a>
+                                    <a class="link active" href="/profile/<%report.user_id%>" target="_blank" ng-bind="report.username"></a>
                                     <div class="tags">
                                         &nbsp;<aside ng-repeat="role in report.roles" class="diamond text-center"><span ng-bind="role"></span></aside>
                                     </div>

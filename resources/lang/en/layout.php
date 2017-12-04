@@ -14,10 +14,13 @@ return [
         "catalogue"=>"CATALOGUE",
         "videos"=>"VIDEOS"
     ],
+    'ALERTS'=>[
+        'compulsive' => 'Compulsory fields are marked with an (<span class="text-important">*</span>).'
+    ],
     "MENU"=>[
         "discover"=>"DISCOVER",
         "creation"=>"CREATE",
-        "videos"=>"VIDEOS",
+        "videos"=>"VIDEO",
         "person"=>"Account management",
         "profile"=>"Personal page",
         "preparations"=>"Drafts",
@@ -47,15 +50,23 @@ return [
         "sns" => "SNS",
         "preparations" => "Pre-Project",
         "invite" => "Invite",
-        "me" => "I"
+        "me" => "I",
+        'zh' => "Chinese",
+        'en' => "English",
+        'yes' => 'Yes',
+        'no' => 'No',
+        'with' => 'With',
+        'without' => 'Without',
+        'year' => 'Year',
+        'month' => 'Month',
     ],
     "HOME"=>[
         "traveler" => "<b>PREVIEW</b> FOR Travelers!<br>You must register to access full functions of ZOOMOV",
         "header"=>"HI! <a class='text-important' href='/profile/:userid' >:username</a><br/>Welcome to ZOOMOV<br/>Fields of wonder",
         "count"=>"You have ",
-        "online"=>"<a href='/account' class='link'>:cnt</a> projects waiting one line",
-        "projects"=>"<a href='/profile/me' class='link'>:cnt</a> projects online",
-        "preparations"=>"<a href='/account' class='link'>:cnt</a> drafts to be submitted",
+        "online"=>"<a href='/account' class='text-important'>:cnt</a> projects waiting one line",
+        "projects"=>"<a href='/profile/me' class='text-important'>:cnt</a> projects online",
+        "preparations"=>"<a href='/account' class='text-important'>:cnt</a> drafts to be submitted",
         "start"=>"Your new project is on the way.",
         "slogan"=>"Allez! Come to advance your big idea!",
         "create"=>"CREATE A NEW PROJECT",
@@ -70,6 +81,25 @@ return [
         "unfollow"=>"Un-follow this project",
         "love"=>"Love this project",
         "unlove"=>"Break up"
+    ],
+    "MONTH"=>[
+        '1'=>'January',
+        '2'=>'February',
+        '3'=>'Mars',
+        '4'=>'April',
+        '5'=>'May',
+        '6'=>'June',
+        '7'=>'July',
+        '8'=>'August',
+        '9'=>'September',
+        '10'=>'October',
+        '11'=>'November',
+        '12'=>'December',
+    ],
+    "TIME"=>[
+        'h'=>'hour',
+        'm'=>'min',
+        's'=>'sec'
     ],
   "PANEL"=>[
     "header"=>"Look for something interesting?",

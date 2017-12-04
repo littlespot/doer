@@ -124,11 +124,10 @@
                                 <div class="flex-rows">
                                     <div>
                                         <span class="text-muted small" translate="FOR"></span>:&nbsp;
-                                        <a class="text-info" href="/question/<%q.question_id%>" target="_blank">
+                                        <a class="text-info" href="/questions/<%q.question_id%>" target="_blank">
                                             <label ng-bind="q.subject"></label>
                                         </a>
                                     </div>
-
                                     <div ng-if="q.answers_cnt > 1" class="text-primary" translate="project.AnswerOther" translate-values="{cnt:q.answers_cnt-1}"></div>
                                     <div ng-if="q.answers_cnt == 1 && !q.mine" class="text-primary">{{trans("project.QUESTION.answer_wait")}}</div>
                                 </div>
@@ -174,19 +173,19 @@
                                 <div class="btn right-btn" disabled  ng-if="q.mine && q.answers_cnt" title="<%'project.MESSAGES.undelable' | translate %>" >
                                     <span class="fa fa-trash"></span>
                                 </div>
-                                <a class="btn right-btn" ng-if="!q.mine" href="/question/<%q.id%>?answer=1" title="{{trans("project.QUESTION.answer_wait")}}" >
+                                <a class="btn right-btn" ng-if="!q.mine" href="/questions/<%q.id%>?answer=1" title="{{trans("project.QUESTION.answer_wait")}}" >
                                     <span class="fa fa-hand-spock-o"></span>
                                 </a>
                                 <div>
                                     <div class="flex-rows">
-                                        <a class="text-primary" href="/question/<%q.id%>" target="_blank">
+                                        <a class="text-primary" href="/questions/<%q.id%>" target="_blank">
                                             <label ng-bind="q.subject"></label>
                                         </a>
                                         <div ng-if="q.answers_cnt == 0">
                                             <span ng-if="q.mine" class="text-default">{{trans('project.QUESTION.answer_none')}}</span>
                                             <span ng-if="!q.mine" class="text-danger">{{trans("project.QUESTION.answer_first")}}</span>
                                         </div>
-                                        <div ng-if="q.answers_cnt > 0" class="text-primary" translate="project.AnswerCnt" translate-values="{cnt:q.cnt}"></div>
+                                        <div ng-if="q.answers_cnt > 0" class="text-primary" translate="project.AnswerCnt" translate-values="{cnt:q.answers_cnt}"></div>
                                     </div>
                                     <div>
                                         <span class="small text-muted" ng-bind="q.created_at | limitTo:16"></span>&nbsp;

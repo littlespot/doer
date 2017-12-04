@@ -7,12 +7,12 @@
         <div class="overlay ng-hide" ng-show="overlay" ng-click="overlay=false;">
             <div>
                 <div class="category">
-                    <div ng-click="setFilter(0)"  ng-class="{active:filterChosen.id == '!!'}" >
-                        {{trans("layout.MENU.all")}}
+                    <div ng-click="setFilter(0)">
+                        <span class="link" ng-class="{active:filterChosen.id == '!!'}" >{{trans("layout.MENU.all")}}</span>
                     </div>
                     @foreach($categories as $category)
-                        <div ng-class="{active:filterChosen.id == '{{$category->id}}'}" ng-click="setFilter('{{$category->id}}', '{{$category->name}}')">
-                            <span>{{$category->name}}</span>
+                        <div ng-click="setFilter('{{$category->id}}', '{{$category->name}}')">
+                            <span class="link" ng-class="{active:filterChosen.id == '{{$category->id}}'}" >{{$category->name}}</span>
                         </div>
                     @endforeach
                 </div>
@@ -77,15 +77,15 @@
         <div id="projects" style="display:block;margin-top:10px">
             <div class="panel">
                 <div class="container">
-                    <h3>
+                    <div class="h3">
                         {{trans("layout.TITLES.best")}}
-                        <span class="link" ng-click="openCatalogue(0)">
+                        <span class="link active" ng-click="openCatalogue(0)">
                             <span ng-if="filters[0].id == '!!'">
                                 {{trans("layout.MENU.all")}}
                             </span>
-                            <span name="genre_<%filters[0].id%>"  ng-if="filters[0].id != '!!'" ng-bind="filters[0].name"></span>
+                            <span ng-if="filters[0].id != '!!'" name="genre_<%filters[0].id%>" ng-bind="filters[0].name"></span>
                         </span>
-                    </h3>
+                    </div>
                     <div ng-if="(recommendations| filter:{genre_id:filters[0].id}).length == 0">
                         @include('templates.empty')
                     </div>
@@ -97,15 +97,15 @@
                         </div>
                     </div>
                     <br/>
-                    <h3 >
+                    <div class="h3">
                         {{trans("layout.TITLES.latest")}}
-                        <span class="link" ng-click="openCatalogue(1)">
+                        <span class="link active" ng-click="openCatalogue(1)">
                             <span ng-if="filters[1].id == '!!'">
                                  {{trans("layout.MENU.all")}}
                             </span>
                             <span name="genre_<%filters[1].id%>"  ng-if="filters[1].id != '!!'" ng-bind="filters[1].name"></span>
                         </span>
-                    </h3>
+                    </div>
                     <div ng-if="(latest| filter:{genre_id:filters[1].id}).length == 0">
                         @include('templates.empty')
                     </div>

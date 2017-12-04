@@ -19,8 +19,8 @@
     <div class="overlay ng-hide" ng-show="overlay" ng-click="overlay=false;">
         <div>
             <div class="category">
-                <div ng-repeat="c in filters" ng-class="{active:filterChosen.id==c.id}" ng-click="setFilter(c)">
-                    <span translate="user.Project.<%c.name%>"></span>
+                <div ng-repeat="c in filters" ng-click="setFilter(c)">
+                    <span class="link" ng-class="{active:filterChosen.id==c.id}" translate="user.Project.<%c.name%>"></span>
                 </div>
             </div>
         </div>
@@ -28,8 +28,8 @@
     <div class="overlay ng-hide" ng-show="overlayOrder" ng-click="overlayOrder=false;">
         <div>
             <div class="category">
-                <div ng-repeat="c in orders" ng-class="{active:orderChosen.id==c.id}" ng-click="setOrder(c)">
-                    <span translate="user.Project.<%c.name%>" ></span>
+                <div ng-repeat="c in orders"  ng-click="setOrder(c)">
+                    <span class="link" ng-class="{active:orderChosen.id==c.id}" translate="user.Project.<%c.name%>" ></span>
                 </div>
             </div>
         </div>
@@ -66,9 +66,11 @@
                          ng-click="changeLocation('/person/reports/{{$user->id}}')" >
                         {{trans("layout.LABELS.reports")}}
                     </div>
+                    <!--
                     <div class="btn-squash-lg btn-text-info margin-top-sm text-uppercase" ng-click="changeLocation('/person/questions/{{$user->id}}')">
                         {{trans("layout.LABELS.questions")}}
                     </div>
+                    -->
                     <div class="btn-squash-lg margin-top-sm text-uppercase" ng-class="{'btn-text-primary': selectedTab != 2, 'btn-text-danger': selectedTab==2 }" ng-click="selectTab(2)">
                         {{trans("layout.LABELS.sns")}}
                     </div>
@@ -95,7 +97,7 @@
             <div class="h3">
                 <div>
                     <span class=" text-uppercase">{{trans("layout.MENU.see")}}</span>
-                    <span class="link" ng-click="openCatalogue()" translate="user.Project.<%filterChosen.name%>"></span>
+                    <span class="link active" ng-click="openCatalogue()" translate="user.Project.<%filterChosen.name%>"></span>
                     @if($admin)
                         {{trans("layout.LABELS.me")}}
                     @else
@@ -120,7 +122,7 @@
                 </div>
                 <div>
                     <span class="text-uppercase">{{trans("layout.MENU.order")}}</span>
-                    <span class="link" ng-click="openOrder()"
+                    <span class="link active" ng-click="openOrder()"
                           translate="user.Project.<%orderChosen.name%>"></span>
                 </div>
             </div>

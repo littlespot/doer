@@ -36,9 +36,11 @@
         <div class="tab-menu-item disabled">
             <span class="text-muted"> {{trans('layout.LABELS.comments')}}</span>
         </div>
+        <!--
         <div class="tab-menu-item true">
-            <span class="text-muted">  {{trans('layout.LABELS.questions')}}</span>
+            <span class="text-muted"> {{trans('layout.LABELS.questions')}}</span>
         </div>
+        -->
         <div class="tab-menu-share">
 
         </div>

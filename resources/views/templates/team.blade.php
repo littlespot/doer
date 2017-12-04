@@ -113,7 +113,8 @@
                 <span ng-if="submitted && !teamInEdit.outsider" class="text-danger"></span>
             </td>
             <td>
-                <span ng-if="!member.deleted" class="btn fa" ng-class="{'text-warning fa-check':teamInEdit.id == member.id, 'text-info fa-edit':teamInEdit.id != member.id}"  ng-click="editTeam(member)"></span>
+                <span ng-if="!member.deleted" class="btn fa" ng-class="{'text-warning fa-check':teamInEdit.id == member.id, 'text-info fa-edit':teamInEdit.id != member.id}"
+                      ng-click="editTeam(member)"></span>
             </td>
             <td class="text-center" style="border-left: 1px solid #ddd;">
                 <span ng-if="!member.deleted" class="btn fa" ng-class="{'text-danger fa-trash':teamInEdit.id != member.id, 'text-info fa-undo':teamInEdit.id == member.id}"

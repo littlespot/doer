@@ -28,7 +28,9 @@
                     </div>
                     <div ng-if="q.cnt > 0" class="text-primary" translate="project.AnswerCnt" translate-values="{cnt:q.cnt}"></div>
                 </div>
+                <!--
                 <div class="margin-top-sm" ng-bind-html="q.content"></div>
+                -->
                 <div class="text-right">
                     <span class="small text-muted" ng-bind="q.created_at | limitTo:16"></span>
                 </div>

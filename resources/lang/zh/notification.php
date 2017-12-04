@@ -26,7 +26,8 @@ return [
         "replies"=>"<strong>:cnt</strong> 前文",
         "applications" => "申请信",
         "reminders" => "提醒",
-        "remind" => "提醒其成员关于项目"
+        "remind" => "提醒其成员关于项目",
+        "unreplied" => "未答复"
     ],
     'title' =>  [
         'add_script'=>'您的新脚本上线',

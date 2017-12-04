@@ -7,6 +7,6 @@
 {{trans('email.button_activation')}}
 @endcomponent
 
-{{trans('email.salutation')}},<br>
+{{trans('email.salutation')}}<br>
 {{ config('app.name') }}
 @endcomponent

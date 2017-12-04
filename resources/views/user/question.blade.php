@@ -38,32 +38,32 @@
                         </div>
                     @endif
                     @include('templates.editor', ['content'=>'', 'picture'=>''])
-                    @if ($errors->has('content'))
-                        <div class="text-danger small">
-                            <span>{{ $errors->first('content') }}</span>
-                        </div>
-                    @else
-                        <div class="error" role="alert" ng-class="{'visible':questionForm.content.$touched}">
-                            <span ng-show="error.required">{{trans('project.ERRORS.require.question_content ')}}</span>
-                            <span ng-show="error.maxlength">{{trans('project.ERRORS.maxlength.question_content', ['cnt'=>100])}}</span>
-                            <span ng-show="error.minlength">{{trans('project.ERRORS.minlength.question_content', ['cnt'=>4])}}</span>
-                        </div>
+                    <div class="text-danger small">
+                    @if ($errors->has('editor'))
+                            <span>{{ trans('project.ERRORS.invalid.question_content') }}</span>
+                        @else
+                            <span ng-if="error.editor">{{ trans('project.ERRORS.invalid.question_content') }}</span>
                     @endif
+                    </div>
                     <div>
-                        <br/>
                         <div>
-                        <span ng-repeat="t in qtags">
-                            <input type="hidden" name="tags[<%t.id%>]" ng-value="t.label" />
-                            <span class="tag">
-                                <span ng-bind="t.label"></span>
+                            <span ng-repeat="t in qtags">
+                                <input type="hidden" name="tags[<%t.id%>]" ng-value="t.label" />
+                                <span class="tag">
+                                    <span ng-bind="t.label"></span>
+                                </span>
+                                 <span class="btn btn-link text-danger fa fa-times"
+                                       ng-click="removeTag(t, $index)"></span>&nbsp;
                             </span>
-                             <span class="btn btn-link text-danger fa fa-times"
-                                   ng-click="removeTag(t, $index)"></span>&nbsp;
-                        </span>
-                            <span ng-if="question.tags.length == 0" class="text-danger"
-                                  translate="project.ERRORS.require.qtags"></span>
                         </div>
                         <br/>
+                        <div class="text-danger small">
+                            @if ($errors->has('tags'))
+                                {{ trans('project.ERRORS.require.question_tag') }}
+                            @else
+                                <span ng-if="error.tags">{{ trans('project.ERRORS.require.question_tag') }}</span>
+                            @endif
+                        </div>
                         <div class="row">
                             <div class="col-sm-11">
                                 <input ng-model="newTags" type="text" class="form-text" name="newTags" id="newTags"
@@ -76,7 +76,7 @@
                         <br/>
                         <div class="text-right">
                             <div class="btn btn-default" ng-click="cancel()"><span class="fa fa-undo"></span></div>
-                            <div class="btn btn-primary" ng-click="save()" ng-disabled="questionForm.$invalid || qtags.length == 0" >
+                            <div class="btn btn-primary" ng-click="save(questionForm.$invalid)" ng-disabled="questionForm.$invalid || qtags.length == 0" >
                                 <span class="fa fa-check"></span>
                             </div>
                         </div>

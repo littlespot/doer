@@ -48,43 +48,41 @@
         <div class="text-center"> {!!trans('project.agreement')!!}</div>
 
     </div>
-        <div class="tab-menu-bar">
-        <a class="tab-menu-item {{$step==0 ? 'active':''}}" ng-click="changeStep('{{$project->id}}', '{{$step}}', 0)"
-           href="javascript:void(0)">
-            <span>{{trans("project.CREATION.pitch")}}</span>
-        </a>
-        <a class="tab-menu-item {{$step==1 ? 'active':''}}" ng-click="changeStep('{{$project->id}}', '{{$step}}', 1)"
-           href="javascript:void(0)">
-            <span>{{trans("project.CREATION.description")}}</span>
-        </a>
-        @if($step > 1 || $project->count > 199 || (!is_null($project->description) && strlen($project->description)> 199))
-            <a class="tab-menu-item {{$step==2 ? 'active':''}}" ng-click="changeStep('{{$project->id}}', '{{$step}}', 2)"
-               href="javascript:void(0)">
-                <span>{{trans("project.CREATION.container")}}</span>
-            </a>
-            <a class="tab-menu-item {{$step==3 ? 'active':''}}" ng-click="changeStep('{{$project->id}}', '{{$step}}', 3)"
-               href="javascript:void(0)">
-                <span>{{trans("project.CREATION.team")}}</span>
-            </a>
-            <a class="tab-menu-item {{$step==4 ? 'active':''}}" ng-click="changeStep('{{$project->id}}', '{{$step}}', 4)"
-               href="javascript:void(0)">
-                <span>{{trans("project.CREATION.recruitment")}}</span>
-            </a>
-        @else
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.container")}}</span>
-            </div>
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.team")}}</span>
-            </div>
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.recruitment")}}</span>
-            </div>
-        @endif
-    </div>
+        <ul class="nav nav-tabs nav-justified nav-top-menu">
+            <li role="presentation" class="{{$step==0 ? 'active':''}}">
+                <a ng-click="changeStep('{{$project->id}}', '{{$step}}', 0)" href="javascript:void(0)">
+                    <span>{{trans("project.CREATION.pitch")}}</span>
+                </a>
+            </li>
+            <li role="presentation" class="{{$step==1 ? 'active':''}}">
+                <a ng-click="changeStep('{{$project->id}}', '{{$step}}', 1)" href="javascript:void(0)">
+                    <span>{{trans("project.CREATION.description")}}</span>
+                </a>
+            </li>
+            @if($step > 1 || $project->count > 199 || (!is_null($project->description) && strlen($project->description)> 199))
+                <li role="presentation" class="{{$step==2 ? 'active':''}}">
+                    <a ng-click="changeStep('{{$project->id}}', '{{$step}}', 2)" href="javascript:void(0)">
+                        <span>{{trans("project.CREATION.container")}}</span>
+                    </a>
+                </li>
+                <li role="presentation" class="{{$step==3 ? 'active':''}}">
+                    <a ng-click="changeStep('{{$project->id}}', '{{$step}}', 3)" href="javascript:void(0)">
+                        <span>{{trans("project.CREATION.recruitment")}}</span>
+                    </a>
+                </li>
+            @else
+                <li class="disabled">
+                    <a href="javascript:void(0)" ng-click="alert()">
+                        <span>{{trans("project.CREATION.container")}}</span>
+                    </a>
+                </li>
+                <li class="disabled">
+                    <a href="javascript:void(0)" ng-click="alert()">
+                        <span>{{trans("project.CREATION.recruitment")}}</span>
+                    </a>
+                </li>
+            @endif
+        </ul>
     </div>
     @yield('tabcontent')
 </div>

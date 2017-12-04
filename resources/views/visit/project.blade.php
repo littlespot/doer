@@ -18,7 +18,7 @@
 <div class="container" ng-controller="projectDetailCtrl" ng-init='init("{{$project->id}}", "{{$project->user_id}}","{{$comments_cnt}}", "{{$tab}}")'>
     <div class="affix fixed-top fixed-right margin-top-lg padding-top-md">
         <div class='btn btn-text-info btn-sq-sm flex-vertical' disabled data-toggle="tooltip" title="{{trans('layout.TIP.views')}}">
-            <div class='fa fa-bullseye fa-2x'></div>
+            <div><img src="/images/icons/view.svg" class="img-responsive"></div>
             <div id="views_cnt">{{$project->admin ? $views_cnt : $views_cnt + 1 }}</div>
         </div>
         @if($project->admin)
@@ -26,22 +26,22 @@
                 <div class='fa fa-bookmark{{$followers_cnt ? "" : "-o"}} fa-2x'></div>
                 <div>{{$followers_cnt}}</div>
             </div>
-            <div id="lovers_cnt" class='btn btn-text-danger btn-sq-sm flex-vertical' disabled data-toggle="tooltip" title="{{trans('layout.TIP.lovers')}}">
-                <div class='fa fa-heart{{$lovers_cnt ? "" : "-o"}} fa-2x'></div>
-                <div>{{$lovers_cnt}}</div>
-            </div>
         @else
             <div id="followers_cnt" class='btn btn-text-success btn-sq-sm flex-vertical' ng-disabled='following' data-toggle="tooltip"
-                 title="{{$myfollow ? trans('layout.TIP.follow') :trans('layout.TIP.unfollow')}}" ng-click="followProject()">
+                 title="{{$myfollow ? trans('layout.TIP.unfollow'):trans('layout.TIP.follow')}}"
+                 data-title-0="{{trans('layout.TIP.follow')}}" data-title-1="{{trans('layout.TIP.unfollow')}}"
+                 ng-click="followProject()">
                 <div class='fa fa-bookmark{{$myfollow ? "" : "-o"}} fa-2x'></div>
                 <div>{{$followers_cnt}}</div>
             </div>
-            <div id="lovers_cnt" class='btn btn-text-danger btn-sq-sm flex-vertical'  ng-disabled='lovwing'
-                 title="{{$mylove ? trans('layout.TIP.love') :trans('layout.TIP.unlove')}}" ng-click="loveProject()">
-                <div class='fa fa-heart{{$mylove ? "" : "-o"}} fa-2x'></div>
-                <div>{{$lovers_cnt}}</div>
-            </div>
         @endif
+        <div id="lovers_cnt" class='btn btn-text-danger btn-sq-sm flex-vertical'  ng-disabled='lovwing'
+             title="{{$mylove ? trans('layout.TIP.unlove'):trans('layout.TIP.love')}}"
+             data-title-0="{{trans('layout.TIP.love')}}" data-title-1="{{trans('layout.TIP.unlove')}}"
+             ng-click="loveProject()">
+            <div class='fa fa-heart{{$mylove ? "" : "-o"}} fa-2x'></div>
+            <div>{{$lovers_cnt}}</div>
+        </div>
     </div>
     @include('templates.synopsis')
     <div class="tab-menu-bar">
@@ -59,10 +59,11 @@
                 {{trans('layout.LABELS.comments')}}
                 <sup id="sup_comments" ng-show="comments_cnt > 0"  ng-bind="comments_cnt"></sup>
             </div>
+        <!--
             <div class="tab-menu-item" ng-class="{'active':selectedTab == 4}" ng-click="selectTab(4)">
                 {{trans('layout.LABELS.questions')}}
                 <sup id="sup_questions">{{$questions_cnt > 0 ? $questions_cnt.'' : ''}}</sup>
-            </div>
+            </div>-->
             <div class="tab-menu-share">
                 <span class="fa fa-share-alt"></span>
             </div>
@@ -70,9 +71,11 @@
             <div class="tab-menu-item disabled" >
                 <span class="text-default">{{trans('layout.LABELS.comments')}}</span>
             </div>
+        <!--
             <div class="tab-menu-item disabled">
                 <span class="text-default">{{trans('layout.LABELS.questions')}}</span>
             </div>
+            -->
             <div class="tab-menu-share disabled">
                 <span class="fa fa-share-alt text-default"></span>
             </div>
@@ -90,7 +93,7 @@
                                 <tbody>
                                 @foreach($project->scripts as $script)
                                     <tr>
-                                        <td width="200px"><a href="{{$script->link}}">{{$script->description}}</a></td>
+                                        <td width="200px"><a href="{{url('http://'.$script->link)}}" title="{{$script->description}}" target="_blank">{{$script->title}}</a></td>
                                         <td>
                                             @foreach($script->authors as $key=>$author)
                                                 @if(!is_null($author->user_id))

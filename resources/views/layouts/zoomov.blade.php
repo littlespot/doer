@@ -13,8 +13,10 @@
     @section('header')
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/bootstrap/css/bootstrap.css" type="text/css">
-    <link rel="stylesheet" href="/bower_components/angular/angucomplete-alt.css" type="text/css">
+    <link rel="stylesheet" href="/bower_components/ng-tag/ng-tags-input.min.css" type="text/css">
+    <link rel="stylesheet" href="/bower_components/ng-tag/ng-tags-input.bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/bower_components/angular/angucomplete-alt.css" type="text/css">
     <link rel="stylesheet" href="/css/tag.css" type="text/css">
     <link rel="stylesheet" href="/css/base.css" type="text/css">
     <link rel="stylesheet" href="/css/common.css" type="text/css">
@@ -22,12 +24,13 @@
     <script src="/bower_components/jquery/jquery-1.11.3.min.js"></script>
     <script src="/bower_components/bootstrap/js/bootstrap.min.js"></script>
     <script src="/bower_components/assets/ie-emulation-modes-warning.js"></script>
+
         <style>
-            #searchinput .angucomplete-image-holder{
+            .angucomplete-image-holder.projects{
                 background-size: contain;
             }
 
-            #searchinput .angucomplete-image{
+            .angucomplete-image.projects{
                 border-radius: 0;
                 width: 48px;
                 height: 27px;
@@ -71,13 +74,14 @@
 @show
     <!-- Scripts -->
     <script>
-        window.Laravel = <?php echo json_encode([
-            'csrfToken' => csrf_token(),
-        ]); ?>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
     </script>
 </head>
-<body class="'{{App::getLocale()}}'">
-<input type="hidden" name="csrfmiddlewaretoken" value="<?php echo csrf_token(); ?>">
+<body class="'{{app()->getLocale()}}'">
 <nav class="navbar navbar-default">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -98,34 +102,30 @@
                     <a href="/discover">{{trans("layout.MENU.discover")}}</a>
                 </li>
                 <li ng-class="{active: currentPath == 'video'}">
-                    <a href="/videos">{{trans("layout.MENU.videos")}}</a>
+                    <a href="/films">{{trans("layout.MENU.videos")}}</a>
                 </li>
                 <li ng-class="{active: currentPath == 'preparations'}">
                     <a href="/preparations">{{trans("layout.MENU.creation")}}</a>
                 </li>
             </ul>
-            <ul class="nav navbar-nav navbar-right" id="navright">
+            <ul class="nav navbar-nav navbar-right" id="navright" style="margin: 0">
                 <li ng-class="{active: $location.path().indexOf('notifications') > 0}">
-                    <a href="/notifications">
-                        <?php echo file_get_contents("images/icons/notification.svg"); ?>
-                    </a>
+                    <a href="/notifications" class="fa fa-bell-o"></a>
                     <sup ng-if="notificationCnt>0" ng-bind="notificationCnt"></sup>
                 </li>
                 <li ng-class="{active: $location.path().indexOf('messages') > 0}">
-                    <a href="/messages">
-                        <?php echo file_get_contents("images/icons/message.svg"); ?>
-                    </a>
+                    <a href="/messages" class="fa fa-envelope-o"></a>
                     <sup ng-if="messageCnt > 0" ng-bind="messageCnt"></sup>
                 </li>
                 @if(Auth::check())
                 <li class="dropdown" id="account" >
-                    <a href="javascript:void(0)" class="dropdown-toggle"
+                    <div class="dropdown-toggle"
                        data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false">
                         <img id="avatars-img" class="img-circle"
                              src="/context/avatars/{{Auth::id()}}.small.jpg?{{time()}}"
                              onError="this.onerror=null;this.src='/images/avatar.png';"/>
-                    </a>
+                    </div>
                     <ul class="dropdown-menu">
                         @if(!Auth::user()->professional)
                         <li ng-class="{active: $route.current.scope.name == 'profile'}">
@@ -137,13 +137,6 @@
                         <li ng-if="preparations.length">
                             <a href="/account" class="btn btn-info">{{trans("layout.MENU.preparations")}}</a>
                         </li>
-                            <!--
-                        <li ng-repeat="p in preparations|orderBy:title">
-                            <a class="btn btn-sm text-left" ng-if="p.title.length > 0" href="/admin/preparations/<%p.id%>"
-                               ng-class="{'separator': $last}" ng-bind="p.title">
-                            </a>
-                        </li>
-                        -->
                         <li>
                             <a class="btn" href="/personal">
                                 <span class="text-primary">{{trans("layout.MENU.person")}}</span>
@@ -164,13 +157,32 @@
                 @endif
             </ul>
 
-            <form id="zooHeaderSearch" class="navbar-form navbar-right" role="search" style="margin: 0;padding: 0">
-                <angucomplete-alt id="searchinput" input-name="search"
+            <form id="zooHeaderSearch" class="navbar-form navbar-right" role="search" style="margin:0;padding: 0;">
+                <div class="btn" style="padding-top: 9px"><span class="fa fa-search"></span></div>
+                <div angucomplete-alt id="searchinput" input-name="search"
+                    placeholder="{{trans('layout.MENU.search')}}"
+                    pause="100"
+                    selected-object="itemSelected"
+                    remote-url="{{config('url')}}/api/search/"
+                    search-fields="title,description"
+                    title-field="title"
+                    description-field="description"
+                    image-uri="/context"
+                    image-field="image"
+                    image-error="/icons/waiting.svg"
+                    minlength="1"
+                    clear-selected = "true"
+                    input-class="form-control"
+                    match-class="highlight"
+                    text-no-results="{{trans('layout.MENU.none')}}"
+                    text-searching="{{trans('layout.MENU.searching')}}">
+                </div>
+
+             <!--   <angucomplete-alt id="searchinput" input-name="search"
                                   placeholder="{{trans('layout.MENU.search')}}"
                                   pause="100"
                                   selected-object="projectSelected"
-                                  local-data="projectIndex"
-                                  focus-in="searchFocus()"
+                                  url="http://myserver.com/api/user/find?s="
                                   search-fields="title,username"
                                   title-field="title"
                                   description-field="username"
@@ -182,7 +194,7 @@
                                   input-class="form-text"
                                   match-class="highlight"
                                   text-no-results="{{trans('layout.MENU.none')}}"
-                                  text-searching="{{trans('layout.MENU.searching')}}"/>
+                                  text-searching="{{trans('layout.MENU.searching')}}"/> -->
             </form>
         </div>
     </div>
@@ -201,6 +213,7 @@
     </ul>
 </div>
 <div class="padding-top-lg">
+    <input type="hidden" name="csrfmiddlewaretoken" value="<?php echo csrf_token(); ?>">
     @yield('content')
 </div>
 
@@ -260,7 +273,6 @@
                 <div><span>{{trans("layout.FOOTER.newsletter")}}</span></div>
                 <div>
                     <a href="weibo.com/zoomov" target="_blank"><img src="/images/icons/weibo.svg" /></a>
-
                 </div>
                 <div>
                     <a href="twitter.com/zoomov_com" target="_blank"><img src="/images/icons/twitter.svg" /></a>
@@ -303,6 +315,7 @@
 <script src="{{ URL::asset('bower_components/angular/roundProgress.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular-scroll-animate.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angucomplete-alt.js') }}"></script>
+<script src="/bower_components/ng-tag/ng-tags-input.min.js"></script>
 <script src="{{ URL::asset('js/modules/zoomovApp.js') }}"></script>
 <script src="{{ URL::asset('js/controllers/header.js') }}"></script>
 @yield('script')

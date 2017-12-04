@@ -52,7 +52,7 @@
                 @if(!is_null(session('message')))
                     {{session('message')}}
                 @endif
-                <form name="zooform" id="zooform" novalidate class="fixed-form grey" method="POST" action="{{ route('login') }}">
+                <form name="zooform" id="zooform" novalidate class="fixed-form grey" method="POST" action="/login">
                     {{ csrf_field() }}
                     @if(is_null($user))
                     <div class="avatar">

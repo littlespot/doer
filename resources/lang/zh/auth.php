@@ -27,8 +27,6 @@ return [
     'forget' => '新密码寄到 :name',
     'invite' => 'ZOOMOV邀请您加入',
     'key' => '激活码不正确',
-    'goactive' => '奔去登录',
-    'uninivted' => '抱歉，系统无法找到您输入的邀请码',
     'unactivated' => '您还没有注册',
     'late' => '已超过激活期限，请重新注册',
     'activated' => '您的账户已激活',

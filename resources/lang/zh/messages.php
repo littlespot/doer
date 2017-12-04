@@ -19,7 +19,7 @@ return [
         'success' => '到位: ¥ :sum.00',
         'inprogress' => '等待: ¥ :sum.00'
     ],
-    'occupation' => [
+    'occupations' => [
         'Planner' => '企划',
         'Writer' => '作家',
         'Animation' => '动画',

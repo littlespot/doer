@@ -26,8 +26,6 @@ return [
     'forget' => 'Send new password to :name',
     'invite' => 'ZOOMOV invites you to join us',
     'key' => 'Woops, the activation key is not correct',
-    'goactive' => 'Go to login',
-    'uninivted' => 'Invalid invitation code',
     'unactivated' => 'Go to register',
     'late' => 'The activation date is expired. Register again',
     'activated' => 'Your account has been activated',

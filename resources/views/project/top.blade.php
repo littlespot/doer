@@ -49,43 +49,51 @@
         </h3>
         <div class="text-center"> {!!trans('project.agreement')!!}</div>
     </div>
-    <div class="tab-menu-bar">
-        <a class="tab-menu-item {{$step==0 ? 'active':''}}"
-           href="/admin/projects/{{$project->id}}?step=0">
-            <span>{{trans("project.CREATION.pitch")}}</span>
-        </a>
-        <a class="tab-menu-item {{$step==1 ? 'active':''}}"
-           href="/admin/projects/{{$project->id}}?step=1">
-            <span>{{trans("project.CREATION.description")}}</span>
-        </a>
+    <ul class="nav nav-tabs nav-justified nav-top-menu">
+        <li role="presentation" class="{{$step==0 ? 'active':''}}">
+            <a href="/admin/projects/{{$project->id}}?step=0">
+                <span>{{trans("project.CREATION.pitch")}}</span>
+            </a>
+        </li>
+        <li role="presentation" class="{{$step==1 ? 'active':''}}">
+            <a href="/admin/projects/{{$project->id}}?step=1">
+                <span>{{trans("project.CREATION.description")}}</span>
+            </a>
+        </li>
         @if($step>1 || $project->count > 199 || (!is_null($project->description) && strlen($project->description)> 199))
-            <a class="tab-menu-item {{$step==2 ? 'active':''}}"
-               href="/admin/projects/{{$project->id}}?step=2">
-                <span>{{trans("project.CREATION.container")}}</span>
-            </a>
-            <a class="tab-menu-item {{$step==3 ? 'active':''}}"
-               href="/admin/projects/{{$project->id}}?step=3">
-                <span>{{trans("project.CREATION.team")}}</span>
-            </a>
-            <a class="tab-menu-item {{$step==4 ? 'active':''}}"
-               href="/admin/projects/{{$project->id}}?step=4">
-                <span>{{trans("project.CREATION.recruitment")}}</span>
-            </a>
+            <li role="presentation" class="{{$step==2 ? 'active':''}}">
+                <a href="/admin/projects/{{$project->id}}?step=2">
+                    <span>{{trans("project.CREATION.container")}}</span>
+                </a>
+            </li>
+            <li role="presentation" class="{{$step==3 ? 'active':''}}">
+                <a href="/admin/projects/{{$project->id}}?step=3">
+                    <span>{{trans("project.CREATION.team")}}</span>
+                </a>
+            </li>
+            <li role="presentation" class="{{$step==4 ? 'active':''}}">
+                <a href="/admin/projects/{{$project->id}}?step=4">
+                    <span>{{trans("project.CREATION.recruitment")}}</span>
+                </a>
+            </li>
         @else
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.container")}}</span>
-            </div>
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.team")}}</span>
-            </div>
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.recruitment")}}</span>
-            </div>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
+                    <span>{{trans("project.CREATION.container")}}</span>
+                </a>
+            </li>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
+                    <span>{{trans("project.CREATION.team")}}</span>
+                </a>
+            </li>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
+                    <span>{{trans("project.CREATION.recruitment")}}</span>
+                </a>
+            </li>
         @endif
-    </div>
+    </ul>
     @yield('tabcontent')
 </div>
 

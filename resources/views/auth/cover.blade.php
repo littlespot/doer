@@ -42,7 +42,6 @@
         <h4>{{trans('layout.SLOGAN')}}</h4>
 
     </div>
-    <input type="hidden" name="csrfmiddlewaretoken" value="<?php echo csrf_token(); ?>">
     <div id="content" class="row">
         @yield('content')
     </div>

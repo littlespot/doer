@@ -78,7 +78,7 @@
                             {!! trans("project.TAGS.recruited") !!}
                         </div>
                     @else
-                        <div>{!! trans("project.TAGS.recruitment", ['cnt' => sizeof($project->recruit)]) !!}</div>
+                        <div>{!! trans("project.TAGS.recruitment", ['cnt' => $project->recruit->sum('quantity')]) !!}</div>
                     @endif
                 </div>
                 <div class="progress-content">

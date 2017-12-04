@@ -1,9 +1,9 @@
 @extends('layouts.zoomov')
 
 @section('content')
-    <link href="/css/projects.css" rel="stylesheet" />
-    <link href="/css/gallery.css" rel="stylesheet" />
     <div class="content padding-top-md" ng-controller="projectCtrl" ng-init="init('{{$filter}}')">
+        <link href="/css/projects.css" rel="stylesheet" />
+        <link href="/css/gallery.css" rel="stylesheet" />
         <div class="jumbotron container" >
             <div class="row" style="height: 100%">
                 <div class="col-md-5 col-xs-12" style="height: 100%; display: table-cell" >
@@ -113,7 +113,7 @@
             </div>
             <br/>
         </div>
-        <div id="projects">
+        <div id="projects" style="display:block;">
             <div class="panel">
                 <div class="container">
                     <div ng-if="projects.length == 0">
@@ -121,7 +121,8 @@
                     </div>
                     <br/>
                     <div ng-if="projects.length > 0" class="row">
-                        <div ng-repeat="p in projects"  class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div ng-repeat="p in projects"
+                             class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             @include('templates.project')
                         </div>
                     </div>

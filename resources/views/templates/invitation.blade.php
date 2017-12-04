@@ -56,12 +56,12 @@
             </div>
         </div>
         <form name="inviteForm" class="margin-top-md">
-        <textarea class="form-control" ng-model="invitation.message" name="mailBody"
-                  rows="20" ng-minlength="10" ng-maxlength="2000" required></textarea>
-            <div class="error" role="alert" ng-class="{'visible':inviteForm.mailBody.$touched || inviteForm.$submitted}">
-                <span ng-show="inviteForm.mailBody.$error.required" translate="notification.ERRORS.require.Invitation"></span>
-                <span ng-show="inviteForm.mailBody.$error.minlength" translate="notification.ERRORS.minlength.Invitation"></span>
-                <span ng-show="inviteForm.mailBody.$error.maxlength" translate="notification.ERRORS.maxlength.Invitation"></span>
+            <textarea class="form-control" ng-model="invitation.message" name="mailBody"
+                      rows="20" ng-minlength="10" ng-maxlength="2000" required></textarea>
+            <div class="error" role="alert" ng-class="{'visible':inviteForm.mailBody.$touched}">
+                <span ng-show="!invitation.message">{{trans('project.ERRORS.require.invitation')}}</span>
+                <span ng-show="invitation.message && invitation.message.length <10">{{trans('project.ERRORS.require.minlength', ['cnt'=>10])}}</span>
+                <span ng-show="invitation.message && invitation.message>2000">{{trans('project.ERRORS.require.maxlength', ['cnt'=>2000])}}</span>
             </div>
             <div class="text-right">
                 <div class="btn btn-default" ng-click="cancelInvite();">

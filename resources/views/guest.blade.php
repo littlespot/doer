@@ -32,16 +32,16 @@
                 </span>
                 <span class="text-default">
                     <?php echo file_get_contents(public_path("/images/icons/location.svg")); ?>
-                    <a href="/discover?city={{$city_id}}">{{$city}}&nbsp;({{$sortname}})</a>
+                    <a href="/discover?city={{$city_id}}">{{$city}}</a>
                 </span>
             </div>
 
             <div class="synopsis">{{ $synopsis }}</div>
             <div>
-                <a class="inner" href="/profile/{{$user_id}}">
+                <a class="inner" target="_blank" href="/profile/{{$user_id}}">
                     <img class="img-circle img-responsive" src="/context/avatars/{{$user_id}}.small.jpg" />
                 </a>
-                <a id="user" class="inner" href="/profile/{{$user_id}}">
+                <a id="user" class="inner" target="_blank" href="/profile/{{$user_id}}">
                     {{$username}}
                 </a>
             </div>
@@ -49,12 +49,12 @@
                 <div class="text-default" style="display:table-cell; width: 100%; vertical-align: middle">
                     <div>{!! trans('messages.finish', ["date" => str_limit($finish_at, 10, '')]) !!}</div>
                     <div>
-                        {!! trans('messages.member', ["cnt"=>$members_cnt]) !!}}
+                        {!! trans('messages.member', ["cnt"=>$members_cnt]) !!}
                     </div>
                     @if(sizeof($recruit) === 0)
                         <div class="text-danger">{{trans('messages.recruited')}}</div>
                     @else
-                        <div>{{trans('messages.recruitment', ["cnt"=>sizeof($recruit)])}}</div>
+                        <div>{!! trans('messages.recruitment', ["cnt"=>sizeof($recruit)]) !!}</div>
                     @endif
                 </div>
                 <div class="progress-content">
@@ -87,13 +87,12 @@
         <div class="col-xs-7">
             @if(sizeof($scripts) > 0)
                 <div class="table-responsive">
-                    <h4 translate="script.title">
-                    </h4>
+                    <h4>{{trans('project.LABELS.synopsis')}}</h4>
                     <table class="table">
                         <tbody>
                         @foreach($scripts as $script)
                             <tr>
-                                <td width="50%"><a href="{{$sscript->link}}">{{$script->description}}</a></td>
+                                <td width="50%"><a href="{{$script->link}}" target="_blank">{{$script->title}}</a></td>
                                 <td>
                                     @foreach($script->authors as $author)
                                         @if(is_null($author->link))
@@ -103,9 +102,9 @@
                                         @endif
                                     @endforeach
                                 </td>
-                                <td width="80px" class="text-right">
+                                <td width="100px" class="text-right">
                                     <span class="small"  class="pull-right">
-                                         {{$script->created_at->format('yyyy-MM-dd')}}
+                                         {{substr($script->created_at, 0, 11)}}
                                     </span>
                                 <td>
                             </tr>
@@ -120,9 +119,9 @@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th><span translate="budget.subject"></span></th>
+                            <th>{{trans('project.LABELS.budget_type')}}</th>
                             <th width="20%" class="number">{{trans('messages.budget.sum')}}</th>
-                            <th><span translate="budget.comment"></span></th>
+                            <th>{{trans('project.LABELS.budget_comment')}}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -160,15 +159,17 @@
                     </table>
                 </div>
             @endif
-            <h4 class="text-chocolate" translate="project.Description"></h4>
+            <h4 class="text-chocolate">{{trans('project.LABELS.description')}}</h4>
             <div>
                 {!! $description !!}
             </div>
         </div>
         <div class="col-xs-offset-1 col-xs-4">
+
             @foreach($recruit as $r)
                 <div class="title">
-                    <span class="quantity">{{trans("recruit", ["occupation"=>$r->name, "quantity"=>$r->quantity])}}</span>
+                    {{$r->name}}
+                     <span class="quantity">{{trans("project.TAGS.recruit", ["cnt"=>$r->quantity])}}</span>
                 </div>
                 <div>{!! $r->description !!}</div>
                 <hr/>

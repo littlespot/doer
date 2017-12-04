@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ZOOMOV</title>
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="/favicon.ico">
     <link href="/bower_components/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/css/common.css" rel="stylesheet" type="text/css">
 </head>
@@ -10,7 +10,7 @@
 <body>
 <div class="container">
 <h1 class="text-center">ZOOMOV网注册协议</h1>
-<p>本《用户注册协议》是您（下称"用户"或"您"，是指通过ZOOMOV网注册使用服务的自然人、法人或其他组织）与北京时代光尘文化传播有限公司（下称&rdquo;光尘文化&rdquo;）之间在使用光尘文化出品的互联网产品之前，注册ZOOMOV网帐号时签署的协议。</p>
+<p>本《用户注册协议》是您（下称"用户"或"您"，是指通过ZOOMOV网注册使用服务的自然人、法人或其他组织）与时代光尘信息科技（苏州）有限公司（下称&rdquo;时代光尘&rdquo;）之间在使用时代光尘出品的互联网产品之前，注册ZOOMOV网帐号时签署的协议。</p>
 <p>ZOOMOV网是一个严肃的影像创作人社区，在此注册为创作会员及在之后进行的创作活动中应遵守以下会员注册条款：</p>
 <h2>1、注册条款的接受</h2>
 <p>一旦会员在注册页面点击或勾选&ldquo;阅读并同意接受注册条款&rdquo;相关内容后，这就表示会员已经阅读并且同意与ZOOMOV网达成协议，并接受所有的注册条款。</p>

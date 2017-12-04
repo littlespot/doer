@@ -23,7 +23,8 @@
                     <input type="hidden" name="token" value="{{ $token }}">
 
                     <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                        <input id="email" type="email" class="form-text" name="email" placeholder="{{trans('auth.register_email')}}" ng-model="email" ng-init="init('{{ $email or old('email') }}')" required autofocus>
+                        <input id="email" type="email" class="form-text" name="email" placeholder="{{trans('auth.register_email')}}" ng-model="email"
+                                ng-init="init('{{ $email or old('email') }}')" required autofocus>
 
                         @if ($errors->has('email'))
                             <div class="text-danger small">

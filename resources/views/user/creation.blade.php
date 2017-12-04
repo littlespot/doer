@@ -16,17 +16,6 @@
         display: block;
         margin-bottom: 10px;
     }
-
-
-    .tab-menu-bar{
-        display: flex;
-        justify-content: space-around;
-    }
-
-    .tab-menu-item{
-        width: 100%;
-    }
-
 </style>
 <script type="text/ng-template" id="alert.html">
     <div class="modal-body" id="modal-body">
@@ -57,27 +46,28 @@
             <div class="text-center"> {!!trans('project.agreement')!!}</div>
 
         </div>
-        <div class="tab-menu-bar">
-            <a class="tab-menu-item active" href="#">
-                <span>{{trans("project.CREATION.pitch")}}</span>
-            </a>
-            <div class="tab-menu-item disabled"
-                 ng-click="alert()">
-                <span>{{trans("project.CREATION.description")}}</span>
-            </div>
-                <div class="tab-menu-item disabled"
-                     ng-click="alert()">
+        <ul class="nav nav-tabs nav-justified nav-top-menu">
+            <li role="presentation" class="active">
+                <a href="#">
+                    <span>{{trans("project.CREATION.pitch")}}</span>
+                </a>
+            </li>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
+                    <span>{{trans("project.CREATION.description")}}</span>
+                </a>
+            </li>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
                     <span>{{trans("project.CREATION.container")}}</span>
-                </div>
-                <div class="tab-menu-item disabled"
-                     ng-click="alert()">
-                    <span>{{trans("project.CREATION.team")}}</span>
-                </div>
-                <div class="tab-menu-item disabled"
-                     ng-click="alert()">
+                </a>
+            </li>
+            <li class="disabled">
+                <a href="javascript:void(0)" ng-click="alert()">
                     <span>{{trans("project.CREATION.recruitment")}}</span>
-                </div>
-        </div>
+                </a>
+            </li>
+        </ul>
         @yield('tabcontent')
     </div>
     <div class="content-margin">
