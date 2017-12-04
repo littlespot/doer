@@ -10,6 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::get('contracts', function()
 {
     return View::make('condition');
@@ -24,38 +25,30 @@ Route::get('terms', function()
     return View::make('terms');
 });
 
+
 Route::resource('users', 'UserController',
     array('only' => array('index','show')));
 
 Route::resource('occupations', 'OccupationController',
     array('only' => array('index','show')));
 
-Route::resource('invitation', 'PotentialController');
-
-Route::get('active', 'Auth\PasswordController@initiation');
-Route::get('relogin', 'Auth\LoginController@relogin');
-Route::get('activation/{key}/{uid}', 'Auth\RegisterController@activation');
-Route::get('password/reset', 'Auth\PasswordController@getReset');
-Route::post('password/reset', 'Auth\PasswordController@firstReset');
-Route::post('forget', 'Auth\AuthController@forget');
-
-Route::get('guest/{id}', 'GuestController@show');
-
 Route::resource('languages', 'LanguageController');
-
-Route::get('invite', function() {
-    return View::make('auth.invitation');
-});
 
 Route::group(['middleware' =>  ['active']], function () {
 
+    Route::get('/synopsis/film/{id}', 'FilmController@getSynopsis');
+    Route::get('/makers', 'FilmController@getMakers');
+    Route::get('/makers/{id}/{except}', 'FilmController@getMakersWithAddress');
+    Route::get('/contacts', 'FilmController@getContacts');
+
+    Route::resource('films', 'FilmController');
     Route::resource('profile', 'ProfileController');
     Route::resource('account', 'AccountController',
         array('only' => array('index','show')));
-
+/*
     Route::resource('questions', 'QuestionController',
         array('only' => array('index','show')));
-
+*/
 
     Route::get('ask/{id}', 'ProjectController@ask');
 
@@ -88,7 +81,7 @@ Route::group(['middleware' =>  ['active']], function () {
 });
 
 Auth::routes();
-
+Route::get('guest/{id}', 'GuestController@show');
 Route::get('personal', 'AccountController@detail')->middleware('auth');
 
 Route::group(['middleware' =>  ['auth']], function (){
@@ -102,17 +95,19 @@ Route::group(['middleware' =>  ['auth']], function (){
 
     Route::resource('locations', 'LocationController',
         array('only' => array('index','show')));
+    Route::get('country/{id}', 'LocationController@cities');
     Route::get('department/{id}', 'LocationController@department');
     Route::get('cities/{id}', 'LocationController@city');
-
 });
 
 // API ROUTES ==================================
 Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
+    Route::get('search/{key}', 'HomeController@search');
+
     Route::get('home/projects',  'HomeController@index');
 
     Route::get('filter', 'ProjectController@refresh');
-
+/*
     Route::get('questions/{id}', 'QuestionController@display');
     Route::get('questionRelated/{id}', 'QuestionController@relates');
     Route::get('questionTags', 'QuestionController@tags');
@@ -121,7 +116,7 @@ Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
 
     Route::resource('answers', 'QuestionAnswerController',
         array('only' => array('index','show')));
-
+*/
     Route::resource('recruitments', 'RecruitmentController',
         array('only' => array('index','show')));
 
@@ -152,17 +147,11 @@ Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
     Route::resource('projects', 'ProjectController',
         array('only' => array('index','show')));
 
-    Route::get('searchItems', 'ProjectController@search');
-    Route::get('search', 'ProjectController@search');
-
     Route::get('project/reports/{id}', 'ProjectController@reports');
     Route::put('project/followers/{id}', 'ProjectController@followers');
     Route::put('project/lovers/{id}', 'ProjectController@lovers');
 
     Route::get('location/projects', 'LocationController@projects');
-
-    Route::resource('occupations', 'OccupationController',
-        array('only' => array('index','show')));
 
     Route::resource('genres', 'GenreController',
         array('only' => array('index','show')));
@@ -198,9 +187,45 @@ Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
     Route::get('friends/{id}', 'RelationController@friends');
     Route::get('fans/{id}', 'RelationController@fans');
     Route::get('idols/{id}', 'RelationController@idols');
+});
+Route::group(['prefix' => 'film', 'middleware' =>  ['active']], function() {
+    Route::get('/{id}/{step}',  'FilmController@home');
+    Route::get('/{id}', 'FilmController@previewForm');
+
+    Route::post('/title', 'FilmController@postTitle');
+    Route::post('/time', 'FilmController@postTime');
+    Route::post('/production', 'FilmController@postProduction');
+    Route::post('/format', 'FilmController@postFormat');
+    Route::post('/screen', 'FilmController@postScreen');
+    Route::post('/producer', 'FilmController@postProducer');
+    Route::post('/rights', 'FilmController@postRights');
+
+    Route::put('/screen/{format}', 'FilmController@screenFormat');
+    Route::put('/{id}/maker/{person}', 'FilmController@saveMaker');
+
+
+    Route::post('/genre', 'FilmController@postGenre');
+    Route::post('/synopsis', 'FilmController@postSynopsis');
+    Route::post('/director', 'FilmController@postDirector');
+    Route::post('/credit', 'FilmController@postCredit');
+
+    Route::post('/{id}/festival',  'FilmController@saveFestival');
+    Route::post('/{id}/diffusion',  'FilmController@saveDiffusion');
+    Route::post('/{id}/theater',  'FilmController@saveTheater');
+
+    Route::post('/{id}/synopsis', 'FilmController@saveSynopsis');
+    Route::post('/{id}/credit', 'FilmController@saveCredit');
+    Route::post('/{id}/upload/{format}', 'FilmController@upload');
+
+    Route::post('/{id}/preview', 'FilmController@preview');
+    Route::post('/{id}/remove/{format}', 'FilmController@remove');
+
+    Route::delete('/{id}/synopsis/{lang_id}', 'FilmController@descrotySynopsis');
+    Route::delete('/{format}/{id}', 'FilmController@descrotyTable');
+    Route::delete('/screen/{format}/{id}', 'FilmController@descrotyScreenFormat');
+    Route::delete('/maker/{format}/{id}', 'FilmController@descrotyMaker');
 
 });
-
 Route::group(['middleware' =>  ['professional']], function() {
     Route::get('api/videos', 'VideoController@refresh');
 
@@ -208,12 +233,12 @@ Route::group(['middleware' =>  ['professional']], function() {
 });
 
 Route::group(['prefix' => 'person', 'middleware' =>  ['active']], function() {
-    Route::get('questions/{id}',  'QuestionController@personal');
+    /*Route::get('questions/{id}',  'QuestionController@personal');
 
     Route::get('asks/{id}', 'QuestionController@asks');
     Route::get('answers/{id}', 'QuestionController@answers');
     Route::get('follows/{id}', 'QuestionController@follows');
-    Route::get('supports/{id}', 'QuestionController@supports');
+    Route::get('supports/{id}', 'QuestionController@supports');*/
 
     Route::get('reports/{id}', 'ReportController@personal');
     Route::get('writes/{id}', 'ReportController@writes');
@@ -235,11 +260,13 @@ Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
     Route::resource('teams', 'TeamController',
         array('only' => array('update', 'store', 'destroy')));
 
-    Route::resource('answers', 'QuestionAnswerController',
-        array('only' => array('update','store', 'destroy')));
+    /*Route::resource('answers', 'QuestionAnswerController',
+        array('only' => array('update','store', 'destroy')));*/
 
     Route::resource('preparations', 'PreparationController');
+
     Route::post('send', 'PreparationController@send');
+
     Route::post('preparation', 'PreparationController@description');
     Route::get('preparation/{id}', 'PreparationController@preview');
 
@@ -283,9 +310,9 @@ Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
     Route::get('preparationsCount', 'AccountController@preparations');
     Route::get('messagesCount', 'AccountController@messages');
 
-    Route::get('occupations', 'OccupationController@admin');
-    Route::get('question/{id}', 'QuestionController@edit');
-    Route::post('question', 'QuestionController@change');
-    Route::resource('questions', 'QuestionController',
-        array('only' => array('update','store', 'destroy')));
+    /* Route::get('question/{id}', 'QuestionController@edit');
+     Route::post('question', 'QuestionController@change');
+
+     Route::resource('questions', 'QuestionController',
+         array('only' => array('update','store', 'destroy')));*/
 });
