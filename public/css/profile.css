@@ -59,7 +59,7 @@
     line-height: 1.8em;
     font-size: 10px;
     cursor: pointer;
-    border: 1px solid #999;
+    border: 1px solid #293a4f;
     background: #fff;
 }
 
@@ -73,9 +73,9 @@
     content: "\00a0";
     cursor: pointer;
     background: #fff;
-    border-top: 1px solid #999;
-    border-right: 1px solid #999;
-    border-bottom: 1px solid #999;
+    border-top: 1px solid #293a4f;
+    border-right: 1px solid #293a4f;
+    border-bottom: 1px solid #293a4f;
 }
 
 
@@ -86,7 +86,7 @@
     text-align: center;
     line-height: 1.8em;
     font-size: 10px;
-    cursor: hand;
+    cursor: help;
     background: #fff;
     color: #293a4f;
     border: 1px solid #293a4f;
@@ -139,53 +139,53 @@
 
 .my .ifollow,
 .myFan .ifollow{
-    background: white;
+    background: #fff;
 }
 
 .myFan .ifollow:after,
 .my .ifollow:after{
-    background: white;
+    background:#fff;
 }
 
-.myFan .ifollow:hover,
-.my .ifollow:hover{
+.ifollow:hover,
+.ifollow:hover{
     background: #999;
-    color:#fff;
+    color:#293a4f;
 }
 
-.myFan .ifollow:hover:after,
-.my .ifollow:hover:after{
+.ifollow:hover:after,
+.ifollow:hover:after{
     background: #999;
-    color:#fff;
+    color:#293a4f;
 }
 
 .myIdol .ifollow,
 .myFriend .ifollow{
-    background: #999;
+    background: #293a4f;
     color: #fff;
 }
 
 .myIdol .ifollow:after,
 .myFriend .ifollow:after{
-    background: #999;
+    background: #293a4f;
     color: #fff;
  }
 
 .myIdol .ifollow:hover,
 .myFriend .ifollow:hover{
-    background: #fff;
-    color:#999;
+    background: #999;
+    color: #293a4f;
 }
 
 .myIdol .ifollow:hover:after,
 .myFriend .ifollow:hover:after{
-    background: #fff;
-    color:#999;
+    background: #999;
+    color: #293a4f;
 }
 
 .myFan .followme,
 .myFriend .followme{
-    color: white;
+    color: #fff;
     background: #293a4f;
 }
 

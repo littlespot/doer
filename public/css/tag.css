@@ -254,7 +254,7 @@ ol.tags, ul.tags {
 
 .ribbon-rotate span::before {
   content: "";
-  position: absolute; left: 0px; top: 100%;
+  position: absolute; left: 0; top: 100%;
   z-index: -1;
   border-left: 3px solid #D77459;
   border-right: 3px solid transparent;
@@ -263,7 +263,7 @@ ol.tags, ul.tags {
 }
 .ribbon-rotate span::after {
   content: "";
-  position: absolute; right: 0px; top: 100%;
+  position: absolute; right: 0; top: 100%;
   z-index: -1;
   border-left: 3px solid transparent;
   border-right: 3px solid #D77459;

@@ -1,7 +1,7 @@
 /* document elements */
 html,
 body {
-    font-family: "Microsoft YaHei", SimHei, helvetica;
+    font-family: "Microsoft YaHei", SimHei, helvetica, sans-serif;
     background-color: #fff;
     color: #484d4e;
     overflow-x:hidden;
@@ -18,19 +18,19 @@ body.zh{
 
 h1, .h1
 {
-    font-family: "Microsoft YaHei", SimHei, helvetica;
+    font-family: "Microsoft YaHei", SimHei, helvetica, sans-serif;
     font-size: 28px;
     font-weight: bold;
 }
 h2, .h2
 {
-    font-family: "malgun gothic", helvetica,simhei;
+    font-family: "malgun gothic", helvetica,simhei, sans-serif;
     font-size: 24px;
     font-weight: bold;
 }
 h3, .h3
 {
-    font-family: "Yu Gothic", helvetica,SimHei;
+    font-family: "Yu Gothic", helvetica,SimHei, sans-serif;
     font-size: 20px;
     font-weight: bolder;
     text-align: center;
@@ -40,26 +40,26 @@ h3, .h3
 }
 h4, .h4
 {
-    font-family: "Microsoft YaHei", helvetica,SimHei;
+    font-family: "Microsoft YaHei", helvetica,SimHei, sans-serif;
     font-size: 18px;
     color:#999;
     padding: 10px 0;
 }
 h5, .h5
 {
-    font-family: "Microsoft YaHei",helvetica,SimHei;
+    font-family: "Microsoft YaHei",helvetica,SimHei, sans-serif;
     font-size: 16px;
 }
 h6 {
     margin-top: 0;
-    font-family: Meiryo, "Microsoft YaHei", helvetica,SimHei;
+    font-family: Meiryo, "Microsoft YaHei", helvetica,SimHei, sans-serif;
     font-size: 14px;
     font-weight:bolder;
 }
 
 .h6{
     margin-top: 0;
-    font-family: Meiryo, "Microsoft YaHei", helvetica,SimHei;
+    font-family: Meiryo, "Microsoft YaHei", helvetica,SimHei, sans-serif;
     font-size: 14px;
     font-weight:bolder;
 }
@@ -462,6 +462,12 @@ h6 {
     background-color: #fff;
 }
 
+a.text-important:hover,
+a.text-important:focus
+{
+    color: #D77459;
+    text-decoration: underline;
+}
 /*form controllers */
 /*input[type="checkbox"] {
     visibility:hidden;
@@ -524,19 +530,23 @@ input[type="checkbox"]:checked + label+span{
     width: 14px;
     height: 14px;
     position: absolute;
-    top: 4px;
+    top: 7px;
     cursor: pointer;
 }
 .checkbox label:after {
     content: '';
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     position: absolute;
     top: 0;
     left: 0;
     background-color: transparent;
     border: 1px solid #ccc;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 -15px 10px -12px rgba(0,0,0,0.05);
+}
+
+.checkbox span{
+    margin-left: 20px;
 }
 
 .checkbox-small {
