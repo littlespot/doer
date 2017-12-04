@@ -56,7 +56,7 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
     }
 
     $scope.supportAnswer = function (answer, user) {
-        if (answer.user_id == user)
+        if (answer.user_id.equals(user))
             return;
 
         answer.supporting = true;
@@ -81,9 +81,7 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
     }
 
     $scope.supportConfirmed = function (answer) {
-        $http.put('/admin/answers/' + answer.id, {
-            _token: $("body input[name='csrfmiddlewaretoken']").val()
-        })
+        $http.put('/admin/answers/' + answer.id)
             .success(function (result) {
                 if(!result)
                     return;
@@ -102,7 +100,7 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
 
     $scope.follow = function () {
         $scope.following = true;
-        $http.put('/admin/questions/'+ $scope.id,  {_token:$("body input[name='csrfmiddlewaretoken']").val()})
+        $http.put('/admin/questions/'+ $scope.id)
             .success(function(){
                 var follower = $("#followers");
                 var counter = $('#count', follower);
@@ -131,7 +129,6 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
 
     $scope.send = function () {
         $scope.answer.sending = true;
-        $scope.answer._token = $("body input[name='csrfmiddlewaretoken']").val();
         $scope.answer.question_id = $scope.id;
         $scope.answer.editor = $('#editor').html();
         $http.post('/admin/answers', $scope.answer)
@@ -166,20 +163,18 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
 
             var page = 0;
             if($scope.apagination.show){
-                if($scope.apagination.currentPage == $scope.apagination.lastPage)
+                if($scope.apagination.currentPage.equals($scope.apagination.lastPage))
                 {
-                    page = $scope.answers.length == 1 ? $scope.apagination.currentPage -1 : 0;
+                    page = $scope.answers.length < 0 ? $scope.apagination.currentPage -1 : 0;
                 }
                 else{
                     page = $scope.apagination.currentPage;
                 }
             }
             answer.deleting = true;
-            if(answer.user_id != auth)
+            if(!answer.user_id.equals(auth))
                 return;
-            $http.delete('/admin/answers/' +answer.id, {
-                    params:{_token: $("body input[name='csrfmiddlewaretoken']").val(), page:page}
-                })
+            $http.delete('/admin/answers/' +answer.id)
                 .success(function (result) {
                     $scope.mineCnt -= 1;
                     if(page){
@@ -191,7 +186,7 @@ appZooMov.controller("questionCtrl", function($sce, $rootScope, $scope, $log, $h
                         var index = -1;
 
                         for(var i = 0; i < $scope.answers.length && index < 0; i++){
-                            if($scope.answers[i].id == answer.id){
+                            if($scope.answers[i].id.equals(answer.id)){
                                 index = i;
                                 $scope.answers.splice(index,1);
                                 $scope.apagination.total -= 1;

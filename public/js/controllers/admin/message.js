@@ -13,7 +13,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             $scope.out_invitations_cnt = invitations[1].cnt;
         }
         else if(invitations.length == 1){
-            if(invitations[0].outbox == 0)
+            if(invitations[0].outbox < 1)
                 $scope.in_invitations_cnt = invitations[0].cnt;
             else
                 $scope.out_invitations_cnt = invitations[0].cnt;
@@ -28,7 +28,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             $scope.out_messages_cnt = messages[1].cnt;
         }
         else if(messages.length == 1){
-            if(messages[0].outbox == 0)
+            if(messages[0].outbox < 1)
                 $scope.in_messages_cnt = messages[0].cnt;
             else
                 $scope.out_messages_cnt = messages[0].cnt;
@@ -96,12 +96,12 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             return;
         }
 
-        if($scope.selectedType == "invitations")
+        if($scope.selectedType.equals("invitations"))
             $scope.out_invitations_cnt += 1;
         else
             $scope.out_messages_cnt += 1;
 
-        if($scope.selectedBox == 'out'){
+        if($scope.selectedBox.equals('out')){
             $http.get('/api/' + $scope.selectedType, {
                 params:{box:'out'}
             })
@@ -126,7 +126,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
     }
 
     $scope.read = function (message, checked) {
-        if($scope.message.id == message.id){
+        if($scope.message.id.equals(message.id)){
             $scope.message = {id:0};
         }
         else{
@@ -166,7 +166,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
         var message = $scope.mail;
         message.loading = true;
 
-        $http.post('/admin/messages', {receiver_id:user.originalObject.id, subject:message.subject, body:message.body, _token:$('input[name="csrfmiddlewaretoken"]').val()})
+        $http.post('/admin/messages', {receiver_id:user.originalObject.id, subject:message.subject, body:message.body})
             .success(function (result) {
                 message.loading = false;
                 $scope.out_messages_cnt += 1;
@@ -183,7 +183,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             return;
         message.deleting = true;
 
-        $http.post('/admin/messages', {parent_id:message.parent_id ? message.parent_id : message.id, receiver_id:message.sender_id, subject:message.subject, body:response, _token:$('input[name="csrfmiddlewaretoken"]').val()})
+        $http.post('/admin/messages', {parent_id:message.parent_id ? message.parent_id : message.id, receiver_id:message.sender_id, subject:message.subject, body:response})
             .success(function (result) {
                 message.deleting = false;
                 message.replied = 1;
@@ -210,13 +210,13 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             message.deleting = true;
 
             $http.delete('/admin/' + $scope.selectedType + '/' + message.id, {
-                params:{box:$scope.selectedBox, parent: all ? message.parent_id: 0, _token:$('input[name="csrfmiddlewaretoken"]').val()}
+                params:{box:$scope.selectedBox, parent: all ? message.parent_id: 0}
             })
                 .success(function (result) {
                     if(!result)
                         return;
                     message.deleting = false;
-                    if($scope.selectedBox == "in"){
+                    if($scope.selectedBox.equals("in")){
                         $scope.messages = result.data;
                         $scope.pagination = $rootScope.setPage(result);
                         $scope.in_messages_cnt = $scope.pagination.total;
@@ -246,13 +246,12 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
 
             message.deleting = true;
 
-            $http.put('/admin/' + $scope.selectedType + '/' + message.id, {accept: accept, _token:$('input[name="csrfmiddlewaretoken"]').val()})
+            $http.put('/admin/' + $scope.selectedType + '/' + message.id, {accept: accept})
                 .success(function (result) {
                     if(!result)
                         return;
 
-                    if(result != 'OK'){
-                        alert(result);
+                    if(!result.equals('OK')){
                         return;
                     }
 
@@ -280,7 +279,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             size:'lg',
             templateUrl: 'confirm.html',
             controller: function ($scope) {
-                $scope.confirm = $scope.selectedBox == 'in' ? 'confirmI': 'confirmU';
+                $scope.confirm = $scope.selectedBox.equals('in') ? 'confirmI': 'confirmU';
             }
         });
 
@@ -291,7 +290,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
             message.deleting = true;
 
             $http.delete('/admin/' + $scope.selectedType + '/' + message.id, {
-                params:{box: $scope.selectedBox, _token: $('input[name="csrfmiddlewaretoken"]').val()}
+                params:{box: $scope.selectedBox}
             })
                 .success(function (result) {
                     if(!result)
@@ -299,7 +298,7 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
 
                     $scope.loadPage(message.id);
 
-                    if($scope.selectedBox == 'in')
+                    if($scope.selectedBox.equals('in'))
                         $scope.in_invitations_cnt = $scope.pagination.total;
                     else
                         $scope.out_invitations_cnt = $scope.pagination.total;
@@ -310,10 +309,10 @@ appZooMov.controller("messagesCtrl", function($rootScope,$http, $scope, $filter,
 
 
     $scope.loadPage = function (id) {
-        if (!$scope.pagination.show || ($scope.pagination.currentPage == $scope.pagination.lastPage && $scope.messages.length > 1)) {
+        if (!$scope.pagination.show || ($scope.pagination.currentPage.equals($scope.pagination.lastPage) && $scope.messages.length > 1)) {
             var index = -1;
             for (var i = 0; i < $scope.messages.length && index < 0; i++) {
-                if ($scope.messages[i].id == id) {
+                if ($scope.messages[i].id.equals(id)) {
                     index = i;
                     $scope.messages.splice(index, 1);
                     $scope.pagination.total -= 1

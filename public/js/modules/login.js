@@ -42,20 +42,20 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
     $rootScope.getCurrentLanguage = function (lang) {
         for(var i = 0; i < $rootScope.languages.length; i++)
         {
-            if($rootScope.languages[i].id == lang){
+            if($rootScope.languages[i].id.equals(lang)){
                 $rootScope.currentLang = $rootScope.languages[i];
                 i = $rootScope.languages.length;
             }
         }
 
-        if($translate.use() != lang){
+        if(!$translate.use().equals(lang)){
             $translate.use(lang)
         }
     }
 
     $rootScope.setLanguage = function (lang) {
         $rootScope.loading();
-        $http.get('/languages/'+lang, {_token:$('input[name="csrfmiddlewaretoken"]').val()})
+        $http.get('/languages/'+lang)
             .success(function () {
                 window.location.reload();
             })
@@ -76,14 +76,14 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
 
 appZooMov.controller('pwdCtrl', function () {
     $scope.changePwd = function(pwd){
-        if(pwd.old == pwd.new){
+        if(pwd.old.equals(pwd.new)){
             $scope.result = 'samepwd';
             $scope.openModal(true);
         }
         else {
-            $http.put('/account/'+ pwd, {_token: $('input[name="csrfmiddlewaretoken"]').val()})
+            $http.put('/account/'+ pwd)
                 .success(function (data) {
-                    if (data == '1') {
+                    if (data.equals('1')) {
                         $uibModal.open({
                             animation: true,
                             templateUrl: 'alert.html',

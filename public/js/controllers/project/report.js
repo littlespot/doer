@@ -45,9 +45,7 @@ appZooMov.controller("reportCtrl", function($rootScope, $scope, $http, $log, $ui
             if (!confirm)
                 return;
             $rootScope.loading();
-            $http.delete('/admin/reports/' + $scope.id,{
-                params:{_token: $("body input[name='csrfmiddlewaretoken']").val()}
-            })
+            $http.delete('/admin/reports/' + $scope.id)
                 .success(function () {
                     window.location.href = "/project/" + $scope.project +'?tab=2';
                 })
@@ -80,7 +78,7 @@ appZooMov.controller("reportCtrl", function($rootScope, $scope, $http, $log, $ui
     }
 
     $scope.loveConfirmed = function () {
-        $http.put('/admin/reports/love/' + $scope.id, {_token: $("body input[name='csrfmiddlewaretoken']").val()})
+        $http.put('/admin/reports/love/' + $scope.id)
             .success(function (result) {
                 if(!result)
                     return;

@@ -36,8 +36,7 @@ appZooMov.directive('inviteContent', function ($http, $log, $uibModal) {
                     receiver_id:scope.invitation.receiver.id,
                     occupation_id:scope.invitation.occupation.id,
                     project_id:scope.invitation.project.id,
-                    message:scope.invitation.message,
-                    _token:$('input[name="csrfmiddlewaretoken"]').val()
+                    message:scope.invitation.message
                 })
                     .success( function(){
                         scope.invitation.loading = false;

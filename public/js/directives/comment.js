@@ -34,7 +34,6 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
                 $http({method:'POST',
                     url:'/admin/comment/'+attrs['relatedOption'],
                     data:{
-                        _token: $("body input[name='csrfmiddlewaretoken']").val(),
                         parent_id: reply ? comment.parent.id:null,
                         message: comment.message,
                         related_id: scope.id
@@ -65,7 +64,7 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
                 if(comment.mine)
                     return;
                 comment.supporting = true;
-                $http.put('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id, {_token: $("body input[name='csrfmiddlewaretoken']").val()})
+                $http.put('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id)
                     .success(function (result) {
                         if(comment.supported) {
                             comment.supports_cnt -= 1;
@@ -97,12 +96,12 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
                 modalInstance.result.then(function (confirm) {
                     if (!confirm)
                         return;
-                    $http.delete('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id + '?_token=' + $("body input[name='csrfmiddlewaretoken']").val())
+                    $http.delete('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id)
                         .then(function successCallback() {
-                            if (!scope.pagination.show || (scope.pagination.currentPage == scope.pagination.lastPage && scope.comments.length > 1)) {
+                            if (!scope.pagination.show || (scope.pagination.currentPage.equals(scope.pagination.lastPage) && scope.comments.length > 1)) {
                                 var index = -1;
                                 for (var i = 0; i < scope.comments.length && index < 0; i++) {
-                                    if (scope.comments[i].id == comment.id) {
+                                    if (scope.comments[i].id.equals(comment.id)) {
                                         index = i;
                                         scope.comments_cnt -= 1;
                                         $("#sup_comments").text(scope.comments_cnt);

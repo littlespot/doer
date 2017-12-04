@@ -19,31 +19,17 @@ appZooMov.controller("headerCtrl", function($scope, $rootScope, $filter, $http, 
                 $rootScope.preparations = result;
             });
     }
-    $scope.signout = function() {
-        if ( $cookies.get('user') != undefined) {
-            $cookies.remove('user');
-        }
 
-        $window.location.href = '/logout';
+    $scope.load = function (query) {
+        return $http.get('/api/searchItems?query=' + query);
     }
 
-    $scope.searchFocus = function () {
-        if(!$scope.projectIndex.length){
-            $scope.searchOn = true;
-            $http.get('/api/searchItems')
-                .success(function (data) {
-                    $scope.projectIndex = data;
-                    $scope.searchOn = false;
-                })
-                .error(function (err) {
-                    $scope.searchOn = false;
-                    $log.error('failure loading items for search', err);
-                })
+    $scope.itemSelected = function (selected) {
+        if(selected.title){
+            if(selected.originalObject.id.startsWith('z'))
+                $window.location.href = '/profile/' + selected.originalObject.id;
+            else
+                $window.location.href = '/project/' + selected.originalObject.id;
         }
-    }
-    
-    $scope.projectSelected = function (selected) {
-        if(selected.title)
-            $window.location.href = '/project/' + selected.originalObject.id;
     }
 })

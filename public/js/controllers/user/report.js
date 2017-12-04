@@ -55,9 +55,7 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
             if (!confirm)
                 return;
 
-            $http.delete('/admin/reports/comment/' + comment.id, {
-                params: {_token: $("body input[name='csrfmiddlewaretoken']").val()}
-            })
+            $http.delete('/admin/reports/comment/' + comment.id)
                 .then(function successCallback(result) {
                     if(!result)
                         return;
@@ -95,9 +93,7 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
 
     $scope.supportConfirmed = function(comment)
     {
-        $http.put('/admin/reports/comment/' + comment.id, {
-            _token: $("body input[name='csrfmiddlewaretoken']").val()
-        })
+        $http.put('/admin/reports/comment/' + comment.id)
             .success(function (result) {
                 if(!result)
                     return;
@@ -137,9 +133,7 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
     }
 
     $scope.loveConfirmed = function (report, admin) {
-        $http.put('/admin/reports/love/' + report.id, {
-            _token: $("body input[name='csrfmiddlewaretoken']").val()
-        })
+        $http.put('/admin/reports/love/' + report.id)
             .success(function (result) {
                 if(!result)
                     return;
@@ -182,7 +176,7 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
         else {
             var index = -1;
             for(var i = 0; i < $scope.results.length && index < 1; i++){
-                if($scope.results[i].id == id){
+                if($scope.results[i].id.equals(id)){
                     index = i;
                     $scope.results.splice(index, 1);
 

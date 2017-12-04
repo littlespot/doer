@@ -33,7 +33,6 @@ appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log,
 
                 scope.recruit.loading = true;
                 scope.newrecruit.project_id = scope.project.id;
-                scope.newrecruit._token= $("body input[name='csrfmiddlewaretoken']").val();
 
                 $http.post(url, scope.newrecruit)
                     .success(function (result) {
@@ -53,7 +52,6 @@ appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log,
 
             scope.saveEditRecruit = function(){
                 scope.recruitInEdit.submitted = scope.submitted;
-                scope.recruitInEdit._token= $("body input[name='csrfmiddlewaretoken']").val();
                 scope.recruit.editing = true;
                 $http.put(url + scope.recruitInEdit.id,  scope.recruitInEdit)
                     .success(function (result) {
@@ -86,7 +84,7 @@ appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log,
                         return false;
 
                     $rootScope.loading();
-                    $http.delete(url + id, {params:{_token:$("body input[name='csrfmiddlewaretoken']").val(), submitted:scope.submitted}})
+                    $http.delete(url + id, {params:{submitted:scope.submitted}})
                         .then(function successCallback() {
                             var old = $rootScope.removeValue(scope.recruit, id, 'id');
                             $("#opt_role_" +old.occupation_id).show();

@@ -33,7 +33,7 @@ appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log
     $scope.removeLang = function (lang) {
         var index = -1;
         for(var i = 0; i < $scope.project.lang.length && index < 0; i++){
-            if($scope.project.lang[i].id == lang){
+            if($scope.project.lang[i].id.equals(lang)){
                 index = i;
             }
         }
@@ -65,7 +65,6 @@ appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log
             });
         }
 
-        $scope.project._token= $("body input[name='csrfmiddlewaretoken']").val();
         var lang = [];
         angular.forEach($scope.project.lang, function (item) {
             lang.push(item.language_id);

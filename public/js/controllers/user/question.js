@@ -85,9 +85,7 @@ appZooMov.controller("answersCtrl", function($rootScope, $scope, $http, $log, $u
             if (!confirm)
                 return;
             answer.deleting = true;
-            $http.delete('/admin/answers/' + answer.id, {
-                params: {_token: $("body input[name='csrfmiddlewaretoken']").val()}
-                })
+            $http.delete('/admin/answers/' + answer.id)
                 .success(function (result) {
                     if(!result)
                         return;
@@ -126,7 +124,7 @@ appZooMov.controller("answersCtrl", function($rootScope, $scope, $http, $log, $u
     }
 
     $scope.followConfirmed = function (question, admin) {
-        $http.put('/admin/questions/' + question.id+'?_token='+ $("body input[name='csrfmiddlewaretoken']").val())
+        $http.put('/admin/questions/' + question.id)
             .success(function (result) {
                 if(!result)
                     return;
@@ -170,7 +168,7 @@ appZooMov.controller("answersCtrl", function($rootScope, $scope, $http, $log, $u
     }
 
     $scope.supportConfirmed = function (answer, admin) {
-        $http.put('/admin/answers/' + answer.id+'?_token='+ $("body input[name='csrfmiddlewaretoken']").val())
+        $http.put('/admin/answers/' + answer.id)
             .success(function (result) {
                 if(!result)
                     return;
@@ -212,7 +210,7 @@ appZooMov.controller("answersCtrl", function($rootScope, $scope, $http, $log, $u
         else {
             var index = -1;
             for(var i = 0; i < $scope.results.length && index < 1; i++){
-                if($scope.results[i].id == id){
+                if($scope.results[i].id.equals(id)){
                     index = i;
                     $scope.results.splice(index, 1);
 

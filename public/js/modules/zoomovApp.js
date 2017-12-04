@@ -3,11 +3,12 @@
  */
 var appZooMov = angular
     .module('zooApp', ['ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'ngTouch', 'ngCookies','ngResource','ngSanitize', 'angular-svg-round-progressbar',
-        'pascalprecht.translate', 'angular-scroll-animate', 'angucomplete-alt']);
+        'pascalprecht.translate', 'angular-scroll-animate', 'angucomplete-alt', 'ngTagsInput']);
 
 appZooMov.config(function($interpolateProvider, $translateProvider, $httpProvider) {
     $interpolateProvider.startSymbol('<%');
     $interpolateProvider.endSymbol('%>');
+    $httpProvider.defaults.headers.post['X-CSRF-TOKEN'] = $('meta[name="csrf-token"]').attr('content');
     $translateProvider.useStaticFilesLoader({
         prefix: window.location.origin + '/i10n/',
         suffix: '.json'
@@ -25,7 +26,7 @@ appZooMov
             if(!input || id < 1)
                 return null;
             for (var i=0; i<input.length; i++) {
-                if (input[i].id == id) {
+                if (input[i].id.equals(id)) {
                     return input[i];
                 }
             }
@@ -37,7 +38,7 @@ appZooMov
             if(!input || id < 1)
                 return -1;
             for (var i=0; i<input.length; i++) {
-                if (input[i].user_id == id) {
+                if (input[i].user_id.equals(id)) {
                     return i;
                 }
             }
@@ -55,7 +56,7 @@ appZooMov
                 var found = -1;
                 for(var i = 0; i < arr2.length && found <0; i++){
                     var item2 = arr2[i];
-                    if(item2.id == item.id)
+                    if(item2.id.equals(item.id))
                         found = i;
                 }
 
@@ -79,7 +80,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
     $rootScope.setValue = function (array, val, callback) {
         var index = -1;
         for(var i = 0; i < array.length && index < 0; i++){
-            if(array[i].id == val.id){
+            if(array[i].id.equals(val.id)){
                 index = i;
                 array[i] = val;
             }
@@ -98,7 +99,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
         var index = -1;
         var result = null;
         for(var i = 0; i < array.length && index <0; i++){
-            if(array[i][key] == val){
+            if(array[i][key].equals(val)){
                 index = i;
                 result = array[i];
             }
@@ -110,7 +111,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
     $rootScope.languages = [{id:"zh", name:"中"}, {id:"en", name:"EN"}];
     $rootScope.setLanguage = function (lang) {
         $rootScope.loading();
-        $http.get('/languages/'+lang, {_token:$('input[name="csrfmiddlewaretoken"]').val()})
+        $http.get('/languages/'+lang)
             .success(function () {
                  window.location.reload();
             })
@@ -167,7 +168,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
             }
         }
 
-        return total;
+        return total.toFixed(2);
     }
 
     $rootScope.differenceInDays = function(firstdate, seconddate) {

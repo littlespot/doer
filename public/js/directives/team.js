@@ -9,7 +9,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
             scope.team_error = {user:null, role:null};
             scope.inTeam = function (id) {
                 for(var i = 0; i < scope.team.length; i++){
-                    if(scope.team[i].user_id == id){
+                    if(scope.team[i].user_id.equals(id)){
                         return scope.team[i];
                     }
                 }
@@ -46,8 +46,8 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                         }
                         var index = -1;
                         for (var i = 0; i < scope.users.length && index < 0; i++) {
-                            if (scope.users[i].location == author.email) {
-                                if (scope.users[i].username == author.name) {
+                            if (scope.users[i].location.equals(author.email)) {
+                                if (scope.users[i].username.equals(author.name)) {
                                     index = i;
                                     var member = scope.inTeam(scope.users[i]);
                                     if(member){
@@ -141,7 +141,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
 
                     var index = -1;
                     for(var i = 0; i < scope.users.length && index <0; i++) {
-                        if (scope.users[i].location == author.email && scope.users[i].id != author.id) {
+                        if (scope.users[i].location.equals(author.email) && !scope.users[i].id.equals(author.id)) {
                             index = i;
                             scope.team_error.user = 'e';
                             return false;
@@ -164,7 +164,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
             }
 
             scope.saveTeam = function () {
-                if(scope.teamInEdit.username && scope.teamInEdit.username.length && (scope.teamInEdit.member.title == scope.teamInEdit.username || scope.teamInEdit.member.originalObject == scope.teamInEdit.username)){
+                if(scope.teamInEdit.username && scope.teamInEdit.username.length && (scope.teamInEdit.member.title.equals(scope.teamInEdit.username) || scope.teamInEdit.member.originalObject.equals(scope.teamInEdit.username))){
                     scope.postTeam();
                 }
                 else{
@@ -188,13 +188,12 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                     roles.push(occupation.occupation_id)
                 });
 
-                if(roles.length == 0){
+                if(roles.length < 1){
                     scope.team_error.role = 'r';
                     return false;
                 }
 
                 scope.teamInEdit.roles = roles.join();
-                scope.teamInEdit._token = $("body input[name='csrfmiddlewaretoken']").val();
 
                 $http.post(url, scope.teamInEdit)
                     .success(function (result) {
@@ -205,7 +204,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                             team.outsider = 1;
                         }
                         else{
-                            team.outsider = team.user_id.substr(0,1) == 'o';
+                            team.outsider = team.user_id.substr(0,1).equals( 'o');
                         }
 
                         if(team.outsider){
@@ -238,7 +237,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
 
             scope.editTeam = function (member) {
                 scope.team_error = null;
-                if(scope.teamInEdit && scope.teamInEdit.id == member.id){
+                if(scope.teamInEdit && scope.teamInEdit.id.equals(member.id)){
                     var roles = [];
                     var occupation = angular.copy(scope.teamInEdit.occupation);
                     angular.forEach(scope.teamInEdit.occupation, function (occupation) {
@@ -246,7 +245,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                         roles.push(occupation.occupation_id)
                     });
 
-                    if(scope.submitted && !member.outsider && member.user_id != scope.project.user_id){
+                    if(scope.submitted && !member.outsider && !member.user_id.equals(scope.project.user_id)){
                         if(!roles.length){
                             scope.quit(member, 'confirmM')
                         }
@@ -255,14 +254,13 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                         }
                     }
 
-                    if(roles.length == 0){
+                    if(roles.length < 1){
                         scope.team_error = 'r';
                         return false;
                     }
 
                     scope.teamInEdit.roles = roles.join();
                     scope.teamInEdit.project_id = scope.project.id;
-                    scope.teamInEdit._token = $("body input[name='csrfmiddlewaretoken']").val();
                     $http.put(url + scope.teamInEdit.id, scope.teamInEdit)
                         .success(function (result) {
                             if(result.indexOf('P') >= 0){
@@ -308,7 +306,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                     for(var i = 0; i < scope.occupations.length && cnt < scope.teamInEdit.occupation.length; i++){
                         var found = false;
                         for(var j = 0; j < scope.teamInEdit.occupation.length && !found; j++){
-                            if(scope.teamInEdit.occupation[j].occupation_id == scope.occupations[i].id){
+                            if(scope.teamInEdit.occupation[j].occupation_id.equals(scope.occupations[i].id)){
                                 found = true;
                                 scope.occupations[i].old =1;
                                 cnt++;
@@ -321,7 +319,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
             }
 
             scope.cancelTeam = function (member, submitted) {
-                if(scope.teamInEdit && scope.teamInEdit.id == member.id){
+                if(scope.teamInEdit && scope.teamInEdit.id.equals(member.id)){
                     member.occupation = angular.copy(scope.teamCopy);
                     scope.teamCopy = null;
                     scope.teamInEdit = null;
@@ -331,7 +329,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                     });
                 }
                 else{
-                    if(!member.outider && member.user_id == scope.project.user_id){
+                    if(!member.outider && member.user_id.equals(scope.project.user_id)){
                         var modalInstance = $uibModal.open({
                             animation: true,
                             templateUrl: 'alert.html',
@@ -361,13 +359,13 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                                 return;
 
                             scope.team.loading = true;
-                            $http.delete(url + member.id, {params:{_token: $("body input[name='csrfmiddlewaretoken']").val(), submitted: scope.submitted}})
+                            $http.delete(url + member.id, {params:{submitted: scope.submitted}})
                                 .then(function successCallback() {
                                     if(scope.submitted){
 
                                         return;
                                     }
-                                    if (!scope.pagination.show || (scope.pagination.currentPage == scope.pagination.lastPage && scope.team.length > 1)) {
+                                    if (!scope.pagination.show || (scope.pagination.currentPage.equals(scope.pagination.lastPage) && scope.team.length > 1)) {
                                         $rootScope.removeValue(scope.team,  member.id);
                                         scope.team.loading = false;
                                     }
@@ -440,8 +438,7 @@ appZooMov.directive('teamContent', function ($rootScope, $http, $filter, $log, $
                         project_id:scope.project.id,
                         message:message,
                         occupations:occupations,
-                        quit:1,
-                        _token:$('input[name="csrfmiddlewaretoken"]').val()
+                        quit:1
                     })
                         .success( function(){
                             scope.team.loading = false;

@@ -2,7 +2,7 @@
  * Created by Jieyun on 25/02/2016.
  */
 
-appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $cookieStore, $timeout, $window, $uibModal, $translate){
+appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $cookieStore, $timeout, $window, $uibModal){
     $scope.error = false;
     $scope.setEmail = function (email) {
         $scope.email = email;
@@ -39,11 +39,9 @@ appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $cookieSto
                 url: 'forget',
                 data: {
                     email: $scope.user.email,
-                    lang: $scope.user.locale,
-                    _token: $("body input[name='csrfmiddlewaretoken']").val(),
-                    token: $("body input[name='csrfmiddlewaretoken']").val()
+                    lang: $scope.user.locale
                 }
-            }).then(function successCallback(response) {
+            }).then(function successCallback() {
                 $rootScope.loaded();
                 $uibModal.open({
                     animation: true,
@@ -52,7 +50,7 @@ appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $cookieSto
                 $timeout(function(){
                     $window.location = "/login";
                 }, 10000);
-            }, function errorCallback(response) {
+            }, function errorCallback() {
                 $rootScope.loaded();
                 $uibModal.open({
                     animation: true,

@@ -57,9 +57,6 @@ appZooMov.controller("homeCtrl", function($rootScope, $scope, $timeout, $http, $
         $scope.filterChosen = $scope.filters[$scope.filterOpt];
 
         var promise = $http({
-            headers:{
-                'token': $("body input[name='csrfmiddlewaretoken']").val()
-            },
             method: 'GET',
             url: '/api/home/projects',
             isArray:false,

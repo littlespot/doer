@@ -11,9 +11,6 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
 
     $scope.loadProjects = function () {
         var promise = $http({
-            headers:{
-                'token': $("body input[name='csrfmiddlewaretoken']").val()
-            },
             method: 'GET',
             url: '/api/profile/'+  $scope.catalogueChosen + '/' + $scope.profile.id,
             isArray:true,
@@ -53,7 +50,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
     }
 
     $scope.selectTab = function (index) {
-        if( $scope.selectedTab == index){
+        if( $scope.selectedTab.equals(index)){
             $scope.selectedTab = 0;
             return;
         }
@@ -81,20 +78,20 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
 
         switch ($scope.selectedTopTab){
             case 'fans':
-                if(number != fans_cnt){
+                if(!number.equals(fans_cnt)){
                     fans.text(number);
                 }
                 $("#sup_idols").text(idols_cnt > 0 ? idols_cnt: '')
                 $("#sup_friends").text($scope.friends_cnt > 0  ? $scope.friends_cnt : '');;
                 break;
             case 'friends':
-                if(number != $scope.friends_cnt)
+                if(!number.equals($scope.friends_cnt))
                     $scope.friends_cnt = number;
                 $("#sup_idols").text(idols_cnt > 0 ? idols_cnt: '');
                 $("#sup_fans").text(fans_cnt > 0 ? fans_cnt: '');
                 break;
             case 'idols':
-                if(number != idols_cnt){
+                if(!number.equals(idols_cnt)){
                     idols.text(number);
                 }
                 $("#sup_fans").text(fans_cnt > 0 ? fans_cnt: '');
@@ -130,9 +127,6 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         }
         if(relation === 'Friend' || ($scope.selectedTopTab === 'fans' && relation === 'Idol')){
             var projects = $http({
-                headers:{
-                    'token': $("body input[name='csrfmiddlewaretoken']").val()
-                },
                 method: 'GET',
                 url: '/api/myrelation',
                 isArray:false,
@@ -150,7 +144,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         else if(relation === 'Fan' || ($scope.selectedTopTab === 'fans' && relation === 'Stranger')){
             var index = -1;
             for(var i = 0; i < $scope.relations.length && index < 0; i++){
-                if($scope.relations[i].id == $scope.profile.id)
+                if($scope.relations[i].id.equals($scope.profile.id))
                     index = i;
             }
 
@@ -163,9 +157,9 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
     $scope.changeRelation = function(id, username, callback){
         var relation = $('#relation_' + id);
         var oldClass = relation.attr('class').split(' ')[1];
-        if(oldClass == 'mySelf')
+        if(oldClass.equals('mySelf'))
             return;
-        else if(oldClass == 'myIdol' || oldClass == 'myFriend'){
+        else if(oldClass.equals('myIdol') || oldClass.equals('myFriend')){
             var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: 'confirm.html',
@@ -187,7 +181,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         var fans = $('.ifollow', relation);
         var fans_cnt = parseInt(fans.text().replace(/[\D]*/,''), 0);
 
-        $http.put('/admin/relations/' + id, {_token: $("body input[name='csrfmiddlewaretoken']").val()})
+        $http.put('/admin/relations/' + id)
             .success(function (result) {
                 if('my'+result.relation === oldClass)
                     return;

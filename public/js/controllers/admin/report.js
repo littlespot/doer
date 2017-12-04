@@ -21,7 +21,7 @@ appZooMov.controller("reportNewCtrl", function($sce,$rootScope, $scope, $filter,
         if(!$scope.report.tags)
             $scope.report.tags = new Array();
         var oldtag = $filter('getById')($scope.report.tags, tag.id);
-        if(!oldtag || oldtag.length == 0) {
+        if(!oldtag || oldtag.length < 1) {
             if (!tag.chosen) {
                 $scope.report.tags.push(tag);
                 tag.chosen = true;
@@ -44,11 +44,11 @@ appZooMov.controller("reportNewCtrl", function($sce,$rootScope, $scope, $filter,
             item = item.trim();
             if(item.length) {
                 tag = $filter('filter')($scope.report.tags, {label: item});
-                if(!tag || tag.length == 0) {
+                if(!tag || tag.length < 1) {
                     var found = false;
                     for(var i = 0; i < $scope.tags.length && !found; i++){
                         var oldtag = $scope.tags[i];
-                        if(oldtag.label == item){
+                        if(oldtag.label.equals(item)){
                             found = true;
                             oldtag.chosen = true;
                             $scope.report.tags.push(oldtag);
@@ -77,9 +77,7 @@ appZooMov.controller("reportNewCtrl", function($sce,$rootScope, $scope, $filter,
             if (!confirm)
                 return;
             $rootScope.loading();
-            $http.delete('/admin/reports/' + $scope.id,{
-                params:{_token: $("body input[name='csrfmiddlewaretoken']").val()}
-            })
+            $http.delete('/admin/reports/' + $scope.id)
                 .success(function () {
                     window.location.href = "/project/" + $scope.project +'?tab=2';
                 })
@@ -91,7 +89,7 @@ appZooMov.controller("reportNewCtrl", function($sce,$rootScope, $scope, $filter,
 
     $scope.save = function () {
         var content = $('#editor').text();
-        if(content.length == 0 || content.length < 15){
+        if(content.length < 1 || content.length < 15){
             $scope.error = true;
         }
         else if($scope.report.tags.length > 0){

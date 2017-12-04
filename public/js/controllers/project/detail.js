@@ -73,7 +73,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                    $scope.loading = false;
                 })
                 .error(function (err) {
-                    alert("error");
+                    alert(err.data);
                     $scope.loading = false;
                 })
         }
@@ -152,7 +152,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
     }
 
     $scope.followConfirmed = function (question) {
-        $http.put('/admin/questions/'+ question.id + '?_token=' + $("body input[name='csrfmiddlewaretoken']").val())
+        $http.put('/admin/questions/'+ question.id)
             .success(function(result){
                 if(!result)
                     return;
@@ -170,14 +170,14 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
         var month = content.created_at.substr(0,7);
         var day = content.created_at.substr(8,2);
         var index = -1;
-        if(type == 't')
+        if(type.equals('t'))
             devent = {user_id:content.user_id, username:content.username, roles:[content.name]};
         else
             devent = content;
         for(var i = 0; i < monthEvent.length && index < 0; i++){
             var mevent = monthEvent[i];
 
-            if(mevent.month == month){
+            if(mevent.month.equals(month)){
 
                 index = i;
                 var eventDays = mevent.events;
@@ -186,17 +186,17 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                 for(var j = 0; j < eventDays.length && dayIndex < 0; j++){
                     var eventDay = eventDays[j];
 
-                    if(eventDay.day == day){
+                    if(eventDay.day.equals(day)){
                         dayIndex = j;
                         var found = -1;
                         for(var z = 0; z < eventDay.events.length && found < 0; z++){
-                            if(eventDay.events[z].type == type){
+                            if(eventDay.events[z].type.equals(type)){
                                 found = z;
-                                if(type == 't'){
+                                if(type.equals('t')){
                                     var p = -1;
                                     for(var t=0; t <  eventDay.events[z].events.length && p<0; t++){
                                         var person = eventDay.events[z].events[t];
-                                        if(person.user_id == content.user_id){
+                                        if(person.user_id.equals(content.user_id)){
                                             p = t;
                                             if(person.roles.indexOf(content.name) < 0)
                                                 person.roles.push(content.name)
@@ -272,9 +272,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
 
             event.deleting = true;
 
-            $http.delete('/api/events/' + event.id, {
-                params: {_token: $("body input[name='csrfmiddlewaretoken']").val()}
-            })
+            $http.delete('/api/events/' + event.id)
                 .success(function (result) {
                     if (!result)
                         return;
@@ -289,7 +287,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                         var events = $scope.events[index];
                         index = -1;
                         for(var i = 0; i < events.length && index < 0; i++){
-                            if(events[i].id == event.id){
+                            if(events[i].id.equals(event.id)){
                                 index = i;
                                 events.splice(index, 1);
                             }
@@ -331,9 +329,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                 }
             }
 
-            $http.delete('/admin/questions/' + question.id, {params:
-                {_token: $("body input[name='csrfmiddlewaretoken']").val(), page:page}
-            })
+            $http.delete('/admin/questions/' + question.id)
                 .success(function (result) {
                     if (!result)
                         return;
@@ -381,15 +377,17 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
         if(!cnt)
             cnt = 0;
         $scope.following = true;
-        $http.put("/api/project/followers/" + $scope.id + '?_token=' + $("body input[name='csrfmiddlewaretoken']").val())
+        $http.put("/api/project/followers/" + $scope.id)
             .success(function() {
                 if(mine == 1){
                     $(count).text(cnt - 1);
                     $(icon).removeClass('fa-bookmark').addClass('fa-bookmark-o');
+                    $(div).attr('title',  $(div).attr('data-title-0'));
                 }
                 else{
                     $(count).text(cnt + 1);
                     $(icon).removeClass('fa-bookmark-o').addClass('fa-bookmark');
+                    $(div).attr('title',  $(div).attr('data-title-1'));
                 }
                 $scope.following  = false
             })
@@ -410,15 +408,17 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
             cnt = 0;
 
         $scope.loving = true;
-        $http.put("/api/project/lovers/" + $scope.id + '?_token=' + $("body input[name='csrfmiddlewaretoken']").val())
+        $http.put("/api/project/lovers/" + $scope.id)
             .success(function() {
                 if(mine == 1){
                     $(count).text(cnt - 1);
                     $(icon).removeClass('fa-heart').addClass('fa-heart-o');
+                    $(div).attr('title',  $(div).attr('data-title-0'));
                 }
                 else{
                     $(count).text(cnt + 1);
                     $(icon).removeClass('fa-heart-o').addClass('fa-heart');
+                    $(div).attr('title',  $(div).attr('data-title-1'));
                 }
 
                 $scope.loving = false;
@@ -445,7 +445,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
     }
 
     $scope.openApplication = function(id, name){
-        $scope.myapplication = {recruit_id:id, motivation:'', occupation:name, _token: $("body input[name='csrfmiddlewaretoken']").val()};
+        $scope.myapplication = {recruit_id:id, motivation:'', occupation:name};
     }
 
     $scope.sendApplication = function (receiver) {

@@ -35,7 +35,7 @@ appZooMov.controller("personalCtrl", function($rootScope, $scope, $http, $cookie
     }
 
     $scope.addSns = function(type){
-        if(!$scope.chosenSns || $scope.chosenSns.type != type){
+        if(!$scope.chosenSns || !$scope.chosenSns.type.equals(type)){
             var index = -1;
             for(var i = 0; index < 0 && i < $scope.sns[type].length; i++){
                 if(!$scope.sns[type][i].sns_id){
@@ -57,12 +57,10 @@ appZooMov.controller("personalCtrl", function($rootScope, $scope, $http, $cookie
     }
 
     $scope.updateSns = function(sns){
-        if(!$scope.editedSns || $scope.editedSns.sns_id != sns.sns_id){
+        if(!$scope.editedSns || !$scope.editedSns.sns_id.equals(sns.sns_id)){
             $scope.editedSns = sns;
         }
         else{
-            $scope.editedSns._token = $("body input[name='csrfmiddlewaretoken']").val();
-
             $http.put('/sns/' + sns.sns_id, $scope.editedSns)
                 .success(function (data) {
                     $scope.editedSns = null;
@@ -74,7 +72,7 @@ appZooMov.controller("personalCtrl", function($rootScope, $scope, $http, $cookie
     }
 
     $scope.cancelSns = function(sns){
-        if($scope.editedSns && $scope.editedSns.sns_id == sns.sns_id){
+        if($scope.editedSns && $scope.editedSns.sns_id.equals(sns.sns_id)){
             $scope.editedSns = null;
         }
         else{
@@ -90,7 +88,7 @@ appZooMov.controller("personalCtrl", function($rootScope, $scope, $http, $cookie
                 if (!confirm)
                     return false;
 
-                $http.delete('/sns/' + sns.sns_id, {params: {_token: $("body input[name='csrfmiddlewaretoken']").val()}})
+                $http.delete('/sns/' + sns.sns_id)
                     .success(function () {
                         sns.sns_id = null;
                         sns.sns_name = null;
@@ -163,12 +161,11 @@ appZooMov.controller("personalCtrl", function($rootScope, $scope, $http, $cookie
     }
 
     $scope.changePwd = function(pwd){
-        if(pwd.old == pwd.new){
+        if(pwd.old.equals(pwd.new)){
             $scope.result = 'samepwd';
             $scope.openModal(true);
         }
         else {
-            pwd._token = $('input[name="csrfmiddlewaretoken"]').val();
             $http.put('/account/'+pwd.old, pwd)
                 .success(function (data) {
                     $uibModal.open({

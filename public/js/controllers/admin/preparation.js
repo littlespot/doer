@@ -16,7 +16,7 @@ appZooMov.controller("menuCtrl", function($rootScope, $scope, $timeout, $log, $h
                 return false;
 
             $rootScope.loading();
-            Preparations.delete({id:id, _token: $("body input[name='csrfmiddlewaretoken']").val()},
+            Preparations.delete({id:id},
                 function () {
                     window.location.href='/';
                 },function (err) {

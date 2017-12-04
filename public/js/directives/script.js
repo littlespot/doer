@@ -27,7 +27,7 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
 
                     var index = -1;
                     for(var i = 0; i < scope.authors.length && index <0; i++) {
-                        if (scope.authors[i].location == author.email && scope.authors[i].id != author.id) {
+                        if (scope.authors[i].location.equals(author.email) && !scope.authors[i].id.equals(author.id)) {
                             index = i;
                             scope.scripts.error = 'email';
                             return false;
@@ -35,13 +35,11 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                         }
                     }
 
-                    author._token = $("body input[name='csrfmiddlewaretoken']").val();
-
                     $http.put('/admin/users/' + author.id, author)
                         .success(function (result) {
                             var index = -1;
                             for(var i = 0; i < scope.authors.length && index < 0; i++){
-                                if(scope.authors[i].id == result.id){
+                                if(scope.authors[i].id.equals(result.id)){
                                     index = i;
                                     scope.authors[index] = {id:result.id, username:result.name, location:result.email, link:result.link};
                                 }
@@ -55,6 +53,30 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                 })
             }
 
+            scope.userSelected = function (selected) {
+                scope.scripts.error = null;
+                if(!selected.title) {
+                }
+                else{
+                    if(selected.originalObject.love > 0){
+                        var already = $filter('getById')(scope.scriptInEdit.authors, selected.originalObject.id);
+                        if(!already)
+                            scope.scriptInEdit.authors.push({id:selected.originalObject.id, name:selected.title, email:selected.originalObject.location, link:selected.originalObject.link});
+                    }
+                    else{
+
+                        $uibModal.open({
+                            animation: true,
+                            templateUrl: 'script_alert.html',
+                            size: 'lg',
+                            controller: function ($scope) {
+                                $scope.alert_message = $filter('translate')(window.document.location.pathname.indexOf('projects') > 0 ? 'project.MESSAGES.notteam': 'project.MESSAGES.notfriends',
+                                    {'user_id': selected.originalObject.id, 'username': selected.title});
+                            }
+                        });
+                    }
+                }
+            }
             scope.authorSelected = function (selected) {
                 scope.scripts.error = null;
                 if(!selected.title) {
@@ -73,8 +95,8 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
 
                         var index = -1;
                         for(var i = 0; i < scope.authors.length && index <0; i++){
-                            if(scope.authors[i].location == author.email){
-                                if(scope.authors[i].username == author.name) {
+                            if(scope.authors[i].location.equals(author.email)){
+                                if(scope.authors[i].username.equals(author.name)) {
                                     index = i;
                                     if (!$filter('getById')(scope.scriptInEdit.authors, scope.authors[i].id))
                                         scope.scriptInEdit.authors.push({id:scope.authors[i].id, name:scope.authors[i].username, email:scope.authors[i].location, link:scope.authors[i].link});
@@ -88,8 +110,6 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                                 }
                             }
                         }
-
-                        author._token = $("body input[name='csrfmiddlewaretoken']").val();
 
                         $http.post('/admin/users', author)
                             .success(function (result) {
@@ -110,7 +130,14 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                                 }
                             })
                             .error(function (err) {
-                                alert(err);
+                                $uibModal.open({
+                                    animation: true,
+                                    templateUrl: 'script_alert.html',
+                                    size: 'lg',
+                                    controller: function ($scope) {
+                                        $scope.alert_message = err;
+                                    }
+                                });
                             });
                     })
                 }
@@ -150,10 +177,10 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                 });
 
                 modalInstance.result.then(function (author) {
-                   if(author == null)
+                   if(isNull(author))
                        return;
                     scope.scripts.loading = true;
-                    $http.delete(url + script.id, {params:{_token: $("body input[name='csrfmiddlewaretoken']").val(), author:author,submitted: scope.submitted}})
+                    $http.delete(url + script.id, {params:{author:author,submitted: scope.submitted}})
                         .then(function successCallback() {
                             $rootScope.removeValue(scope.scripts, script.id);
                             scope.scripts.loading = false;
@@ -166,7 +193,7 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
 
             scope.editScript = function (script) {
                 scope.scripts.error = null;
-                if(scope.scriptInEdit && scope.scriptInEdit.id == script.id)
+                if(scope.scriptInEdit && scope.scriptInEdit.id.equals(script.id))
                     scope.scriptInEdit = null;
                 else{
                     scope.scriptInEdit = {id:script.id, project_id:script.project_id, title:script.title, link:script.link, description:script.description,
@@ -177,7 +204,7 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
             }
 
             scope.saveScript = function (invalid) {
-                if(invalid  || scope.scriptInEdit.authors.length == 0 || scope.scripts.error)
+                if(invalid  || scope.scriptInEdit.authors.length < 1 || scope.scripts.error)
                     return;
 
                 var newAuthor = "";
@@ -191,8 +218,7 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                     scope.scriptInEdit.newAuthor = newAuthor.substr(0, newAuthor.length - 1);
 
                 scope.scripts.loading = true;
-                scope.scriptInEdit._token = $("body input[name='csrfmiddlewaretoken']").val();
-                if(scope.scriptInEdit.id == 0){
+                if(scope.scriptInEdit.id < 1){
                     $http.post(url, scope.scriptInEdit)
                         .success(function (result) {
                             result.authors = authors;
@@ -200,7 +226,6 @@ appZooMov.directive('scriptContent', function ($rootScope, $http, $filter, $log,
                             scope.scripts.loading = false;
                         })
                         .error(function (err) {
-                            alert(err);
                             $log.error("failed to save script", err);
                             scope.scripts.loading = false;
                         });

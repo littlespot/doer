@@ -37,4 +37,22 @@ appZooMov.controller("menuCtrl", function($rootScope, $scope, $timeout, $http, $
                 window.location.href = '/project/' + id;
         });
     }
+    
+    $scope.changeStep = function (id, current, forward) {
+        if(current  < 2){
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'complete.html'
+            });
+
+            modalInstance.result.then(function (confirm) {
+                if (!confirm)
+                    return false;
+                else
+                    window.location.href = '/admin/projects/' + id +'?step=' + forward;
+            });
+        }
+        else
+            window.location.href = '/admin/projects/' + id +'?step=' + forward;
+    }
 })

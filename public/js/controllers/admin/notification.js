@@ -1,7 +1,7 @@
 /**
  * Created by Jieyun on 06/06/2016.
  */
-appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $filter,$uibModal, $log) {
+appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $filter,$uibModal) {
     $scope.selectedView = 0;
 
     $scope.init = function (projects) {
@@ -25,7 +25,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
     }
 
     $scope.remind = function () {
-        if($scope.selectedView == 2)
+        if($scope.selectedView.equals(2))
             $scope.selectedView = 0;
         else{
             $scope.selectedView = 2;
@@ -46,7 +46,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
     }
     
     $scope.read = function (message, checked) {
-        if($scope.message.id == message.id){
+        if($scope.message.id.equals(message.id)){
             $scope.message = {id:0};
         }
         else{
@@ -81,7 +81,6 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
         if(invalid)
             return;
         $scope.reminder.project_id = $scope.reminder.project.id;
-        $scope.reminder._token = $('input[name="csrfmiddlewaretoken"]').val();
         var modalInstance = $uibModal.open({
             animation: true,
             templateUrl: 'confirm.html',
@@ -98,8 +97,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
 
             $http.post('/admin/reminders', $scope.reminder)
                 .success(function (result) {
-                    if(result != 'OK'){
-                        alert(result);
+                    if(!result.equals('OK')){
                         return;
                     }
 
@@ -127,8 +125,8 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
 
                     sup.text(count);
 
-                    if($scope.selectedType == 'reminders' && $scope.selectedBox == 'out'){
-                        if($scope.pagination.currentPage == 1)
+                    if($scope.selectedType.equals('reminders') && $scope.selectedBox.equals('out')){
+                        if($scope.pagination.currentPage.equals(1))
                             $scope.messages.splice(0, 0, $scope.reminder);
 
                         $scope.pagination.total += 1;
@@ -142,9 +140,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
 
     $scope.checkApplication = function (message) {
         message.deleting = true;
-        $http.put('/admin/check/' + $scope.selectedType + '/' + message.place_id, {
-            _token: $('input[name="csrfmiddlewaretoken"]').val()
-        })
+        $http.put('/admin/check/' + $scope.selectedType + '/' + message.place_id)
             .success(function () {
                 message.checked = 1;
                 message.deleting = false;
@@ -167,7 +163,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
 
             message.deleting = true;
 
-            $http.put('/admin/' + $scope.selectedType + '/' + message.id, {accept: accept, _token:$('input[name="csrfmiddlewaretoken"]').val()})
+            $http.put('/admin/' + $scope.selectedType + '/' + message.id, {accept: accept})
                 .success(function (result) {
                     if(!result)
                         return;
@@ -202,7 +198,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
 
            $rootScope.loading();
 
-            $http.delete('/profile/' + id, {params:{_token: $('input[name="csrfmiddlewaretoken"]').val()}})
+            $http.delete('/profile/' + id)
                 .success(function () {
                    $('#notification_' + id).remove();
                     $rootScope.loaded();
@@ -226,7 +222,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
             message.deleting = true;
 
             $http.delete('/admin/' + $scope.selectedType + '/' + message.id, {
-                params:{box: 'in', _token: $('input[name="csrfmiddlewaretoken"]').val()}
+                params:{box: 'in'}
             })
                 .success(function (result) {
                     if(!result)
@@ -268,10 +264,10 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
     }
 
     $scope.loadPage = function (id) {
-        if (!$scope.pagination.show || ($scope.pagination.currentPage == $scope.pagination.lastPage && $scope.messages.length > 1)) {
+        if (!$scope.pagination.show || ($scope.pagination.currentPage.equals($scope.pagination.lastPage) && $scope.messages.length > 1)) {
             var index = -1;
             for (var i = 0; i < $scope.messages.length && index < 0; i++) {
-                if ($scope.messages[i].id == id) {
+                if ($scope.messages[i].id.equals(id)) {
                     index = i;
                     $scope.messages.splice(index, 1);
                     $scope.pagination.total -= 1
@@ -279,7 +275,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
             }
         }
         else {
-            if($scope.pagination.currentPage > 1 && $scope.messages.length == 1){
+            if($scope.pagination.currentPage > 1 && $scope.messages.length.equals(1)){
                 $scope.pagination.currentPage -= 1;
             }
 

@@ -24,7 +24,7 @@ appZooMov.directive('location', function ($http) {
                         scope.disabled.depart = false;
                         scope.departments = departments.data;
                     },
-                    function(errorPayload) {
+                    function() {
                         scope.disabled.depart = false;
                     });
             }
