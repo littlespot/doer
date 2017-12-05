@@ -2,12 +2,9 @@
 
 namespace Zoomov\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Auth;
 use DB;
 use Config;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Mail;
 use Zoomov\Event;
 use Zoomov\Guest;
 use Zoomov\Notification;
@@ -17,9 +14,13 @@ use Zoomov\ProjectTeam;
 use Zoomov\ProjectTeamOccupation;
 use Zoomov\Script;
 use Zoomov\ScriptAuthor;
+use Zoomov\Mail\Author;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ScriptController extends EventRelatedController
 {
+
     public function update($id, Request $request)
     {
         try {
@@ -63,6 +64,7 @@ class ScriptController extends EventRelatedController
 
             $alreadyAuthors = ScriptAuthor::where("script_id",$script->id)
                 ->selectRaw("IFNULL(user_id, author_id) as id")
+                ->distinct()
                 ->pluck('id')
                 ->all();
 
@@ -85,10 +87,101 @@ class ScriptController extends EventRelatedController
             $toAdd = array_diff($authors, $alreadyAuthors);
 
             if(sizeof($toAdd) > 0){
-                $this->addAuthor($script, $toAdd, $project);
+                $team = ProjectTeam::where('project_id', $script->project_id)
+                    ->selectRaw('id, user_id, outsider_id')
+                    ->get();
+
+                $notification = null;
+
+                foreach ($toAdd as $author) {
+                    if ($author[0] == 'o'){
+                        ScriptAuthor::create([
+                            "author_id" => $author,
+                            "script_id" => $script->id,
+                        ]);
+
+                        $member = $team->where('outsider_id', $author)->first();
+
+                        if($project->active == 1){
+                            $this->sendMail($project,  Outsiderauthor::find($author), $script, 'creation');
+                        }
+
+                        if (is_null($member)) {
+                            $member = ProjectTeam::create([
+                                "id" => $this->uuid('t'),
+                                "project_id" => $script->project_id,
+                                "outsider_id" => $author
+                            ]);
+
+                            ProjectTeamOccupation::create([
+                                "project_team_id" => $member->id,
+                                "occupation_id" => $this->writer
+                            ]);
+                        } elseif (is_null(ProjectTeamOccupation::where('project_team_id', $member->id)->where('occupation_id', $this->writer)->select('id')->first())) {
+                            ProjectTeamOccupation::create([
+                                "project_team_id" => $member->id,
+                                "occupation_id" => $this->writer
+                            ]);
+                        }
+                    }
+                    elseif(is_null($project->active)){
+                        ScriptAuthor::create([
+                            "user_id" => $author,
+                            "script_id" => $script->id,
+                        ]);
+
+                        $member = $team->where('user_id', $author)->first();
+
+                        if (is_null($member)) {
+                            $member = ProjectTeam::create([
+                                "id" => $this->uuid('t'),
+                                "project_id" => $script->project_id,
+                                "user_id" => $author
+                            ]);
+
+                            ProjectTeamOccupation::create([
+                                "project_team_id" => $member->id,
+                                "occupation_id" => $this->writer
+                            ]);
+                        } elseif (is_null(ProjectTeamOccupation::where('project_team_id', $member->id)->where('occupation_id', $this->writer)->select('id')->first())) {
+                            ProjectTeamOccupation::create([
+                                "project_team_id" => $member->id,
+                                "occupation_id" => $this->writer
+                            ]);
+                        }
+                    }
+                    else if($project->active == 1){
+                        $member = $team->where('user_id', $author)->first();
+
+                        if (is_null($member)) {
+                            return Response('NOT AUTHORIZED', 501);
+                        }
+
+                        ScriptAuthor::create([
+                            "user_id" => $author,
+                            "script_id" => $script->id,
+                        ]);
+
+                        if (is_null(ProjectTeamOccupation::where('project_team_id', $member->id)->where('occupation_id', $this->writer)->select('id')->first())) {
+                            ProjectTeamOccupation::create([
+                                "project_team_id" => $member->id,
+                                "occupation_id" => $this->writer
+                            ]);
+                        }
+
+                        if(is_null($notification)){
+                            $notification = Notification::create([
+                                'title'=>trans('notification.title.add_script'),
+                                'body'=>trans('notification.body.add_script', ['script'=>$script->title, 'project'=>$project->title, 'user'=>Auth::user()->username])
+                            ]);
+                        }
+
+                        DB::table('notification_receivers')->insert(['notification_id'=>$notification->id, 'user_id'=>$author]);
+                    }
+                }
             }
 
-            if($project->active == 1){
+      /*      if($project->active == 1){
                 $authors = '';
                 $newLink = "<a href='".$script->link."' target='_blank'>".$script->title ."(".str_limit($script->created_at, 10, '').")</a>";
 
@@ -155,7 +248,7 @@ class ScriptController extends EventRelatedController
                         "type" => "s"
                     ]);
                 }
-            }
+            }*/
 
             return $script;
 
@@ -167,6 +260,7 @@ class ScriptController extends EventRelatedController
     public function store(Request $request)
     {
         $project =$this->getProject($request->project_id);
+
         if(is_null($project)) {
             return Response('NOT AUTHORIZED', 501);
         }
@@ -199,7 +293,7 @@ class ScriptController extends EventRelatedController
                 foreach ($users as $user){
                     $authors .= "<a href='".$user->link."' target='_blank'>".$user->name."</a>".",";
 
-                    $this->sendMail($project, $user, $script->title, $newLink, "", 'creation');
+                    //$this->sendMail($project, $user, $script->title,'creation');
                 }
 
                 Event::create([
@@ -266,7 +360,7 @@ class ScriptController extends EventRelatedController
             if($project->active == 1){
                 foreach ($authors as $user){
                     if ($user->id[0] == 'o'){
-                        $this->sendMail($project, $user, $script->title, $script->title, "", 'suppression');
+                        $this->sendMail($project, $user, $script,'suppression');
                     }
                     else{
                         if(is_null($notification)){
@@ -280,8 +374,8 @@ class ScriptController extends EventRelatedController
 
                     }
                 }
-
-                DB::table('events')->whereRaw("related_id = ".$id." and (type = 'as' or type='es')")->update(['deleted' => 1]);
+                DB::table('events')->whereRaw("related_id = ".$id." and type = 's'")->delete();
+             //   DB::table('events')->whereRaw("related_id = ".$id." and type = 's'")->update(['deleted' => '1']);
             }
 
             $script->delete();
@@ -292,23 +386,18 @@ class ScriptController extends EventRelatedController
         }
     }
 
-    private function sendMail($project, $user, $oldTitle, $oldLink, $newLink, $mail){
+    private function sendMail($project, $user, $script, $mail){
         $guest = Guest::where('project_id', $project->id)->where('user_id', $user->id)->first();
+
         if (is_null($guest)) {
             $guest = Guest::create([
-                "project" => $project->id,
+                "project_id" => $project->id,
                 "user_id" => $user->id,
-                "code" => $this->uuid('g', 24, 'guest')
+                "code" => $this->uuid('g', 10, 'guest')
             ]);
         }
 
-        $subject = trans('messages.script.'.$mail, ['name' => Auth::user()->username, 'script' => $oldTitle, 'title' => $project->title]);
-
-        Mail::send('emails.' .$user->locale . '.script.'.$mail,
-            ['user' => Auth::user()->username, 'script'=>$oldTitle, 'guest'=>$user->name, 'link' => $guest->code, 'oldlink' => $oldLink, 'newlink' => $newLink, 'title' => $project->title],
-            function ($message) use ($user, $subject) {
-                $message->to($user->email, 'ZOOMOV')->subject($subject);
-            });
+        Mail::to($user->email)->send(new Author($project, $script, substr($user->id, 0, 1) == 'o' ? $user->name : $user->username, $guest->code,$mail));
     }
 
     private function addAuthor($script, $authors, $project)
@@ -320,6 +409,7 @@ class ScriptController extends EventRelatedController
         $notification = null;
 
         foreach ($authors as $author) {
+
             if ($author[0] == 'o'){
                 ScriptAuthor::create([
                     "author_id" => $author,
@@ -329,7 +419,7 @@ class ScriptController extends EventRelatedController
                 $member = $team->where('outsider_id', $author)->first();
 
                 if($project->active == 1){
-                    $this->sendMail($project, Outsiderauthor::find($author), $script->title, $script->link, null,'creation');
+                    $this->sendMail($project, Outsiderauthor::find($author), $script, 'creation');
                 }
 
                 if (is_null($member)) {

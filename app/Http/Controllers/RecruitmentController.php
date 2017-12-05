@@ -10,6 +10,7 @@ use Config;
 use DB;
 use Zoomov\Application;
 use Zoomov\ApplicationPlaceholder;
+use Zoomov\Project;
 use Zoomov\ProjectRecruitment;
 
 class RecruitmentController extends EventRelatedController
@@ -43,27 +44,23 @@ class RecruitmentController extends EventRelatedController
 
     public function update($id, Request $request)
     {
-        try {
-            $recruit = ProjectRecruitment::find($id);
-            $project = $this->getProject($recruit->project_id);
-            if(is_null($project)){
-                return Response('NOT AUTHORIZED', 501);
-            }
+        $recruit = ProjectRecruitment::find($id);
+        $project = Project::select('id', 'user_id', 'title', 'active')->find($recruit->project_id);
 
-            $recruit->description = $request->description;
-            $recruit->quantity = $request->quantity;
-
-            if(!$project->active == 1){
-                $recruit->occupation_id = $request->occupation_id;
-            }
-
-            $recruit->save();
-
-            return $recruit;
-
-        }catch (Exception $e) {
-            return $e->getMessage();
+        if($project->user_id != Auth::id()){
+            return Response('NOT AUTHORIZED', 501);
         }
+
+        $recruit->description = $request->description;
+        $recruit->quantity = $request->quantity;
+
+        if(is_null($project->active) ||  $project->active == 0){
+            $recruit->occupation_id = $request->occupation_id;
+        }
+
+        $recruit->save();
+
+        return $recruit;
     }
 
     public function store(Request $request)

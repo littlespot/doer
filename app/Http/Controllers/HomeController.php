@@ -2,7 +2,6 @@
 
 namespace Zoomov\Http\Controllers;
 
-use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 
 use Auth;
@@ -10,6 +9,7 @@ use DB;
 use Lang;
 use Zoomov\Genre;
 use Zoomov\Project;
+use Zoomov\User;
 
 class HomeController extends VisitController
 {
@@ -80,5 +80,17 @@ class HomeController extends VisitController
             "WHERE rn < 4) ORDER BY projects.updated_at desc");
 
         return \Response::json(['recommendations' => $recommends, 'latest'=>$rank]);
+    }
+
+    public function search($key){
+        return Project::where('projects.active', '>', '0')
+            ->join('users', 'user_id', '=', 'users.id')
+            ->where('projects.title','like','%'.$key.'%')
+            ->selectRaw('projects.id, title, username as description, concat("projects", "/", projects.id) as image')
+            ->get()
+            ->union(User::where('active', '>', '0')->where('username','like','%'.$key.'%') ->join('cities', 'city_id', '=', 'cities.id')
+                ->selectRaw('users.id, username as title, name_'.app()->getLocale().' as description, concat("avatars", "/", users.id) as image')
+                ->get());
+
     }
 }

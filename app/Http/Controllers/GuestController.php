@@ -1,11 +1,13 @@
 <?php
 
 namespace Zoomov\Http\Controllers;
-
-use Illuminate\Http\Request;
-
 use DB;
+use App;
+use Zoomov\Budget;
 use Zoomov\Project;
+use Zoomov\ProjectRecruitment;
+use Zoomov\Script;
+use Zoomov\Sponsor;
 
 class GuestController extends Controller
 {
@@ -14,9 +16,8 @@ class GuestController extends Controller
         if($lang != 'zh' && $lang != 'fr'){
             $lang = 'en';
         }
-
-        $project = Project::with('scripts', 'budget', 'sponsor', 'recruit')
-            ->join('guests', 'projects.id', '=', 'guests.project_id')
+        App::setLocale($lang);
+        $project = Project::join('guests', 'projects.id', '=', 'guests.project_id')
             ->join('users', 'users.id', '=', 'projects.user_id')
             ->join('genres', 'genre_id', '=', 'genres.id')
             ->join('cities', 'projects.city_id', '=', 'cities.id')
@@ -46,6 +47,25 @@ class GuestController extends Controller
             return view('errors.404');
         }
         else{
+            $budget = Budget::where('project_id', $project->id)
+                ->get();
+            $sponsor = Sponsor::where('project_id', $project->id)
+                ->get();
+            $scripts = Script::where('project_id', $project->id)
+                ->with('authors')
+                ->selectRaw('id, link,title,description,DATE_FORMAT(created_at, "%Y-%m-%d") as created_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $recruit = ProjectRecruitment::where('project_id', $project->id)
+                ->join('occupations', 'project_recruitments.occupation_id', '=', 'occupations.id')
+                ->select( 'quantity', 'project_recruitments.description', 'occupations.name_'.App::getLocale().' as name')
+                ->get();
+
+            $project->recruit = $recruit;
+            $project->scripts = $scripts;
+            $project->budget = $budget;
+            $project->sponsor = $sponsor;
             return view('guest', $project);
         }
     }

@@ -73,10 +73,10 @@ class PictureController extends Controller
                 $src =  public_path($image->getDestination(config('constants.image.original'), $extension));
 
                 if ($type == IMAGETYPE_GIF || $type == IMAGETYPE_JPEG || $type == IMAGETYPE_PNG) {
-
                     if (file_exists($src)) {
                         unlink($src);
                     }
+
 
                     $result = move_uploaded_file($file['tmp_name'], $src);
 

@@ -17,20 +17,6 @@ class OccupationController extends Controller
             ->get();
     }
 
-    public function admin()
-    {
-        return DB::table('occupations')
-            ->where('name', '<>', 'Planner')
-            ->leftJoin('user_occupations', function ($join) {
-                $join->on('occupations.id', '=', 'user_occupations.occupation_id')
-                    ->where('user_occupations.user_id', '=', Auth::id());
-            })
-            ->select('occupations.id', 'occupations.name', 'user_occupations.id as uid', 'user_occupations.id as old')
-            ->orderBy('occupations.name')
-            ->orderBy('user_occupations.id')
-            ->get();
-    }
-
     public function show($id)
     {
         return UserOccupation::where('user_id', $id)

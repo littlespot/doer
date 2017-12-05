@@ -18,6 +18,18 @@ class QuestionController extends Controller
 {
     private $query = 'questions.id, subject, content, questions.created_at, questions.updated_at, IFNULL(follower.cnt, 0) as followers_cnt';
 
+    public function index(){
+        $user = Auth::id();
+        $questions = Question::where('user_id', $user)
+            ->select('content', 'created_at');
+
+        $answers = QuestionAnswer::where('user_id', $user)
+            ->join('questions', 'question_answers.question_id', '=', 'questions.id')
+            ->select('content', 'subject', 'question_answers.created_at');
+
+        return [$questions, $answers];
+    }
+
     public function display($id){
         return Question::where('project_id', $id)
             ->join('users', 'users.id', '=', 'user_id')
@@ -30,7 +42,9 @@ class QuestionController extends Controller
             ->leftJoin(DB::raw("(select id, question_id from question_followers where user_id = '".Auth::id()."') myfollow"), function ($join) {
                 $join->on('myfollow.question_id', '=', 'questions.id');
             })
-            ->selectRaw($this->query. ", (CASE WHEN user_id = '".Auth::id()."' THEN 1 ELSE  0 END) as mine, user_id, username, IFNULL(answer.cnt, 0) as cnt,
+            ->selectRaw("questions.id, subject, 
+                    questions.created_at, questions.updated_at, IFNULL(follower.cnt, 0) as followers_cnt,
+                    (CASE WHEN user_id = '".Auth::id()."' THEN 1 ELSE  0 END) as mine, user_id, username, IFNULL(answer.cnt, 0) as cnt,
                     FLOOR((unix_timestamp(now()) - unix_timestamp(questions.created_at))/60/60/24) <1  as newest, IFNULL(myfollow.id,0) as myfollow")
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -63,18 +77,6 @@ class QuestionController extends Controller
                 ->get();
 
         return view('visit.question', ["question" => $question, "tags"=>$tags, "answer"=>$request->input("answer", 0)]);
-    }
-
-    public function index(){
-        $user = Auth::id();
-        $questions = Question::where('user_id', $user)
-            ->select('content', 'created_at');
-
-        $answers = QuestionAnswer::where('user_id', $user)
-            ->join('questions', 'question_answers.question_id', '=', 'questions.id')
-            ->select('content', 'subject', 'question_answers.created_at');
-
-        return [$questions, $answers];
     }
 
     public function tags(){
@@ -280,6 +282,7 @@ class QuestionController extends Controller
             'project_id'=>'required',
             'subject' => 'required|min:4|max:100',
             'editor' => 'required|min:15|max:4000',
+            'tags' => 'required'
         ]);
 
         try{
