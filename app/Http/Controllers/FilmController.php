@@ -717,8 +717,8 @@ class FilmController extends Controller
 
     public function postMedia(Request $request){
         $step = $request['step'];
-        $completed = $request['completed'];
-        return $this->afterPost($request->id, $completed, $step);
+        $film = Film::find($request->id);
+        return $this->afterPost($film, $film->completed, $step);
     }
 
     public function saveCredits($id, Request$request){
@@ -1022,6 +1022,7 @@ class FilmController extends Controller
             $completed = $this->setStatus(sizeof($files) < 1, 11, $film->completed);
             if($completed != $film->completed){
                 $film->update(['completed' => $completed]);
+                return ['result'=>$name, 'completed'=>decbin($completed)];
             }
         }
 
@@ -1197,6 +1198,7 @@ class FilmController extends Controller
     private function afterPost($id, $completed, $step){
         $status = str_pad(decbin($completed), 12,'0');
         $index = strrpos($status, '0');
+        return $index ? 'Y' : 'N';
         if(!$index){
             return redirect('/film/'.$id);
         }
