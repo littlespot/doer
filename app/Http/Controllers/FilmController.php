@@ -5,7 +5,6 @@ use App;
 use Auth;
 use Config;
 use DB;
-use function GuzzleHttp\Psr7\str;
 use Storage;
 use Illuminate\Http\Request;
 use Zoomov\Credit;
@@ -14,6 +13,7 @@ use Zoomov\FilmCast;
 use Zoomov\FilmCastCredit;
 use Zoomov\FilmFestival;
 use Zoomov\FilmFestivalReward;
+use Zoomov\Helpers\Uploader;
 use Zoomov\Language;
 use Zoomov\City;
 use Zoomov\Country;
@@ -117,19 +117,19 @@ class FilmController extends Controller
                 $film = Film::select('id', 'completed', 'title', 'country_id', 'dialog', 'language', 'silent')->find($id);
                 return view('film.language', ['countries'=>$countries, 'languages'=>$languages, 'production'=>$production, 'dialog'=>$dialog, 'shooting'=>$shooting, 'film'=>$film, 'step'=>$step-1]);
             case 4:
-                $vformats = DB::table('camera_formats')
-                    ->leftJoin(DB::raw("(select camera_format_id, id, film_id from film_camera_formats where film_id = '".$id."') a"), function ($join) {
-                        $join->on('camera_formats.id', '=', 'a.camera_format_id');
+                $vformats = DB::table('cameras')
+                    ->leftJoin(DB::raw("(select camera_id, id, film_id from film_cameras where film_id = '".$id."') a"), function ($join) {
+                        $join->on('cameras.id', '=', 'a.camera_id');
                     })
-                    ->selectRaw('camera_formats.id, label_'.App::getLocale().' as label, IFNULL(a.id, 0) as chosen, film_id')
+                    ->selectRaw('cameras.id, label_'.App::getLocale().' as label, IFNULL(a.id, 0) as chosen, film_id')
                     ->orderBy('mark')
                     ->orderByRaw('convert(label_'.App::getLocale().' using gbk) ASC')
                     ->get();
-                $fformats = DB::table('cine_formats')
-                    ->leftJoin(DB::raw("(select cine_format_id, id, film_id from film_cine_formats where film_id = '".$id."') a"), function ($join) {
-                        $join->on('cine_formats.id', '=', 'a.cine_format_id');
+                $fformats = DB::table('format_cines')
+                    ->leftJoin(DB::raw("(select format_cine_id, id, film_id from film_format_cines where film_id = '".$id."') a"), function ($join) {
+                        $join->on('format_cines.id', '=', 'a.format_cine_id');
                     })
-                    ->selectRaw('cine_formats.id, label, IFNULL(a.id, 0) as chosen')
+                    ->selectRaw('format_cines.id, label, IFNULL(a.id, 0) as chosen')
                     ->orderBy('id')->get();
                 $animations = DB::table('animations')
                     ->leftJoin(DB::raw("(select animation_id, id, film_id from film_animations where film_id = '".$id."') a"), function ($join) {
@@ -142,38 +142,38 @@ class FilmController extends Controller
                 $film = Film::select('id', 'completed', 'title')->find($id);
                 return view('film.shooting', ['vformats'=>$vformats, 'fformats'=>$fformats, 'animations'=>$animations, 'softwares'=>$softwares, 'film'=>$film, 'step'=>$step-1]);
             case 5:
-                $pscreens = DB::table('screen_play_formats')
+                $pscreens = DB::table('screen_format_digitals')
                     ->where('film_id', $id)
-                    ->join('play_formats', 'play_format_id', '=', 'play_formats.id')
+                    ->join('format_digitals', 'format_digital_id', '=', 'format_digitals.id')
                     ->leftJoin(DB::raw("(select screen_id, language_id, name_".App::getLocale()." as language, dubbed from screen_subtitles s inner join languages l on s.language_id = l.id where screen_type = 'p') a"), function ($join) {
-                        $join->on('screen_play_formats.id', '=', 'a.screen_id');
+                        $join->on('screen_format_digitals.id', '=', 'a.screen_id');
                     })
-                    ->select('screen_play_formats.id', 'play_format_id', 'play_format', 'ratio', 'resolution_x', 'resolution_y', 'english_dubbed', 'size', 'decode as label', 'language_id', 'language', 'dubbed')
+                    ->select('screen_format_digitals.id', 'format_digital_id', 'ratio', 'resolution_x', 'resolution_y', 'english_dubbed', 'size', 'decode as label', 'language_id', 'language', 'dubbed')
                     ->get();
-                $vscreens = DB::table('screen_video_formats')
+                $vscreens = DB::table('screen_format_videos')
                     ->where('film_id', $id)
                     ->join('sounds', 'sounds.id', '=', 'sound_id')
-                    ->join('video_formats', 'video_format_id', '=', 'video_formats.id')
+                    ->join('format_videos', 'format_video_id', '=', 'format_videos.id')
                     ->leftJoin(DB::raw("(select screen_id, language_id, name_".App::getLocale()." as language, dubbed from screen_subtitles s inner join  languages l on s.language_id = l.id where screen_type = 'v') a"), function ($join) {
-                        $join->on('screen_video_formats.id', '=', 'a.screen_id');
+                        $join->on('screen_format_videos.id', '=', 'a.screen_id');
                     })
-                    ->select('screen_video_formats.id', 'video_format_id', 'sound_id', 'ratio', 'standard',  'english_dubbed',
-                        'language_id', 'language', 'dubbed', 'sounds.label_'.App::getLocale().' as sound', 'video_formats.label_'.App::getLocale().' as label')
+                    ->select('screen_format_videos.id', 'format_video_id', 'sound_id', 'ratio', 'standard',  'english_dubbed',
+                        'language_id', 'language', 'dubbed', 'sounds.label_'.App::getLocale().' as sound', 'format_videos.label_'.App::getLocale().' as label')
                     ->get();
-                $cscreens = DB::table('screen_cine_formats')
+                $cscreens = DB::table('screen_format_cines')
                     ->where('film_id', $id)
                     ->join('sounds', 'sounds.id', '=', 'sound_id')
-                    ->join('cine_formats', 'cine_format_id', '=', 'cine_formats.id')
+                    ->join('format_cines', 'format_cine_id', '=', 'format_cines.id')
                     ->leftJoin(DB::raw("(select screen_id, language_id, name_".App::getLocale()." as language, dubbed from screen_subtitles s inner join languages l on s.language_id = l.id where screen_type = 'c') a"), function ($join) {
-                        $join->on('screen_cine_formats.id', '=', 'a.screen_id');
+                        $join->on('screen_format_cines.id', '=', 'a.screen_id');
                     })
-                    ->select('screen_cine_formats.id', 'cine_format_id', 'sound_id', 'ratio', 'speed',  'english_dubbed', 'reel_count', 'reel_length',
-                        'language_id', 'language', 'dubbed', 'sounds.label_'.App::getLocale().' as sound', 'cine_formats.label')
-                    ->orderBy('cine_formats.label')
+                    ->select('screen_format_cines.id', 'format_cine_id', 'sound_id', 'ratio', 'speed',  'english_dubbed', 'reel_count', 'reel_length',
+                        'language_id', 'language', 'dubbed', 'sounds.label_'.App::getLocale().' as sound', 'format_cines.label')
+                    ->orderBy('format_cines.label')
                     ->get();
-                $pformats = DB::table('play_formats')->orderBy('decode')->get();
-                $vformats = DB::table('video_formats')->select('id','label_'.App::getLocale().' as label')->orderByRaw('convert(label_'.App::getLocale().' using gbk) ASC')->get();
-                $cformats = DB::table('cine_formats')->where('screen', 1)->orderBy('label')->get();
+                $pformats = DB::table('format_digitals')->orderBy('decode')->get();
+                $vformats = DB::table('format_videos')->select('id','label_'.App::getLocale().' as label')->orderByRaw('convert(label_'.App::getLocale().' using gbk) ASC')->get();
+                $cformats = DB::table('format_cines')->where('screen', 1)->orderBy('label')->get();
                 $sounds = DB::table('sounds')->select('id', 'label_'.App::getLocale().' as label', 'digital')
                     ->orderBy('order')
                     ->get();
@@ -380,9 +380,16 @@ class FilmController extends Controller
                     ->orderBy('rank')
                     ->get();
                 $film = Film::find($id);
+                $file = null;
                 if(Storage::disk('public')->exists("film/".$id."/preview")){
                     $files = Storage::disk('public')->files("film/".$id."/preview");
-                    $file = sizeof($files)>0 ? $files[0] :null;
+                    foreach ($files as $f){
+
+                        if(basename($f).startsWith('preview')){
+                            $file = $f;
+                            break;
+                        }
+                    }
                     $size = Storage::disk('public')->size($file);
                     $name = basename($file);
                     $ext = substr($name, strrpos($name,'.')+1);
@@ -393,10 +400,11 @@ class FilmController extends Controller
                     $name = '';
                     $ext = '';
                 }
+
                 return view('film.upload', ['languages'=>$languages, 'film'=>$film, 'file'=>$file, 'size'=>$size, 'name'=>$name, 'ext'=>$ext]);
             }
             else{
-                return redirect('/film/'.$id.'/'.$index + 1);
+                return redirect('/film/'.$id.'/'.($index +1));
             }
         }
     }
@@ -494,13 +502,11 @@ class FilmController extends Controller
     {
         $film = Film::find($request->id);
 
-        $table = 'camera_format';
+        $table = 'camera';
         $video = $request->has($table) ? $request[$table] : null;
         $invalid = is_null($video);
 
-        $this->setFormat($video, $table, $film->id);
-
-        $table = 'cine_format';
+        $table = 'format_cine';
         $video = $request->has($table) ? $request[$table] : null;
         $invalid |= is_null($video);
 
@@ -532,7 +538,7 @@ class FilmController extends Controller
 
         $invalid = is_null($color) || is_null($special);
 
-        $invalid |= !DB::table('screen_play_formats')->where('film_id', $film->id)->exists();
+        $invalid |= !DB::table('screen_format_digitals')->where('film_id', $film->id)->exists();
 
         $completed = $request['completed'];
         $step = $request['step'];
@@ -932,7 +938,7 @@ class FilmController extends Controller
     public function screenFormat($format, Request $request){
         $values = $request->except( 'subtitle', 'dubbed');
         $validator = [
-            $format.'_format_id' => 'required',
+            'format_'.$format.'_id' => 'required',
             'ratio' => 'required'
         ];
 
@@ -965,13 +971,13 @@ class FilmController extends Controller
             $values['english_dubbed'] = $engdubbed;
         }
 
-        $screen = DB::table('screen_'.$format.'_formats')->where($values)->exists();
+        $screen = DB::table('screen_format_'.$format.'s')->where($values)->exists();
 
         if($screen){
             return [];
         }
 
-        $screen_id = DB::table('screen_'.$format.'_formats')->insertGetId($values);
+        $screen_id = DB::table('screen_format_'.$format.'s')->insertGetId($values);
         $subtitle = $request->input('subtitle', null);
         $dubbed = 0;
 
@@ -993,8 +999,6 @@ class FilmController extends Controller
     }
 
     public function upload($id, $format, Request $request){
-        $file = $request->file($format);
-
         $folderName = 'film/'.$id;
         if(!Storage::disk('public')->exists($folderName)) {
             Storage::makeDirectory($folderName);
@@ -1005,59 +1009,114 @@ class FilmController extends Controller
             Storage::makeDirectory($folderName);
         }
 
-        $files = Storage::disk('public')->files($folderName);
-        if(sizeof($files) > 8){
+        $size = sizeof(Storage::disk('public')->files($folderName));
+        if($size > 8){
             return false;
         }
-        $name = $file->getClientOriginalName();
-        $ext = $file->getClientOriginalExtension();
-        $oldName = str_replace($ext, time(),$name);
-        $name = $oldName.'.'.$ext;
-        $request->file($format)->storeAs(
-            '/public/'.$folderName, $name
-        );
+        $files = $request->file($format);
+        foreach ($files as $file) {
+            $name = $file->getClientOriginalName();
+            $ext = $file->getClientOriginalExtension();
+            $oldName = str_replace($ext, time(),$name);
+            $name = $oldName.'.'.$ext;
+            $file->storeAs(
+                '/public/'.$folderName, $name
+            );
+
+            $size++;
+
+            if($size > 8){
+                return false;
+            }
+        }
 
         if($format == 'pictures'){
             $film = Film::find($id);
-            $completed = $this->setStatus(sizeof($files) < 1, 11, $film->completed);
+            $completed = $this->setStatus(false, 11, $film->completed);
             if($completed != $film->completed){
                 $film->update(['completed' => $completed]);
                 return ['result'=>$name, 'completed'=>decbin($completed)];
             }
+
         }
 
-        return ['result'=>$name];
+        return ['result'=>''];
     }
 
     public function preview($id, Request $request){
-        if(!$request->hasFile('preview')){
-            return ['result' => 'error'];
-        }
+        $time_start = microtime(true);
 
-        $folderName = 'film/'.$id;
-        if(!Storage::disk('public')->exists($folderName)) {
-            Storage::makeDirectory($folderName);
-        }
+        $blobNum =  $request['blob_num'];
+        $totalNum = $request['total_blob_num'];
+        $filename = 'film'.$request['ext'];
+        if($blobNum == 1) {
+            $folderName = 'film/' . $id;
+            if (!Storage::disk('public')->exists($folderName)) {
+                Storage::makeDirectory($folderName);
+            }
 
-        $folderName = $folderName.'/preview';
-        if(!Storage::disk('public')->exists($folderName)) {
-            Storage::makeDirectory($folderName);
-        }
-
-        $files = Storage::disk('public')->files($folderName);
-        foreach ($files as $file){
-            if(basename($file) == 'preview'){
-                unlink($file);
+            if($totalNum == 1){
+                $folderName = 'film/'.$id.'/preview';
+                foreach(Storage::disk('public')->files($folderName) as $file){
+                    Storage::disk('public')->delete($file);
+                }
+                $request->file('preview')->storeAs('/public/'.$folderName, 'preview'.$request['ext']);
+                $request->file('preview')->storeAs('/public/'.$folderName, $filename);
+                return ['result'=>$folderName.'/'.$filename,'completed'=>1];
+            }
+            else{
+                $folderName = $folderName . '/temp';
+                if (Storage::disk('public')->exists($folderName)) {
+                    foreach ( Storage::disk('public')->files($folderName) as $old){
+                        Storage::disk('public')->delete($old);
+                    }
+                }
+                else{
+                    Storage::makeDirectory($folderName);
+                }
             }
         }
-        $file = $request->file('preview');
+        else{
+            $folderName = 'film/' . $id . '/temp';
+        }
+
+
+        $request->file('preview')->storeAs('/public/'.$folderName, $filename.'__'.$blobNum);
+
+        if($blobNum ==$totalNum){
+            $blob = '';
+            $files = Storage::disk('public')->files($folderName);
+            foreach ($files as $file) {
+                $blob .= Storage::disk('public')->get($file);
+            }
+
+            $folderName = 'film/'.$id.'/preview';
+
+            foreach(Storage::disk('public')->files($folderName) as $file){
+                Storage::disk('public')->delete($file);
+            }
+
+            Storage::copy( 'film/' . $id . '/temp/'.$filename.'__1', $folderName.'/preview'.$request['ext']);
+
+            foreach(Storage::disk('public')->files('film/' . $id . '/temp') as $file){
+                Storage::disk('public')->delete($file);
+            }
+
+            Storage::disk('public')->put($folderName.'/'.$filename, $blob);
+
+            return ['result'=>$folderName.'/'.$filename,'completed'=>1];
+
+        }
+
+        return ['result'=>microtime(true) - $time_start, 'completed'=>0];
+    /*    $file = $request->file('preview');
         $ext = $file->getClientOriginalExtension();
         $path = $file->storeAs(
             '/public/'.$folderName, 'preview.'.$ext
         );
 
         $film = DB::table('films')->first();
-        return ['result' => $path, 'film'=>$film];
+        return ['result' => $path, 'film'=>$film];*/
     }
 
     public function store(Request $request){
@@ -1097,17 +1156,18 @@ class FilmController extends Controller
         Storage::disk('public')->delete($folderName.'/'.$request['key']);
         if($format == 'pictures'){
             $film = Film::find($id);
-            $files = Storage::disk('public')->has($folderName);
+            $files = Storage::disk('public')->files($folderName);
             $completed = $this->setStatus(sizeof($files) < 1, 11, $film->completed);
             if($completed != $film->completed){
                 $film->update(['completed' => $completed]);
+                return ['result'=>$request['key'], 'completed'=>$completed];
             }
         }
         return $request->all();
     }
 
     public function descrotyScreenFormat($format, $id){
-        DB::table('screen_'.$format.'_formats')->delete(['id'=>$id]);
+        DB::table('screen_format_'.$format.'s')->delete(['id'=>$id]);
         DB::table('screen_subtitles')->where('screen_id',$id)->where('screen_type', substr($format, 0, 1))->delete();
         return $id;
     }
@@ -1161,10 +1221,10 @@ class FilmController extends Controller
 
         $toAdd = is_null($formats) ? [] : array_diff($formats, $old);
 
-        foreach ($toAdd as $v){
-            DB::table('film_'.$table.'s')->insert([
+        foreach ($toAdd as $v) {
+            DB::table('film_' . $table . 's')->insert([
                 'film_id' => $film,
-                $table.'_id' => $v
+                $table . '_id' => $v
             ]);
         }
     }
@@ -1198,7 +1258,7 @@ class FilmController extends Controller
     private function afterPost($id, $completed, $step){
         $status = str_pad(decbin($completed), 12,'0');
         $index = strrpos($status, '0');
-        return $index ? 'Y' : 'N';
+
         if(!$index){
             return redirect('/film/'.$id);
         }

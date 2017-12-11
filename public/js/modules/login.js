@@ -42,13 +42,13 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
     $rootScope.getCurrentLanguage = function (lang) {
         for(var i = 0; i < $rootScope.languages.length; i++)
         {
-            if($rootScope.languages[i].id.equals(lang)){
+            if($rootScope.languages[i].id == lang){
                 $rootScope.currentLang = $rootScope.languages[i];
                 i = $rootScope.languages.length;
             }
         }
 
-        if(!$translate.use().equals(lang)){
+        if(!$translate.use() == lang){
             $translate.use(lang)
         }
     }

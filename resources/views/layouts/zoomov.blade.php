@@ -13,15 +13,13 @@
     @section('header')
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/bootstrap/css/bootstrap.css" type="text/css">
-    <link rel="stylesheet" href="/bower_components/ng-tag/ng-tags-input.min.css" type="text/css">
-    <link rel="stylesheet" href="/bower_components/ng-tag/ng-tags-input.bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/angular/angucomplete-alt.css" type="text/css">
     <link rel="stylesheet" href="/css/tag.css" type="text/css">
     <link rel="stylesheet" href="/css/base.css" type="text/css">
     <link rel="stylesheet" href="/css/common.css" type="text/css">
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/bower_components/jquery/jquery-1.11.3.min.js"></script>
+    <script src="/bower_components/jquery/jquery-2.2.1.min.js"></script>
     <script src="/bower_components/bootstrap/js/bootstrap.min.js"></script>
     <script src="/bower_components/assets/ie-emulation-modes-warning.js"></script>
 
@@ -315,7 +313,6 @@
 <script src="{{ URL::asset('bower_components/angular/roundProgress.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular-scroll-animate.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angucomplete-alt.js') }}"></script>
-<script src="/bower_components/ng-tag/ng-tags-input.min.js"></script>
 <script src="{{ URL::asset('js/modules/zoomovApp.js') }}"></script>
 <script src="{{ URL::asset('js/controllers/header.js') }}"></script>
 @yield('script')

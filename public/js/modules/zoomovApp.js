@@ -3,7 +3,7 @@
  */
 var appZooMov = angular
     .module('zooApp', ['ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'ngTouch', 'ngCookies','ngResource','ngSanitize', 'angular-svg-round-progressbar',
-        'pascalprecht.translate', 'angular-scroll-animate', 'angucomplete-alt', 'ngTagsInput']);
+        'pascalprecht.translate', 'angular-scroll-animate', 'angucomplete-alt']);
 
 appZooMov.config(function($interpolateProvider, $translateProvider, $httpProvider) {
     $interpolateProvider.startSymbol('<%');
@@ -26,7 +26,7 @@ appZooMov
             if(!input || id < 1)
                 return null;
             for (var i=0; i<input.length; i++) {
-                if (input[i].id.equals(id)) {
+                if (input[i].id == id) {
                     return input[i];
                 }
             }

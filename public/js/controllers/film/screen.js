@@ -1,10 +1,10 @@
 appZooMov.controller("filmCtrl", function($rootScope, $scope,$http) {
     $scope.regex = /^\d+(\.\d+)*[m, g]?$/i;
 
-    $scope.init = function (id, play, cine, video) {
-        $scope.screen = {'play': angular.fromJson(play), 'cine': angular.fromJson(cine), 'video': angular.fromJson(video)};
-        $scope.data = {'play':{'film_id': id},'cine':{'film_id': id},'video':{'film_id': id}};
-        $scope.error = {'play':{},'cine':{},'video':{}};
+    $scope.init = function (id, digital, cine, video) {
+        $scope.screen = {'digital': angular.fromJson(digital), 'cine': angular.fromJson(cine), 'video': angular.fromJson(video)};
+        $scope.data = {'digital':{'film_id': id},'cine':{'film_id': id},'video':{'film_id': id}};
+        $scope.error = {'digital':{},'cine':{},'video':{}};
         $rootScope.loaded();
     }
 
@@ -36,7 +36,7 @@ appZooMov.controller("filmCtrl", function($rootScope, $scope,$http) {
            .success(function (result) {
                if(result.length > 1){
 
-                   data['label'] = $('#'+ name + '_format_id option:selected').text();
+                   data['label'] = $('#format_'+ name + '_id option:selected').text();
                    if(data['sound_id']){
                        data['sound'] = $('#'+ name + '_sound option:selected').text();
                    }
