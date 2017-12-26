@@ -1,5 +1,5 @@
 appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
-    $scope.length = 1024 * 1024 * 15;
+    $scope.length = 1024 * 1024 * 5;
     $scope.length_kb = 1024*15;
     $scope.init = function (id) {
         $scope.url = '/film/' + id + '/preview';
@@ -111,11 +111,12 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
         if(angular.isDefined(xhr)){
             xhr = null;
         }
+
+        $('.progress span').text('');
         if($scope.end < $scope.size){
             $('#btnStop').removeAttr('disabled').hide();
             $('.btn-file').removeAttr('disabled');
             $('#btnContinue').show();
-            $('.progress span').text('');
             $scope.end = $scope.size;
             $('#video>source').attr('src', $scope.origin);
             $('#video').load();
@@ -128,7 +129,8 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
     $scope.completed = function () {
         $('#buttons .btn').hide();
         $('.btn-file').removeAttr('disabled');
-        $('#video>source').attr('src', '/storage' +  $scope.url + 'preview' + $scope.ext + '?' + Date.now());
+        $('#video>source').attr('src', '/storage' +  $scope.url + '/preview' + $scope.ext + '?' + Date.now());
+        $('.progress span').text('');
         $('#video').load();
     }
 })

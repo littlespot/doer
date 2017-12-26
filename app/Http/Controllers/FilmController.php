@@ -1049,13 +1049,27 @@ class FilmController extends Controller
         $blobNum =  $request['blob_num'];
         $totalNum = $request['total_blob_num'];
         $filename = 'film'.$request['ext'];
+        $file = $request->file('preview');
+        $size = $file->getClientSize();
+        $content = file_get_contents($file);
         if($blobNum == 1) {
             $folderName = 'film/' . $id;
             if (!Storage::disk('public')->exists($folderName)) {
                 Storage::makeDirectory($folderName);
             }
 
-            if($totalNum == 1){
+            $folderName = 'film/'.$id.'/preview';
+            if (Storage::disk('public')->exists($folderName)) {
+                foreach(Storage::disk('public')->files($folderName) as $file){
+                    Storage::disk('public')->delete($file);
+                }
+            }
+            else{
+                Storage::makeDirectory($folderName);
+            }
+
+            Storage::disk('public')->put($folderName.'/'.'preview'.$request['ext'], $content);
+           /* if($totalNum == 1){
                 $folderName = 'film/'.$id.'/preview';
                 foreach(Storage::disk('public')->files($folderName) as $file){
                     Storage::disk('public')->delete($file);
@@ -1074,49 +1088,51 @@ class FilmController extends Controller
                 else{
                     Storage::makeDirectory($folderName);
                 }
-            }
+            }*/
         }
         else{
-            $folderName = 'film/' . $id . '/temp';
+            $folderName = 'film/' . $id . '/preview';
         }
 
 
-        $request->file('preview')->storeAs('/public/'.$folderName, $filename.'__'.$blobNum);
+        if ($fp = fopen ( storage_path('app/public/'.$folderName.'/'.$filename), 'ab' )) {
+            $startTime = microtime ();
+            do {
+                $canWrite = flock ( $fp, LOCK_EX );
+                if (! $canWrite)
+                    usleep ( round ( rand ( 0, 100 ) * 1000 ) );
+            } while ( (! $canWrite) && ((microtime () - $startTime) < 1000) );
+            if ($canWrite) {
+                fwrite ( $fp, $content, $size);
+            }
+            fclose ( $fp );
+        }
 
         if($blobNum ==$totalNum){
-            $blob = '';
-            $files = Storage::disk('public')->files($folderName);
-            foreach ($files as $file) {
-                $blob .= Storage::disk('public')->get($file);
-            }
-
-            $folderName = 'film/'.$id.'/preview';
+          /*  $folderName = 'film/'.$id.'/preview';
 
             foreach(Storage::disk('public')->files($folderName) as $file){
                 Storage::disk('public')->delete($file);
             }
 
-            Storage::copy( 'film/' . $id . '/temp/'.$filename.'__1', $folderName.'/preview'.$request['ext']);
+            Storage::disk('public')->copy( 'film/' . $id . '/temp/'.$filename.'__1', $folderName.'/preview'.$request['ext']);
+
+			$fp = fopen(storage_path('app/public/'.$folderName.'/'.$filename), "ab");
 
             foreach(Storage::disk('public')->files('film/' . $id . '/temp') as $file){
+				$handle = fopen(storage_path('app/public/'.$file),"rb");
+				fwrite($fp, Storage::disk('public')->get($file));
+				fclose($handle);
+				unset($handle);
                 Storage::disk('public')->delete($file);
             }
 
-            Storage::disk('public')->put($folderName.'/'.$filename, $blob);
-
-            return ['result'=>$folderName.'/'.$filename,'completed'=>1];
-
+			fclose($fp);*/
+			rename(storage_path('app/public/'.$folderName.'/'.$filename), storage_path('app/public/'.$folderName.'/'.uuid().$ext));
+            return ['result'=>$folderName.'/'.preview.$ext,'completed'=>1];
         }
 
         return ['result'=>microtime(true) - $time_start, 'completed'=>0];
-    /*    $file = $request->file('preview');
-        $ext = $file->getClientOriginalExtension();
-        $path = $file->storeAs(
-            '/public/'.$folderName, 'preview.'.$ext
-        );
-
-        $film = DB::table('films')->first();
-        return ['result' => $path, 'film'=>$film];*/
     }
 
     public function store(Request $request){

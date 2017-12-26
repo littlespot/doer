@@ -74,18 +74,19 @@
     <div id="progress">
         <div id="finish" ng-style="{'width':percent}"></div>
     </div>
+
     <video width="400" controls  id="video">
         @if(is_null($file))
             <source src="/storage/player.swf" type="video/swf">
         @else
-            <source src="/storage/{{$file.'?'.time()}}" type="video/{{$ext}}">
+            <source src="/storage/public/film/{{$film->id}}/preview.{{$ext}}" type="video/{{$ext}}">
         @endif
     </video>
     <form id="previewForm">
         {{csrf_field()}}
         <div class="progress">
             <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            <span>60% complete</span>
+            <span></span>
         </div>
         <div class="input-group">
             <input readonly="readonly" placeholder="Select file" class="form-control" id="filename" type="text">
