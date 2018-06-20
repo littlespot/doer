@@ -2,36 +2,29 @@ appZooMov.directive('location', function ($http) {
     return {
         restrict: 'A',
         link: function(scope, elem, attr, log) {
-            scope.departments = [];
-            scope.cities = [];
+            var self = scope;
+            var opt = attr['location'];
+
+
             scope.disabled = {depart:false, city:false};
-
-            scope.country_id = attr["country"];
-
             scope.loadDepart = function (id) {
                 if(!id){
-                    scope.departments = [];
+                    scope[opt].departments = [];
                 }
                 scope.disabled.depart = true;
-                var promise = $http({
-                    method: 'GET',
-                    url: '/locations/' + id,
-                    isArray:false
-                });
+                $http.get('/departments/' + id)
+                    .success(function (departments) {
+                        scope[opt].departments = departments;
+                    })
+                    .error(function (err) {
+                        return [];
+                    })
 
-                promise.then(
-                    function(departments) {
-                        scope.disabled.depart = false;
-                        scope.departments = departments.data;
-                    },
-                    function() {
-                        scope.disabled.depart = false;
-                    });
             }
 
             scope.loadCity = function (id) {
                 if(!id){
-                    scope.cities = [];
+                    scope[opt].cities = [];
                 }
 
                 scope.disabled.city = true;
@@ -43,7 +36,7 @@ appZooMov.directive('location', function ($http) {
                 promise.then(
                     function(departments) {
                         scope.disabled.city = false;
-                        scope.cities = departments.data;
+                        scope[opt].cities = departments.data;
                     },
                     function(errorPayload) {
                         scope.disabled.city = false;
@@ -51,14 +44,53 @@ appZooMov.directive('location', function ($http) {
                     });
             }
 
-
-            if(scope.country_id && scope.country_id > 0){
-                scope.departments = scope.loadDepart(scope.country_id);
-                scope.department_id = parseInt(attr["department"]);
-
-                if(scope.department_id && scope.department_id > 0){
-                    scope.cities = scope.loadCity(scope.department_id);
+            scope.setDepartment = function(department_id) {
+                if(!department_id){
+                    scope[opt].cities = [];
                 }
+
+                scope[opt].department_id = department_id;
+                self.disabled.city = true;
+                var promise = $http({
+                    method: 'GET',
+                    url: '/cities/' + department_id,
+                    isArray:false
+                });
+                promise.then(
+                    function(cities) {
+                        self.disabled.city = false;
+                        scope[opt].cities = cities.data;
+                        return true;
+                    },
+                    function(errorPayload) {
+                        self.disabled.city = false;
+                        return false;
+                    });
+            }
+
+            scope.setCity = function(city_id) {
+                var promise = $http({
+                    method: 'GET',
+                    url: '/locations/' + city_id,
+                    isArray:false
+                });
+
+                promise.then(
+                    function(result) {
+                        self.disabled = {depart:false, city:false};
+                        return result.data;
+ /*                       var data = result.data;
+                        self.cities = data.cities;
+                        self.departments = data.departments;
+                        self.countries = data.countries;
+                        self.department_id = data.department_id;
+                        self.country_id = data.country_id;
+                        return true;*/
+                    },
+                    function() {
+                        self.disabled.depart = false;
+                        return false;
+                    });
             }
         }
     };

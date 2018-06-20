@@ -56,21 +56,9 @@ appZooMov.controller("reportCtrl", function($rootScope, $scope, $http, $log, $ui
     }
 
     $scope.love = function () {
-        $scope.loving = true;
-        if($('#lovers >.fa').hasClass('fa-heart')){
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: 'confirm.html',
-                controller: function($scope) {
-                    $scope.confirm = 'confirmL';
-                }
-            });
 
-            modalInstance.result.then(function (confirm) {
-                if (!confirm)
-                    return;
-                $scope.loveConfirmed();
-            })
+        if($('#lovers >.fa').hasClass('fa-heart')){
+            $('#unloveConfirmModal').modal('show');
         }
         else{
             $scope.loveConfirmed();
@@ -78,6 +66,7 @@ appZooMov.controller("reportCtrl", function($rootScope, $scope, $http, $log, $ui
     }
 
     $scope.loveConfirmed = function () {
+        $scope.loving = true;
         $http.put('/admin/reports/love/' + $scope.id)
             .success(function (result) {
                 if(!result)
@@ -93,7 +82,7 @@ appZooMov.controller("reportCtrl", function($rootScope, $scope, $http, $log, $ui
                 else{
                     $('#lovers >.fa').removeClass('fa-heart').addClass('fa-heart-o');
                 }
-
+                $('#unloveConfirmModal').modal('hide');
                 count += result.cnt;
 
                 $("#count").text(count ? count : '');

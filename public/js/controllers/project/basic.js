@@ -8,10 +8,8 @@ appZooMov.controller("projectCtrl", function($rootScope, $scope) {
     }
 
     $scope.addLang = function (lang) {
-        alert(lang);
         var lang_opt = $('#opt_lang_' + lang);
         $scope.project.lang.push({language_id:lang, name:lang_opt.text(), rank:lang_opt.attr('rank')});
-        $scope.newLang = '';
         $('#opt_lang_' + lang).remove();
     }
 

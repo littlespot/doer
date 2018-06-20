@@ -1,17 +1,16 @@
 /**
  * Created by Jieyun on 06/06/2016.
  */
-appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $filter,$uibModal) {
-    $scope.selectedView = 0;
-
+appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $filter) {
     $scope.init = function (projects) {
         $scope.message = {id:0};
         $scope.projects = angular.fromJson(projects);
+        $scope.reminder = {subject:'', project:null};
         if($scope.projects.length > 0){
-            $scope.reminder = {message:"", project:$scope.projects[0]};
             $scope.owned = $filter("filter")($scope.projects,{admin:true});
         }
 
+        $scope.selectTopTab('applications', 'in');
         $rootScope.loaded();
     }
 
@@ -22,14 +21,6 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
             .success(function (result) {
                 $scope.messages = result.data;
             })
-    }
-
-    $scope.remind = function () {
-        if($scope.selectedView.equals(2))
-            $scope.selectedView = 0;
-        else{
-            $scope.selectedView = 2;
-        }
     }
 
     $scope.selectTopTab = function (index, box) {
@@ -46,7 +37,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
     }
     
     $scope.read = function (message, checked) {
-        if($scope.message.id.equals(message.id)){
+        if($scope.message.id == message.id){
             $scope.message = {id:0};
         }
         else{
@@ -56,8 +47,9 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
                     params:{checked: checked ? checked: message.checked}
                 })
                     .success(function (result) {
-                        message.letter = result.letter;
-                        if(!checked && !message.checked){
+                        if(result)
+                            message.letter = result.letter;
+                        if(checked && !message.checked){
                             message.checked = 1;
                             var sup = $("#" + $scope.selectedBox + "_" + $scope.selectedType);
                             var count = parseInt(sup.text().replace(/[\D]*/, ''));
@@ -80,62 +72,47 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
     $scope.sendReminder = function (invalid) {
         if(invalid)
             return;
-        $scope.reminder.project_id = $scope.reminder.project.id;
-        var modalInstance = $uibModal.open({
-            animation: true,
-            templateUrl: 'confirm.html',
-            controller: function ($scope) {
-                $scope.confirm = 'confirmS';
-            }
-        });
 
-        modalInstance.result.then(function (confirm) {
-            if (!confirm)
-                return;
+        $http.post('/admin/reminders', $scope.reminder)
+            .success(function (result) {
+                if(result != 'OK'){
+                    $scope.reminder.error = result;
+                    return;
+                }
+                var sup = $("#reminders_cnt");
+                var count = parseInt(sup.text().replace(/[\D]*/, ''));
 
-            $scope.reminder.loading = true;
+                if (!count) {
+                    count = 1;
+                }
+                else {
+                    count += 1;
+                }
 
-            $http.post('/admin/reminders', $scope.reminder)
-                .success(function (result) {
-                    if(!result.equals('OK')){
-                        return;
-                    }
+                sup.text(count);
 
-                    var sup = $("#reminders_cnt");
-                    var count = parseInt(sup.text().replace(/[\D]*/, ''));
+                sup = $("#out_reminders");
+                count = parseInt(sup.text().replace(/[\D]*/, ''));
 
-                    if (!count) {
-                        count = 1;
-                    }
-                    else {
-                        count += 1;
-                    }
+                if (!count) {
+                    count = 1;
+                }
+                else {
+                    count += 1;
+                }
 
-                    sup.text(count);
+                sup.text(count);
 
-                    sup = $("#out_reminders");
-                    count = parseInt(sup.text().replace(/[\D]*/, ''));
+                if($scope.selectedType == 'reminders' && $scope.selectedBox == 'out'){
+                    if($scope.pagination.currentPage == 1)
+                        $scope.messages.splice(0, 0, $scope.reminder);
 
-                    if (!count) {
-                        count = 1;
-                    }
-                    else {
-                        count += 1;
-                    }
-
-                    sup.text(count);
-
-                    if($scope.selectedType.equals('reminders') && $scope.selectedBox.equals('out')){
-                        if($scope.pagination.currentPage.equals(1))
-                            $scope.messages.splice(0, 0, $scope.reminder);
-
-                        $scope.pagination.total += 1;
-                    }
-                    $scope.selectedView = 0;
-                    $scope.reminder = {subject:"", message:"", project:$scope.projects[0]};
-                    $scope.reminder.loading = false;
-                })
-        });
+                    $scope.pagination.total += 1;
+                }
+                $scope.reminder = {subject:'', project:null};
+                $scope.reminder.loading = false;
+                $('#reminderModal').modal('hide');
+            })
     }
 
     $scope.checkApplication = function (message) {
@@ -147,127 +124,79 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
             });
     }
 
-    $scope.updateApplication = function (message, accept) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            size:'lg',
-            templateUrl: 'confirm.html',
-            controller: function ($scope) {
-                $scope.confirm = accept ? 'confirmA' : 'confirmR';
-            }
-        });
+    $scope.acceptApplication = function (message) {
+        $scope.applicationToUpdated = message;
+        $('#acceptModal').modal('show');
+    }
+    $scope.refuseApplication = function (message) {
+        $scope.applicationToUpdated = message;
+        $('#refuseModal').modal('show');
+    }
+    $scope.applicationUpdated = function (accept) {
+        $http.put('/admin/' + $scope.selectedType + '/' + $scope.applicationToUpdated.id, {accept: accept})
+            .success(function (result) {
+                if(!result)
+                    return;
 
-        modalInstance.result.then(function (confirm) {
-            if (!confirm)
-                return;
+                var sup = $("#sup_applications");
+                var count = parseInt(sup.text().replace(/[\D]*/,''));
+                if(count){
+                    count -= 1;
+                    sup.text(count > 0 ? count:'');
+                }
+                $scope.applicationToUpdated.accepted = accept;
+                if(accept){
+                    $('#acceptModal').modal('hide');
+                }
+                else{
+                    $('#refuseModal').modal('hide');
+                }
+                $scope.applicationToUpdated.deleting = false;
+            })
+    }
 
-            message.deleting = true;
+    $scope.deleteNotification = function (obj, opt, params) {
+        $scope.objToDelete = {obj:obj, type:opt, params:params};
+        $('#deleteModal').modal('show');
+    }
 
-            $http.put('/admin/' + $scope.selectedType + '/' + message.id, {accept: accept})
+    $scope.notificationDeleted = function () {
+        if($scope.objToDelete.type == 'n'){
+            $http.delete('/admin/notifications/' +  $scope.objToDelete.obj, {
+                params: $scope.objToDelete.params
+            })
                 .success(function (result) {
-                    if(!result)
-                        return;
-
-                    var sup = $("#sup_applications");
-                    var count = parseInt(sup.text().replace(/[\D]*/,''));
-                    if(count){
-                        count -= 1;
-                        sup.text(count > 0 ? count:'');
-                    }
-
-                    message.accepted = accept;
-                    message.deleting = false;
-                    $scope.message = {id:0};
+                    $('#notification_' + $scope.objToDelete.obj).remove();
+                    $('#deleteModal').modal('hide');
                 })
-        });
-    }
-
-    $scope.deleteNotification = function (id) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            size:'lg',
-            templateUrl: 'confirm.html',
-            controller: function ($scope) {
-                $scope.confirm = 'confirmN';
-            }
-        });
-
-        modalInstance.result.then(function (confirm) {
-            if (!confirm)
-                return;
-
-           $rootScope.loading();
-
-            $http.delete('/profile/' + id)
-                .success(function () {
-                   $('#notification_' + id).remove();
-                    $rootScope.loaded();
-                })
-        });
-    }
-    $scope.deleteApplication = function (message) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            size:'lg',
-            templateUrl: 'confirm.html',
-            controller: function ($scope) {
-                $scope.confirm = 'confirmD';
-            }
-        });
-
-        modalInstance.result.then(function (confirm) {
-            if (!confirm)
-                return;
-
-            message.deleting = true;
-
-            $http.delete('/admin/' + $scope.selectedType + '/' + message.id, {
-                params:{box: 'in'}
+        }
+        else if($scope.objToDelete.type == 'a'){
+            $http.delete('/admin/applications/' +  $scope.objToDelete.obj.id, {
+                params: $scope.objToDelete.params
             })
                 .success(function (result) {
                     if(!result)
                         return;
-
-                    $scope.loadPage(message.id);
-                    message.deleting = false;
+                    $('#deleteModal').modal('hide');
+                    $scope.loadPage($scope.objToDelete.obj.id);
                 })
-        });
-    }
-
-    $scope.removeApplication = function (message) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            size:'lg',
-            templateUrl: 'confirm.html',
-            controller: function ($scope) {
-                $scope.confirm = 'confirmM';
-            }
-        });
-
-        modalInstance.result.then(function (confirm) {
-            if (!confirm)
-                return;
-
-            message.deleting = true;
-
-            $http.delete('/admin/' + $scope.selectedType + '/' + message.id, {
-                params:{box: 'out'}
+        }
+        else{
+            $http.delete('/admin/' + $scope.selectedType + '/' + $scope.objToDelete.obj.id, {
+                params: $scope.objToDelete.params
             })
                 .success(function (result) {
-                    if(!result)
-                        return;
-
-                    $scope.loadPage(message.id);
-                    message.deleting = false;
+                    $('#deleteModal').modal('hide');
+                    $scope.loadPage($scope.objToDelete.obj.id);
                 })
-        });
+        }
     }
 
     $scope.loadPage = function (id) {
-        if (!$scope.pagination.show || ($scope.pagination.currentPage.equals($scope.pagination.lastPage) && $scope.messages.length > 1)) {
+        if (!$scope.pagination.show || ($scope.pagination.currentPage == $scope.pagination.lastPage && $scope.messages.length > 1)) {
             var index = -1;
             for (var i = 0; i < $scope.messages.length && index < 0; i++) {
-                if ($scope.messages[i].id.equals(id)) {
+                if ($scope.messages[i].id == id) {
                     index = i;
                     $scope.messages.splice(index, 1);
                     $scope.pagination.total -= 1
@@ -275,7 +204,7 @@ appZooMov.controller("notificationsCtrl", function($rootScope, $scope, $http, $f
             }
         }
         else {
-            if($scope.pagination.currentPage > 1 && $scope.messages.length.equals(1)){
+            if($scope.pagination.currentPage > 1 && $scope.messages.length == 1){
                 $scope.pagination.currentPage -= 1;
             }
 

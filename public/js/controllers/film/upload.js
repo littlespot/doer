@@ -1,8 +1,30 @@
-appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
+appZooMov.controller('filmCtrl', function ($rootScope, $scope, $timeout, $interval) {
     $scope.length = 1024 * 1024 * 5;
     $scope.length_kb = 1024*15;
-    $scope.init = function (id) {
-        $scope.url = '/film/' + id + '/preview';
+    $scope.init = function (id, other) {
+        $scope.url = '/movie/' + id + '/preview';
+        if(other){
+            $scope.other_language = true;
+            $scope.subtitle_language = {id:other, name:$('#opt_language_' + other).text(), edited:false};
+
+        }
+        else{
+            $scope.other_language = false;
+            $scope.subtitle_language = {id:0, name:null, edited:false};
+        }
+        $rootScope.loaded();
+    }
+
+    $scope.$watch('other_language', function (newVal, oldVal) {
+        if(!oldVal && newVal){
+            $scope.subtitle_language.edited = true;
+        }
+
+    })
+
+    $scope.subtitleSaved = function (id) {
+        $scope.subtitle_language.name = $('#opt_language_' + id).text();
+        $scope.subtitle_language.edited = false;
     }
 
     var xhr;
@@ -23,26 +45,28 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
         $scope.blob_num = 1;
         $scope.ext = $scope.file.name.substr($scope.file.name.lastIndexOf('.'));
         $scope.size = $scope.file.size;
-        $('.progress-bar').attr('aria-valuenow',0).width('0%');
-        $scope.origin = $('#video>source').attr('src');
+        $('.progress-bar span').text('100%');
+        $('.progress-bar').removeClass('bg-success').addClass('progress-bar-striped').attr('aria-valuenow',0).width('0%');
+        //$scope.origin = $('#video>source').attr('src');
         $scope.startUpload();
     }
 
     $scope.startUpload = function () {
         $('#btnStart').hide();
         $('#btnStop').show();
-        $('.btn-file').attr('disabled', true);
-        if($scope.origin.indexOf('player.swf')<0){
+        $('.btn-file').hide();
+
+        /*if($scope.origin.indexOf('player.swf')<0){
             $('#video>source').attr('src', '/storage/player.swf');
             $('#video').load();
-        }
-        if(angular.isUndefined(xhr))
-            xhr = new XMLHttpRequest();
+        }*/
+        xhr = new XMLHttpRequest();
+
         $scope.cutFile();
     }
 
     $scope.cutFile = function (){
-        if($scope.file && angular.isDefined(xhr)){
+        if($scope.file && angular.isDefined(xhr) && !$scope.stopped){
             $scope.end = $scope.start + $scope.length;
             var file_blob = $scope.file.slice($scope.start, $scope.end);
             $scope.sendFile(file_blob);
@@ -53,13 +77,17 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
     }
 
     $scope.stopUpload = function () {
-        $('#btnContinue').hide();
+       /* $('#btnContinue').show();
         $('#btnStop').attr('disabled', true);
-        $scope.endUpload();
+        $('.progress-bar').addClass('bg-danger');*/
+        $scope.stopped = true;
+
     }
+
 
     $scope.continueUpload = function () {
         $('#btnContinue').hide();
+        $('.progress-bar').removeClass('bg-danger').
         $scope.startUpload();
     }
 
@@ -93,8 +121,7 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
                             $scope.cutFile();
                         }
                         else {
-                            $('.progress-bar').text('100%');
-                            $scope.completed();
+                            $scope.completed(data.message);
                         }
                     }, 1000);
                 }
@@ -107,30 +134,35 @@ appZooMov.controller('filmCtrl', function ($scope, $timeout, $interval) {
         xhr.send(form_data);
     }
 
-    $scope.endUpload = function () {
+    $scope.endUpload = function (message) {
         if(angular.isDefined(xhr)){
             xhr = null;
         }
-
+        $scope.stopped = false;
         $('.progress span').text('');
         if($scope.end < $scope.size){
-            $('#btnStop').removeAttr('disabled').hide();
-            $('.btn-file').removeAttr('disabled');
-            $('#btnContinue').show();
+
+            $('#btnStop').hide();
+            $('#btnStart').show();
+            $('.btn-file').show();
+            $('.progress-bar').attr('aria-valuenow',0).width('0%');
+            //   $('#btnContinue').show();
             $scope.end = $scope.size;
-            $('#video>source').attr('src', $scope.origin);
-            $('#video').load();
+            /*  $('#video>source').attr('src', $scope.origin);
+              $('#video').load();*/
         }
         else{
-            $scope.completed();
+            $scope.completed(message);
         }
     }
 
-    $scope.completed = function () {
+    $scope.completed = function (message) {
+        $('.progress-bar').removeClass('progress-bar-striped').addClass('bg-success');
+        $('.progress-bar span').text('100%');
         $('#buttons .btn').hide();
-        $('.btn-file').removeAttr('disabled');
-        $('#video>source').attr('src', '/storage' +  $scope.url + '/preview' + $scope.ext + '?' + Date.now());
-        $('.progress span').text('');
-        $('#video').load();
+        $('.btn-file').show();
+        $('#copyalert').removeClass('alert-danger').addClass('alert-success').text(message);
+        /*$('#video>source').attr('src',url + '?' + Date.now()).attr('type', 'video/' + ext);
+        $('#video').load();*/
     }
 })

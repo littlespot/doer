@@ -2,7 +2,7 @@
  * Created by Jieyun on 2016/12/1.
  */
 
-appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
+appZooMov.directive('pictureContent', function($rootScope,$http, $filter) {
     return {
         restrict: 'A',
         link:function(scope, elem, attr){
@@ -15,15 +15,13 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
 
             jQuery.extend(support, {datauri: support.fileList && support.blobURLs});
 
-            if(attr["pictureContent"] === "project"){
+            if(attr["pictureContent"] === "projects"){
 
                 scope.pictureDst = 'projects';
-                scope.pcitureName = scope.project ? scope.project.id : '';
                 scope.ratio = 64/36;
                 scope.size = 2;
             }else{
                 scope.pictureDst = 'avatars';
-                scope.pcitureName = scope.user ? scope.user.id : '';
                 scope.ratio = 1/1;
                 scope.size = 1;
             }
@@ -37,22 +35,16 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
                             var size = ((file.size/1024)/1024).toFixed(4);
                             if(size > scope.size){
                                 scope.stopCropper();
-                                $uibModal.open({
-                                    animation: true,
-                                    templateUrl: 'alert.html',
-                                    controller: function($scope) {
-                                        $scope.alert = 'picture';
-                                    }
-                                });
+                                $('#pictureErrorModal').modal('show');
                             }
                             else if (scope.url) {
                                 URL.revokeObjectURL(scope.url); // Revoke the old one
                                 scope.url = URL.createObjectURL(file);
-                                scope.startCropper();
+                                scope.startCropper(scope.url);
                             }
                             else{
                                 scope.url = URL.createObjectURL(file);
-                                scope.startCropper();
+                                scope.startCropper(scope.url);
                             }
                         }
                     }
@@ -76,8 +68,11 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
                 $('#picture_cropper').cropper("rotate", degree);
             }
 
-            scope.startCropper = function () {
-                var modalInstance = $uibModal.open({
+            scope.startCropper = function (url) {
+                $('#picture_cropper').attr('src', url);
+                scope.cropPicture();
+                $('#pictureCropperModal').modal('show');
+             /*   var modalInstance = $uibModal.open({
                     animation: true,
                     templateUrl: 'picture.html',
                     size:'lg',
@@ -111,9 +106,27 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
                     }
                     else
                         scope.stopCropper();
-                })
+                })*/
             }
 
+            scope.cropPicture = function () {
+                $('#picture_cropper').cropper({
+                    preview:'.img-preview',
+                    aspectRatio: scope.ratio,
+                    autoCropArea: 1,
+                    viewMode:2,
+                    crop: function (e) {
+                        var json = [
+                            '{"x":' + e.x,
+                            '"y":' + e.y,
+                            '"height":' + e.height,
+                            '"width":' + e.width,
+                            '"rotate":' + e.rotate + '}'
+                        ].join();
+                        $('.avatar-data', elem).val(json);
+                    }
+                });
+            }
             scope.stopCropper = function () {
                 $('.img-original').show();
                 $('.img-container').hide();
@@ -121,7 +134,7 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
                 $('#picture_cropper').cropper('destroy');
             }
 
-            scope.submitPicture = function (form) {
+            scope.submitPicture = function () {
                 if (!scope.url && !$(".avatar-src", elem).val()) {
                     return false;
                 }
@@ -130,48 +143,37 @@ appZooMov.directive('pictureContent', function($rootScope, $uibModal, $filter) {
                     var form = $('#picture-form')[0];
 
                     var data = new FormData(form);
-
-                     $.ajax(
-                        '/crop',
-                        {
-                            type: 'post',
-                            data: data,
-                            dataType: 'json',
-                            processData: false,
-                            contentType: false,
-
-                            beforeSend: function () {
-                                $('#crazyloader').fadeIn();
-                            },
-
-                            complete: function (data) {
-                                if (data.status === 200) {
-                                    scope.url = data.responseText;
-                                    var picToUpdate = $("#" + scope.pictureDst + "-img");
-                                    if(picToUpdate){
-                                        picToUpdate.attr("src", scope.url + "?" + new Date().getTime());
-                                    }
-                                    if (!!$('<input type="file">').prop('files') && !!window.URL && URL.createObjectURL) {
-                                        $('.poster img').attr('src', scope.url + "?" + new Date().getTime());
-                                        scope.stopCropper();
-                                    }
-                                    else {
-                                        $(".avatar-src", elem).val(scope.url);
-                                        scope.startCropper();
-                                    }
-                                } else {
-                                    scope.alert(data.responseText);
-                                    scope.stopCropper();
-                                }
-
-                                $('#crazyloader').fadeOut();
-                            },
-
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                                scope.alert(textStatus || errorThrown);
+                    $http({
+                        method: 'POST',
+                        url: '/crop',
+                        data: data,
+                        headers: {
+                            'Content-Type': undefined
+                        }
+                    }).success(function (data) {
+                            scope.url = data;
+                            var picToUpdate = $("#" + scope.pictureDst + "-img");
+                            if (picToUpdate) {
+                                var url = scope.url;
+                                var index = url.lastIndexOf('.');
+                                url = url.substr(0, index) + '.small' + url.substr(index);
+                                picToUpdate.attr("src", url + "?" + new Date().getTime());
                             }
+                            if (!!$('<input type="file">').prop('files') && !!window.URL && URL.createObjectURL) {
+
+                                $('.poster img').attr('src', scope.url + "?" + new Date().getTime());
+                                scope.stopCropper();
+                            }
+                            else {
+                                $(".avatar-src", elem).val(scope.url);
+                                scope.startCropper();
+                            }
+                            $('#pictureCropperModal').modal('hide');
+                        })
+                        .error(function (XMLHttpRequest, textStatus, errorThrown) {
+                           //     scope.alert(textStatus || errorThrown);
+                            scope.stopCropper();
                         });
-                    return false;
                 }
             }
 

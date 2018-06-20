@@ -10,12 +10,12 @@ appZooMov.controller("homeCtrl", function($rootScope, $scope, $timeout, $http, $
         var ratio = Math.floor(height/width);
 
         if(ratio < maxratio){
-            $('.zooCarousel').css('min-height',  height - $("nav").height() - 80);
+            $('#zooCarousel').css('min-height',  height - $("nav").height() - 80);
         }
         else{
-            $('.zooCarousel').css('min-height', width * 0.8 * maxratio);
+            $('#zooCarousel').css('min-height', width * 0.8 * maxratio);
             if(ratio > 1){
-                $('.zooCarousel img').css('width', '100%').css('height', 'auto');
+                $('#zooCarousel img').css('width', '100%').css('height', 'auto');
             }
         }
     };
@@ -23,39 +23,31 @@ appZooMov.controller("homeCtrl", function($rootScope, $scope, $timeout, $http, $
     $(window).resize(function() {
         $scope.setHeight();
     });
-    $scope.openCatalogue = function (opt) {
-        $scope.filterOpt = opt;
-        $scope.filterChosen = $scope.filters[$scope.filterOpt];
-        $scope.overlay = true;
-    }
 
-    $scope.setFilter = function (id, name) {
+    $scope.setFilter = function (index, id, name) {
         if (id == 0) {
-            $scope.filters[$scope.filterOpt] = {id: '!!', name: 'Catalogue'};
+            $scope.filters[index] = {id: '!!', name: 'Catalogue'};
         }
         else {
-            $scope.filters[$scope.filterOpt] = {id:id, name:name}
+            $scope.filters[index] = {id:id, name:name}
         }
-
-        $scope.overlay = false;
     }
 
     $scope.changeLocation = function (path, project) {
         $location.path(path + '/' + project.id);
     }
 
-    $scope.init = function (pictures, ratio) {
+    $scope.init = function (pictures, height) {
         var files = pictures.split(',');
         angular.forEach(files, function (key, value) {
             if(key && key.length > 0)
                 $scope.slides.push({id:value + 1, image:key})
         })
-        $scope.setHeight(ratio);
 
-        $scope.filterOpt = 0;
+        $('.carousel-item').height(height);
+        //$scope.setHeight(ratio);
         $scope.filters = [{id: '!!', name: 'Catalogue'} , {id: '!!', name: 'Catalogue'}];
-        $scope.filterChosen = $scope.filters[$scope.filterOpt];
-
+        $rootScope.loaded();
         var promise = $http({
             method: 'GET',
             url: '/api/home/projects',

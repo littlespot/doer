@@ -1,7 +1,7 @@
 /**
  * Created by Jieyun on 2016/12/1.
  */
-appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log, $uibModal) {
+appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log) {
     return {
         restrict:'A',
         link: function (scope) {
@@ -71,30 +71,22 @@ appZooMov.directive('recruitContent', function ($rootScope, $http, $filter,$log,
             }
 
             scope.removeRecruit = function(id){
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'confirm.html',
-                    controller: function ($scope) {
-                        $scope.confirm = 'confirmJ';
-                    }
-                });
+                scope.recruitToDeleted = id;
+                $('#recruitDeleteModal').modal('show');
+            }
 
-                modalInstance.result.then(function (confirm) {
-                    if (!confirm)
-                        return false;
-
-                    $rootScope.loading();
-                    $http.delete(url + id, {params:{submitted:scope.submitted}})
-                        .then(function successCallback() {
-                            var old = $rootScope.removeValue(scope.recruit, id, 'id');
-                            $("#opt_role_" +old.occupation_id).show();
-                            $("#role_opt_" +old.occupation_id).show();
-                            $rootScope.loaded();
-                        }, function errorCallback(response) {
-                            scope.recruit.loading = false;
-                            alert(response.data);
-                        });
-                });
+            scope.recruitDeleted = function () {
+                $rootScope.loading();
+                $http.delete(url + scope.recruitToDeleted, {params:{submitted:scope.submitted}})
+                    .then(function successCallback() {
+                        var old = $rootScope.removeValue(scope.recruit, scope.recruitToDeleted, 'id');
+                        $("#opt_role_" +old.occupation_id).show();
+                        $("#role_opt_" +old.occupation_id).show();
+                        $('#recruitDeleteModal').modal('hide');
+                        $rootScope.loaded();
+                    }, function errorCallback(response) {
+                        $rootScope.loaded();
+                    });
             }
         }
     }

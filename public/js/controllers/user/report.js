@@ -20,13 +20,14 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
             })
     }
 
-    $scope.pageChanged = function () {
+    $scope.pageChanged = function (i) {
         $scope.loading = true;
         $http.get('/person/' +  $scope.selectedTab +'/' + $scope.id, {
-            params: angular.extend({}, $scope.filter, {page: $scope.pagination.currentPage})
+            params: angular.extend({}, $scope.filter, {page: i})
         })
             .success(function (result) {
                 $scope.results = result.data;
+                $scope.pagination.currentPage = result.data.current_page;
                 $scope.loading = false;
             })
             .error(function (err) {
@@ -38,6 +39,7 @@ appZooMov.controller("reportsCtrl", function($rootScope, $scope, $http, $log, $u
     $scope.init = function (id, tab) {
         $scope.id = id;
         $scope.selectedTab = tab;
+        $scope.selectTab(tab);
         $rootScope.loaded();
     }
 

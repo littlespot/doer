@@ -1,0 +1,46 @@
+.festival-green{
+    background: url("/images/icons/top-right-green.png") no-repeat top right;
+}
+
+.festival-red{
+    background: url("/images/icons/top-right-red.png") no-repeat top right;
+}
+
+.festival-grey{
+    background: url("/images/icons/top-right-grey.png") no-repeat top right;
+}
+
+.jumbotron-festival{
+    height: 324px;
+}
+.jumbotron-festival .poster{
+    width:324px;
+}
+
+.jumbotron-festival .flex-column{
+    height: 265px;
+}
+
+.festival-banner{
+    height:200px;
+}
+.festival-banner >img{
+    height: auto;
+    width: 200px;
+}
+.festival-banner .media-body{
+    height:200px;
+}
+
+.film-banner{
+    height:200px;
+}
+/*
+ * Override Bootstrap's default container.
+ */
+
+@media (max-width: 991px) {
+    .jumbotron-festival .poster{
+        width:240px;
+    }
+}

@@ -2,7 +2,7 @@
  * Created by Jieyun on 25/02/2016.
  */
 
-appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $cookieStore, $timeout, $window, $uibModal){
+appZooMov.controller("loginCtrl", function($rootScope, $scope, $http, $timeout, $window, $uibModal){
     $scope.error = false;
     $scope.setEmail = function (email) {
         $scope.email = email;

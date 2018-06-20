@@ -1,10 +1,10 @@
 /**
  * Created by Jieyun on 28/02/2016.
  */
-appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log, $http, $uibModal, Preparations) {
+appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log, $http, $filter, Preparations) {
     $scope.error = {description:false, finish_at:false, poster:false};
 
-    $scope.init = function (project) {
+    $scope.init = function () {
         $scope.dateOptions = {
             minDate: Preparations.setDate()
         };
@@ -13,10 +13,10 @@ appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log
             opened: false
         };
 
-        $scope.project = angular.fromJson(project);
-        if(!$scope.project.lang){
-            $scope.project.lang = [];
-        }
+        $scope.project = {};
+        $scope.project.langs = [];
+        $scope.project.departments = [];
+        $scope.project.cities = [];
         $rootScope.loaded();
     }
 
@@ -24,49 +24,43 @@ appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log
         $scope.calendar.opened = true;
     };
 
-    $scope.addLang = function (lang) {
-        $scope.project.lang.push({language_id:lang, name:$('#opt_lang_' + lang).text()});
-        $scope.newLang = '';
-        $('#opt_lang_' + lang).hide();
+    $scope.addLang = function (newLang) {
+        var lang_opt = $('#newLang option:selected');
+        $scope.project.langs.push({language_id:lang_opt.val(), name:lang_opt.text(), rank:lang_opt.attr('rank')});
+        lang_opt.attr('disabled', true);
+        newLang = null;
     }
 
     $scope.removeLang = function (lang) {
-        var index = -1;
-        for(var i = 0; i < $scope.project.lang.length && index < 0; i++){
-            if($scope.project.lang[i].id.equals(lang)){
-                index = i;
-            }
-        }
-        if(index >= 0){
-            $scope.project.lang.splice(index,1);
-            $('#opt_lang_' + lang).show();
-        }
+        $rootScope.removeValue($scope.project.langs, lang, 'language_id');
+        $('#opt_lang_'+lang).removeAttr('disabled');
     }
 
-    $scope.save = function (invalid) {
-
+   $scope.save = function (invalid) {
         if(invalid)
             return;
-        $scope.error = {description:false, finish_at:false, poster:false};
+
+       if($('#poster_image').attr('src').indexOf('default.png')>0){
+           $('#alertPosterModal').modal('show');
+           return false;
+       }
+       else if(!Preparations.compareDate($scope.project.finish_at)){
+           $('#alertPreparationModal').modal('show');
+           return false;
+       }
+       else{
+           $('#basicinfo').submit();
+       }
+        /* $scope.error = {description:false, finish_at:false, poster:false};
         if(!Preparations.compareDate($scope.project.finish_at)){
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: 'alert.html',
-                controller: function($scope) {
-                    $scope.alert = 'date';
-                }
-            });
+            if ($scope.selectedTab > 0)
+                $scope.selectTab(0);
 
-            modalInstance.result.then(function () {
-                if ($scope.selectedTab > 0)
-                    $scope.selectTab(0);
-
-                return false;
-            });
+            $('#alertPreparationModal').modal('show');
         }
 
         var lang = [];
-        angular.forEach($scope.project.lang, function (item) {
+        angular.forEach($scope.project.langs, function (item) {
             lang.push(item.language_id);
         });
 
@@ -75,18 +69,7 @@ appZooMov.controller("creationCtrl", function($rootScope, $scope, $timeout, $log
             $scope.pictureId = data.id;
             window.location.href='/admin/preparations/' + data.id + '?step=1';
         },function (error) {
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: 'alert.html',
-                controller: function($scope) {
-                    $scope.alert = 'poster';
-                }
-            });
-
-            modalInstance.result.then(function () {
-
-                return false;
-            });
-        });
+            $('#alertPosterModal').modal('show');
+        });*/
     }
 });

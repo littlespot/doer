@@ -1,7 +1,7 @@
 /**
  * Created by Jieyun on 2016/12/1.
  */
-appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $log) {
+appZooMov.directive('budgetContent', function ($rootScope, $http, $log) {
         return {
         restrict:'A',
         link: function (scope) {
@@ -12,7 +12,7 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
 
             scope.switchEditBudget = function (budget, invalid) {
                 scope.budgetNew = null;
-                if(!scope.budgetEdit || !scope.budgetEdit.id.equals(budget.id)){
+                if(!scope.budgetEdit || !scope.budgetEdit.id == budget.id){
                     scope.budgetEdit = angular.copy(budget);
                     scope.budgetEdit.project = scope.submitted;
                 }
@@ -39,37 +39,27 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
             }
 
             scope.cancelEditBudget = function (id) {
-                if(scope.budgetEdit && scope.budgetEdit.id.equals(id))
+                if(scope.budgetEdit && scope.budgetEdit.id == id)
                     scope.budgetEdit = null;
                 else
                     scope.deleteBudget(id);
             }
 
             scope.deleteBudget = function (id) {
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'budget.html',
-                    controller: function ($scope) {
-                        $scope.confirm = 'confirmB';
-                    }
-                });
-
-                modalInstance.result.then(function (confirm) {
-                    if (!confirm)
-                        return;
-
+                scope.budgetToDelete = id;
+                $('#deleteBudgetModal').modal('show');
+            }
+            scope.budgetDeleted = function (id) {
                     scope.budgets.loading = true;
-                    $http.delete('/admin/budgets/' + id, {params:{
-                        project: scope.submitted}
-                    })
+                    $http.delete('/admin/budgets/' + id, {params:{project: scope.submitted}})
                         .then(function successCallback() {
                             $rootScope.removeValue(scope.budgets, id);
                             scope.budgets.loading = false;
+                            $('#deleteBudgetModal').modal('hide');
                         }, function errorCallback(response) {
-                            alert(response.message);
+                            scope.budgets.error = response.message;
                             scope.budgets.loading = false;
                         });
-                })
             }
 
             scope.saveBudget = function (invalid) {
@@ -100,9 +90,9 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
                 scope.sponsorNew = {id: 0, user: null, quantity: 100, sponsed_at:new Date(), project_id:scope.project.id, opened:false, project:scope.submitted,sponsor:{originalObject:null}};
             }
 
-            scope.switchEditSponsor = function (sponsor, invalid) {
+            scope.switchEditSponsor = function (sponsor, invalid){
                 scope.sponsorNew = null;
-                if(!scope.sponsorInEdit || !scope.sponsorInEdit.id.equals(sponsor.id))
+                if(!scope.sponsorInEdit || !scope.sponsorInEdit.id == sponsor.id)
                     scope.sponsorInEdit = {id: sponsor.id, project_id:sponsor.project_id, quantity:sponsor.quantity, sponsor_name:sponsor.sponsor_name,
                         sponsed_at: new Date(sponsor.sponsed_at), project:scope.submitted, opened:false, sponsor:{originalObject:sponsor.sponsor_name}};
                 else if(invalid)
@@ -122,8 +112,7 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
                 else
                     scope.sponsorInEdit.username = scope.sponsorInEdit.sponsor.originalObject;
                 scope.sponsors.loading = true;
-
-                $http.put('/admin/sponsors/' + id, scope.sponsorInEdit)
+                $http.put('/api/sponsors/' + id, scope.sponsorInEdit)
                     .success(function (result) {
                         $rootScope.setValue(scope.sponsors, result);
                         scope.sponsorInEdit = null;
@@ -136,38 +125,27 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
             }
 
             scope.cancelEditSponsor = function (id) {
-                if(scope.sponsorInEdit && scope.sponsorInEdit.id.equals(id))
+                if(scope.sponsorInEdit && scope.sponsorInEdit.id == id)
                    scope.sponsorInEdit = null;
                 else
                     scope.deleteSponsor(id);
             }
 
             scope.deleteSponsor = function (id) {
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'budget.html',
-                    controller: function ($scope) {
-                        $scope.confirm = 'confirmS';
-                    }
-                });
-
-                modalInstance.result.then(function (confirm) {
-                    if (!confirm)
-                        return;
-
-                    scope.sponsors.loading = true;
-                    $http.delete('/admin/sponsors/' + id, {params:{
-                        project: scope.submitted}
-                    })
-                        .then(function successCallback() {
-                            $rootScope.removeValue(scope.sponsors, id);
-                            scope.sponsors.loading = false;
-
-                        }, function errorCallback(response) {
-                            alert(response.message);
-                            scope.sponsors.loading = false;
-                        });
-                });
+                scope.sponsorToDelete = id;
+                $('#deleteSponsorModal').modal('show');
+            }
+            scope.sponsorDeleted = function (id) {
+                scope.sponsors.loading = true;
+                $http.delete('/api/sponsors/' + id, {params:{project: scope.submitted}})
+                    .then(function successCallback() {
+                        $rootScope.removeValue(scope.sponsors, id);
+                        scope.sponsors.loading = false;
+                        $('#deleteSponsorModal').modal('hide');
+                    }, function errorCallback(response) {
+                        scope.sponsors.erro = response.message;
+                        scope.sponsors.loading = false;
+                    });
             }
 
             scope.saveSponsor = function (invalid){
@@ -182,7 +160,7 @@ appZooMov.directive('budgetContent', function ($rootScope, $http, $uibModal, $lo
                     scope.sponsorNew.username = scope.sponsorNew.sponsor.originalObject;
                 scope.sponsors.loading = true;
 
-                $http.post('/admin/sponsors', scope.sponsorNew)
+                $http.post('/api/sponsors', scope.sponsorNew)
                     .success(function (result) {
                         scope.sponsors.push(result);
                         scope.sponsorNew = null;

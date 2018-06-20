@@ -1,100 +1,218 @@
-appZooMov.controller("filmCtrl", function($rootScope, $scope) {
-    $scope.init = function (production, shooting, dialog) {
-        $scope.production = angular.fromJson(production);
-        for(var i = 0; i <$scope.production.length; i++)
-        {
-            $scope.production[i] = $scope.production[i].toString();
+appZooMov.controller("filmCtrl", function($rootScope, $scope, $http) {
+
+    $scope.init = function (dialogs, production, shooting) {
+        $scope.doubleValue = {id:'', name:''};
+        if(production){
+            $scope.productions = angular.fromJson(production);
         }
-        $scope.shooting = angular.fromJson(shooting);
-        for(var i = 0; i <$scope.shooting.length; i++)
-        {
-            $scope.shooting[i] = $scope.shooting[i].toString();
+        else{
+            $scope.productions = [];
         }
-        $scope.dialog = angular.fromJson(dialog);
-        for(var i = 0; i <$scope.dialog.length; i++)
-        {
-            $scope.dialog[i] = $scope.dialog[i].toString();
+
+
+        if(shooting){
+            $scope.shootings = angular.fromJson(shooting);
         }
+        else{
+            $scope.shootings = [];
+        }
+
+        if(dialogs){
+            $scope.dialogs = angular.fromJson(dialogs);
+        }
+        else{
+            $scope.dialogs = [];
+        }
+
         $rootScope.loaded();
     }
 
-    $scope.$watch('principal', function (newVal, oldVal) {
-        if(oldVal && oldVal != ''){
-            $('#block_production select option[value="'+oldVal+'"]').removeAttr('disabled');
-            $('#block_shooting select option[value="'+oldVal+'"]').removeAttr('disabled');
-        }
-
-        if(newVal && newVal != ''){
-            $('#block_production select option[value="'+newVal+'"]').removeAttr('selected');
-            $('#block_production select option[value="'+newVal+'"]').attr('disabled', true);
-            $('#block_shooting select option[value="'+newVal+'"]').removeAttr('selected');
-            $('#block_shooting select option[value="'+newVal+'"]').attr('disabled', true);
-        }
-    })
-
-  /*  $scope.changeProduction = function (i) {
-      $('#production_'+i).siblings('select').find('option').each(function () {
-            var val = $(this).val();
-            if (val != $scope.principal && $scope.production.indexOf(val) < 0) {
-                $(this).removeAttr('disabled');
-            }
-            else{
-                $(this).attr('disabled', true);
-            }
-        })
-    }*/
-
-    $scope.addProduction = function () {
-        var count = 0;
-        var selectors = $('#block_production select:visible');
-
-        for(;count<selectors.length; count++){
-             var val = selectors[count].value;
-            if(!val || val == ''){
-                return false;
-            }
-        }
-
-        if(count < 5){
-            $('#production_'+ count).show();
-        }
-        if(count > 3){
-            $('#btn_production').hide();
-        }
+    $scope.editCountry = function () {
+        $scope.countryEdited = $scope.principal;
     }
 
-   /* $scope.changeShooting = function (i) {
-        $('#shooting_'+i).siblings('select').find('option').each(function () {
-            var val = $(this).val();
-            if (val != $scope.principal && $scope.shooting.indexOf(val) < 0) {
-                $(this).removeAttr('disabled');
-            }
-            else{
-                $(this).attr('disabled', true);
-            }
-        })
-    }*/
+    $scope.cancelCountry = function () {
+        $scope.countryEdited = null;
+    }
 
-    $scope.addShooting = function () {
-        var count = 0;
-        var selectors = $('#block_shooting select:visible');
+    $scope.changeCountry = function (film_id) {
+        var country_id = $('#nation_principal').val();
 
-        for(;count<selectors.length; count++){
-            var val = selectors[count].value;
-            if(!val || val == ''){
-                return false;
+        if($scope.principal == country_id)
+            return false;
+
+        $http.put('/archive/'+ film_id + '/country', {'country_id': country_id})
+            .success(function (result) {
+                $('#opt_country_'+ $scope.principal).removeAttr('disabled');
+                $('#production_country_'+ $scope.principal).removeAttr('disabled');
+                $('#opt_country_'+ country_id).attr('disabled', true);
+                $('#production_country_'+ country_id).attr('disabled', true);
+                $scope.principal = country_id;
+
+
+                $scope.country_name =  $('#nation_principal option:selected').text();
+                $scope.countryEdited = null;
+            })
+            .error(function (err) {
+                $scope.country_id = null;
+            });
+    }
+
+    $scope.addProduction = function (film_id) {
+        var country_id = $('#nation_productions').val();
+        if(!country_id)
+            return false;
+        angular.forEach($scope.productions, function (production, key) {
+            if(key == country_id && production){
+               $scope.doubleValue = {id:'p', name:production};
+               $('#alertAddModal').modal('show');
             }
-        }
+        });
 
-        if(count < 9){
-            $('#shooting_'+ count).show();
+        if($scope.productionToAdd){
+            return false;
         }
-        if(count > 7){
-            $('#btn_shooting').hide();
+        $http.post('/archive/'+ film_id + '/productions', {'country_id': country_id})
+            .success(function (result) {
+                $scope.productions.push({id:country_id, name:$('#production_country_'+country_id).text(), order:result});
+                $('#opt_country_'+ country_id).attr('disabled', true);
+                $('#production_country_'+ country_id).attr('disabled', true);
+            })
+            .error(function (err) {
+            });
+    }
+
+    $scope.removeProduction = function (id, name) {
+        $scope.productionToDelete = {id:id, name:name};
+        $('#deleteConfirmModal').modal('show');
+    }
+
+    $scope.productionDeleted = function (film_id) {
+        $http.delete('/archive/'+ film_id + '/productions/' + $scope.productionToDelete.id)
+            .success(function () {
+                $('#opt_country_'+ $scope.productionToDelete.id).removeAttr('disabled');
+                $('#production_country_'+ $scope.productionToDelete.id).removeAttr('disabled');
+                $rootScope.removeValue($scope.productions, $scope.productionToDelete.id);
+                $scope.productionToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            })
+            .error(function (err) {
+                $scope.productionToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            });
+    }
+
+    $scope.addShooting = function (film_id) {
+        var country_id = $('#nation_shootings').val();
+        if(!country_id)
+            return false;
+        angular.forEach($scope.shootings, function (shooting, key) {
+            if(key == country_id && shooting){
+                $scope.doubleValue = {id:'s', name:shooting};
+                $('#alertAddModal').modal('show');
+            }
+        });
+
+        if($scope.shootingToAdd){
+            return false;
         }
+        $http.post('/movie/'+ film_id + '/shootings', {'country_id': country_id})
+            .success(function (result) {
+                $scope.shootings.push({id:country_id, name:$('#shooting_country_'+country_id).text(), order:result});
+                $('#shooting_country_'+ country_id).attr('disabled', true);
+            })
+            .error(function (err) {
+            });
+    }
+
+    $scope.removeShooting = function (id, name) {
+        $scope.shootingToDelete = {id:id, name:name};
+        $('#deleteConfirmModal').modal('show');
+    }
+
+    $scope.shootingDeleted = function (film_id) {
+        $http.delete('/movie/'+ film_id + '/shootings/' + $scope.shootingToDelete.id)
+            .success(function () {
+                $('#shooting_country_'+ $scope.shootingToDelete.id).removeAttr('disabled');
+                $rootScope.removeValue($scope.shootings, $scope.shootingToDelete.id)
+                $scope.shootingToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            })
+            .error(function (err) {
+                $scope.shootingToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            });
+    }
+
+    $scope.addDialog = function (film_id) {
+        var language_id = $('#dialog_lang').val();
+        if(!language_id)
+            return false;
+        angular.forEach($scope.dialogs, function (language, key) {
+            if(key == language_id && language){
+                $scope.doubleValue = {id:'d', name:language};
+                $('#alertAddModal').modal('show');
+            }
+        });
+
+        if($scope.languageToAdd){
+            return false;
+        }
+        $http.post('/archive/'+ film_id + '/languages', {'language_id': language_id})
+            .success(function (result) {
+                $scope.dialogs.push({id:language_id, name:$('#dialog_' + language_id).text(), order:result});
+                $('#dialog_'+ language_id).attr('disabled', true);
+            })
+            .error(function (err) {
+            });
+    }
+
+    $scope.removeDialog= function (dialog) {
+        $scope.dialogToDelete = dialog;
+        $('#deleteConfirmModal').modal('show');
+    }
+
+    $scope.dialogDeleted = function (film_id) {
+        $http.delete('/archive/'+ film_id + '/languages/' + $scope.dialogToDelete.id)
+            .success(function () {
+                $('#dialog_'+ $scope.dialogToDelete.id).removeAttr('disabled');
+                $rootScope.removeValue($scope.dialogs, $scope.dialogToDelete.id);
+                $scope.dialogToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            })
+            .error(function (err) {
+                $scope.dialogToDelete = null;
+                $('#deleteConfirmModal').modal('hide');
+            });
+    }
+
+    $scope.editConlange = function () {
+        $scope.conlangeEdited = true;
+    }
+    $scope.changeConlange = function (film_id) {
+        $http.put('/archive/'+ film_id + '/conlange', {'conlange': $('#conlange').val()})
+            .success(function (result) {
+                $scope.conlange = result;
+                $scope.conlangeEdited = null;
+            })
+            .error(function (err) {
+                $scope.conlangeEdited = null;
+            });
+    }
+    
+    $scope.removeConlange = function (film_id) {
+        $http.put('/archive/'+ film_id + '/conlange')
+            .success(function (result) {
+                $scope.conlange = result;
+                $scope.conlangeEdited = null;
+            })
+            .error(function (err) {
+                $scope.conlangeEdited = null;
+            });
     }
 
     $scope.changeSound = function (val) {
+
         if(val > 0){
             $("#block_lang").show();
         }
@@ -102,16 +220,4 @@ appZooMov.controller("filmCtrl", function($rootScope, $scope) {
             $("#block_lang").hide();
         }
     }
-
-   /* $scope.changeDialog = function (i) {
-        $('#dialog_'+i).siblings('select').find('option').each(function () {
-            var val = $(this).val();
-            if ($scope.dialog.indexOf(val) < 0) {
-                $(this).removeAttr('disabled');
-            }
-            else{
-                $(this).attr('disabled', true);
-            }
-        })
-    }*/
 });

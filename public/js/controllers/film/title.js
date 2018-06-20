@@ -1,8 +1,8 @@
-appZooMov.controller("filmCtrl", function($rootScope, $scope) {
+appZooMov.controller("filmCtrl", function($rootScope, $scope, $http) {
     $scope.init = function (titles) {
         $scope.titles = angular.fromJson(titles);
         $scope.cancelTitle();
-        $scope.error = {title:0, lang:0}
+        $scope.error = {title:0, title_latin:0, title_inter:0, trans:0, lang:0}
         $rootScope.loaded();
     }
 
@@ -14,52 +14,75 @@ appZooMov.controller("filmCtrl", function($rootScope, $scope) {
         $scope.editTitle = {language_id:0, title:''};
     }
 
-    $scope.saveTitle = function (t) {
+    $scope.saveTitle = function (film_id, t) {
        t.title = $scope.editTitle.title;
-       $scope.cancelTitle();
+        $http.post('/archive/'+ film_id + '/title', $scope.editTitle)
+            .success(function (result) {
+                if(result){
+                    t = angular.copy($scope.editTitle);
+                    t.id = result;
+                }
+                $scope.editTitle = '';
+            })
+            .error(function (errors) {
+                $scope.error.trans = errors;
+                $scope.editTitle = '';
+            })
     }
 
     $scope.deleteTitle = function (t) {
-        var found = -1;
-        for(var i = 0; i<$scope.titles.length && found < 0; i++){
-            if($scope.titles[i].language_id.equalsContent(t.language_id)){
-                $scope.error = {title:false, lang:2};
-                found = i;
-            }
-        }
+        $scope.titleToDelete = t;
+        $('#deleteTitleModal').modal('show');
+    }
+    
+    $scope.titleDeleted = function (film_id) {
+        $http.delete('/archive/'+ film_id + '/title/' + $scope.titleToDelete.language_id)
+            .success(function (result) {
+                var found = -1;
+                for(var i = 0; i<$scope.titles.length && found < 0; i++){
+                    if($scope.titles[i].id == $scope.titleToDelete.id){
+                        found = i;
+                    }
+                }
 
-        if(found >= 0 )
-            $scope.titles.splice(found, 1);
+                if(found >= 0 )
+                    $scope.titles.splice(found, 1);
+
+                $scope.titleToDelete = '';
+
+                $('#deleteTitleModal').modal('hide');
+            })
+            .error(function (errors) {
+                $scope.error.trans = errors;
+                $scope.titleToDelete = '';
+            })
+
     }
 
-    $scope.addTitle = function () {
-        if(!$scope.newTitle || $scope.newTitle.length < 1 || $scope.newTitle.length > 80){
-            if(!$scope.langSelected)
-                $scope.error = {title:(!$scope.newTitle || $scope.newTitle.length) ? 1 : 2, lang:1};
-            else
-                $scope.error = {title:(!$scope.newTitle || $scope.newTitle.length) ? 1 : 2, lang:0};
-
-            return false;
-        }
-
-        if(!$scope.langSelected){
-            $scope.error = {title:0, lang:1};
-            return false;
-        }
-
-
-        for(var i = 0; i<$scope.titles.length && !found; i++){
-            if($scope.titles[i].language_id.equalsContent($scope.langSelected.originalObject.id)){
-                $scope.error = {title:0, lang:2};
+    $scope.addTitle = function (film_id) {
+        for(var i = 0; i<$scope.titles.length; i++){
+            if($scope.titles[i].language_id == $scope.newTitle.language_id){
+                $scope.error.trans = 0;
+                $scope.error.lang = 2;
                 return false;
             }
         }
 
-        $scope.error.lang = {title:0, lang:0};
-
-        $scope.titles.push({language:$scope.langSelected.originalObject.name, language_id:$scope.langSelected.originalObject.id, title:$scope.newTitle});
-
-        $scope.newTitle = '';
+        $scope.error.trans = 0;
+        $scope.error.lang = 0;
+        $http.post('/archive/'+ film_id + '/title', $scope.newTitle)
+            .success(function (result) {
+                $scope.newTitle.language = $('#lang_trans option:selected').text();
+                $scope.titles.push(angular.copy($scope.newTitle));
+                if(!result){
+                    $scope.error.lang = 2;
+                }
+                $scope.newTitle = null;
+            })
+            .error(function (errors) {
+                $scope.error.trans = errors;
+                $scope.newTitle = null;
+            })
         return false;
     }
 

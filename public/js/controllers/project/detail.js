@@ -86,7 +86,11 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
         $scope.loading = true;
         $scope.loadData(index);
     }
-
+    $('a[data-toggle="pill"]').on('click', function (e) {
+        e.preventDefault();
+        $scope.selectTab(parseInt($(this).attr('data-index')));
+        $(this).tab('show')
+    })
     $scope.init = function (id, user, comments_cnt, tab) {
         $scope.id = id;
         $scope.user = user;
@@ -170,14 +174,14 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
         var month = content.created_at.substr(0,7);
         var day = content.created_at.substr(8,2);
         var index = -1;
-        if(type.equals('t'))
+        if(type == 't')
             devent = {user_id:content.user_id, username:content.username, roles:[content.name]};
         else
             devent = content;
         for(var i = 0; i < monthEvent.length && index < 0; i++){
             var mevent = monthEvent[i];
 
-            if(mevent.month.equals(month)){
+            if(mevent.month == month){
 
                 index = i;
                 var eventDays = mevent.events;
@@ -186,17 +190,17 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                 for(var j = 0; j < eventDays.length && dayIndex < 0; j++){
                     var eventDay = eventDays[j];
 
-                    if(eventDay.day.equals(day)){
+                    if(eventDay.day == day){
                         dayIndex = j;
                         var found = -1;
                         for(var z = 0; z < eventDay.events.length && found < 0; z++){
-                            if(eventDay.events[z].type.equals(type)){
+                            if(eventDay.events[z].type == type){
                                 found = z;
-                                if(type.equals('t')){
+                                if(type == 't'){
                                     var p = -1;
                                     for(var t=0; t <  eventDay.events[z].events.length && p<0; t++){
                                         var person = eventDay.events[z].events[t];
-                                        if(person.user_id.equals(content.user_id)){
+                                        if(person.user_id == content.user_id){
                                             p = t;
                                             if(person.roles.indexOf(content.name) < 0)
                                                 person.roles.push(content.name)
@@ -287,7 +291,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                         var events = $scope.events[index];
                         index = -1;
                         for(var i = 0; i < events.length && index < 0; i++){
-                            if(events[i].id.equals(event.id)){
+                            if(events[i].id == event.id){
                                 index = i;
                                 events.splice(index, 1);
                             }
@@ -459,6 +463,7 @@ appZooMov.controller("projectDetailCtrl", function($rootScope, $scope, $http, $f
                 $('.recruit-block', application).addClass('recruit-applied');
                 $('.title>.pull-right', application).show();
                 $('.overlay', application).remove();
+                $('#recruitStatus_' + $scope.myapplication.recruit_id).show();
                 $scope.myapplication = null;
             }, function errorCallback(response) {
                 $log.error('failure send application to recuit ' + $scope.myapplication.recruit_id, response);

@@ -996,14 +996,7 @@ svg path{
 }
 
 
-.closer{
-    border: 1px rgba(153, 153, 153,1) solid;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    float: right;
-    font-size: 16px;
-}
+
 .overlay{
     margin: 0;
     position: fixed;

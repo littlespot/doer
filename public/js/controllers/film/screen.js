@@ -3,21 +3,38 @@ appZooMov.controller("filmCtrl", function($rootScope, $scope,$http) {
 
     $scope.init = function (id, digital, cine, video) {
         $scope.screen = {'digital': angular.fromJson(digital), 'cine': angular.fromJson(cine), 'video': angular.fromJson(video)};
-        $scope.data = {'digital':{'film_id': id},'cine':{'film_id': id},'video':{'film_id': id}};
         $scope.error = {'digital':{},'cine':{},'video':{}};
         $rootScope.loaded();
     }
 
-    $scope.editor = function (name) {
-        $scope.screen[name].edit = 1;
+    $scope.edit = function (type, edited) {
+        $scope.editedScreen = angular.copy(edited);
+        $scope.editedType = type;
+        $('#editorModal').modal('show');
     }
-    $scope.cancel = function (name) {
-        $scope.screen[name].edit = 0;
+
+    $scope.cancelEdit = function () {
+        $scope.editedScreen = null;
+        $('#editorModal').modal('hide');
     }
-   $scope.post = function (name, invalid) {
-        if(invalid)
+    
+    $scope.removeLang = function (id) {
+        $rootScope.removeValue($scope.editedScreen.subtitles, id);
+    }
+
+    $scope.addLang = function () {
+        if($scope.editedScreen.newlang.language_id && ($scope.editedScreen.newlang.dubbed || $scope.editedScreen.newlang.subbed)){
+            var name = $('#newLang_opt_'+$scope.editedScreen.newlang.language_id).text();
+            $scope.editedScreen.subtitles.push({language_id:$scope.editedScreen.newlang.language_id, name:name, dubbed:$scope.editedScreen.newlang.dubbed?1:0, subbed:$scope.editedScreen.newlang.subbed?1:0})
+            $scope.editedScreen.newlang ={language_id:null, subbed:false, dubbed:false}
+        }
+    }
+
+   $scope.post = function (film_id, invalid) {
+        if(invalid || ! $scope.editedScreen || !$scope.editedType)
             return false;
-       var data = angular.copy($scope.data[name]);
+
+       var data = $scope.editedScreen;
        if(data.size){
            var size = data.size.toString().toLowerCase();
            var supfix = size.substr(size.length - 1, 1);
@@ -32,39 +49,43 @@ appZooMov.controller("filmCtrl", function($rootScope, $scope,$http) {
            }
        }
 
-       $http.put('/film/screen/'+name, data)
+       var name = $scope.editedType;
+       data.english_dubbed = data.english_dubbed ? 1 : 0;
+       data.english_subbed = data.english_subbed ? 1 : 0;
+       $http.post('/movie/' + film_id + '/screen/' + name, data)
            .success(function (result) {
-               if(result.length > 1){
-
-                   data['label'] = $('#format_'+ name + '_id option:selected').text();
-                   if(data['sound_id']){
-                       data['sound'] = $('#'+ name + '_sound option:selected').text();
-                   }
-                   data['english_dubbed'] = result[0];
-                   data['dubbed'] = result[1];
-                   data['language'] = $('#' + name + '_subtitle option:selected').text();
+               data.label = $('#format_label').find("option:selected").text();
+               data.sound = $('#sound_name').find("option:selected").text();
+               if(data.id)
+                   $rootScope.setValue($scope.screen[name], data);
+               else{
+                   data.id = result;
                    $scope.screen[name].push(data);
-                   $scope.data[name] = {'film_id': data.film_id};
-                   $scope.screen[name].edit = 0;
                }
+               $('#editorModal').modal('hide');
            })
-           .error(function (msg) {
-               $scope.error[name] = msg.errors;
+           .error(function (err) {
+               $scope.errors = err.message;
            })
    }
 
-    $scope.delete = function (name,id) {
-        $http.delete('/film/screen/' + name + '/' + id)
-            .success(function (result) {
-                var data = $scope.screen[name];
-                var found = 0;
-                for (var i = 0; i < data.length && !found; i++) {
-                    if(data[i].id == result){
-                        found = i;
-                    }
-                }
+    $scope.delete = function (name,screen) {
+       $scope.screenToDelete = screen;
+       $scope.deletedType = name;
+        $('#deleteModal').modal('show');
+    }
 
-                $scope.screen[name].splice(found, 1);
+    $scope.screenDeleted = function () {
+        var name = $scope.deletedType;
+        $http.delete('/movie/' + $scope.screenToDelete.id + '/screen/' + name + '/')
+            .success(function (result) {
+                $rootScope.removeValue($scope.screen[name], $scope.screenToDelete.id);
+                $('#deleteModal').modal('hide');
+            })
+            .error(function (msg) {
+                $scope.errors = msg;
+                $('#deleteModal').modal('hide');
+                $('#errorModal').modal('show');
             })
     }
 });

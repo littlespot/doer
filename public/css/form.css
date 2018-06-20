@@ -1,10 +1,5 @@
-label{
-    display: inline-block;
-    text-align: justify;
-    position: relative;
-}
 
-label:before{
+/*label:before{
     content: ' ';
     position: absolute;
     left:0;
@@ -15,13 +10,13 @@ label:before{
 label.require:before{
     content: '*';
     color:rgb(215,116,89);
-}
-
+}*/
+/*
 label:after {
     content: "";
     display: inline-block;
     width: 100%;
-}
+}*/
 .nav-top-menu{
     border-top: 1px #ccc solid;border-left: 1px #ccc solid;
 }

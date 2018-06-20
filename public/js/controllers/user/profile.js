@@ -1,18 +1,10 @@
-appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeout, $http, $uibModal, $log, Projects) {
+appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeout, $http, $log) {
 
-    $scope.setLocalPage = function (total, perPage) {
-        var totalPage = Math.ceil(total/perPage);
-        return {
-            show:totalPage>1,
-            currentPage: 1,
-            perPage: perPage,
-            total:total};
-    }
-
-    $scope.loadProjects = function () {
+    $scope.loadProjects = function (page) {
         var promise = $http({
             method: 'GET',
             url: '/api/profile/'+  $scope.catalogueChosen + '/' + $scope.profile.id,
+            params:page ? {page:page} : {},
             isArray:true,
             cache:true
         });
@@ -20,9 +12,12 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         promise.then(
             function(projects) {
                 $scope.projects = projects.data;
-                $scope.pagination = $scope.setLocalPage($scope.projects.length, 9);
-                $('#catalogues li[data-bind=catalogues]:hidden').show();
-                $('#catalogue_'+ $scope.catalogueChosen).hide();
+                if(!page){
+                    $scope.pagination = $rootScope.setPage(projects.data);
+                }
+                else{
+                    $scope.pagination.currentPage = projects.data.current_page;
+                }
                 $rootScope.loaded();
             },
             function(error) {
@@ -31,7 +26,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
     }
 
     $scope.loadRelations = function (page, callback) {
-        $http.get('/api/' + $scope.selectedTopTab + '/' + $scope.profile.id + (page ? '?page=' +$scope.rpagination.currentPage : ''))
+        $http.get('/api/' + $scope.selectedTopTab + '/' + $scope.profile.id + (page ? '?page=' +page : ''))
             .success(function(relations){
                 $scope.relations = relations.data;
                 $scope.rpagination = $rootScope.setPage(relations);
@@ -50,14 +45,17 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
     }
 
     $scope.selectTab = function (index) {
-        if( $scope.selectedTab.equals(index)){
+        if( $scope.selectedTab == index){
             $scope.selectedTab = 0;
             return;
         }
 
         $scope.selectedTab = index;
 
-        if(index == 2 && !$scope.sns)
+        if(index == 1){
+            $scope.selectTopTab(0);
+        }
+        else if(index == 2 && !$scope.sns){
             $http.get('/sns/' +  $scope.profile.id)
                 .success(function (data) {
                     $scope.sns = data;
@@ -65,6 +63,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
                 .error(function (error) {
                     $log.error('failure loading sns for user ' + $scope.profile.id, error);
                 });
+        }
     }
 
     $scope.resetNumber = function (relations) {
@@ -78,20 +77,20 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
 
         switch ($scope.selectedTopTab){
             case 'fans':
-                if(!number.equals(fans_cnt)){
+                if(!number == fans_cnt){
                     fans.text(number);
                 }
                 $("#sup_idols").text(idols_cnt > 0 ? idols_cnt: '')
                 $("#sup_friends").text($scope.friends_cnt > 0  ? $scope.friends_cnt : '');;
                 break;
             case 'friends':
-                if(!number.equals($scope.friends_cnt))
+                if(!number == $scope.friends_cnt)
                     $scope.friends_cnt = number;
                 $("#sup_idols").text(idols_cnt > 0 ? idols_cnt: '');
                 $("#sup_fans").text(fans_cnt > 0 ? fans_cnt: '');
                 break;
             case 'idols':
-                if(!number.equals(idols_cnt)){
+                if(!number == idols_cnt){
                     idols.text(number);
                 }
                 $("#sup_fans").text(fans_cnt > 0 ? fans_cnt: '');
@@ -100,8 +99,12 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         }
     }
 
-    $scope.pageChanged = function () {
-        $scope.loadRelations(true, false);
+    $scope.pageChanged = function (page) {
+        $scope.loadProjects(page);
+    }
+
+    $scope.relationPageChanged = function (page) {
+        $scope.loadRelations(page, false);
     }
 
     $scope.changeLocation = function(path)
@@ -144,7 +147,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         else if(relation === 'Fan' || ($scope.selectedTopTab === 'fans' && relation === 'Stranger')){
             var index = -1;
             for(var i = 0; i < $scope.relations.length && index < 0; i++){
-                if($scope.relations[i].id.equals($scope.profile.id))
+                if($scope.relations[i].id == $scope.profile.id)
                     index = i;
             }
 
@@ -157,27 +160,21 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
     $scope.changeRelation = function(id, username, callback){
         var relation = $('#relation_' + id);
         var oldClass = relation.attr('class').split(' ')[1];
-        if(oldClass.equals('mySelf'))
+        if(oldClass == 'mySelf')
             return;
-        else if(oldClass.equals('myIdol') || oldClass.equals('myFriend')){
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: 'confirm.html',
-                controller: function($scope) {
-                    $scope.selectedUser = username;
-                }
-            });
-
-            modalInstance.result.then(function (confirm) {
-                if (confirm)
-                    $scope.relation(id,callback,relation, oldClass);
-            })
+        else if(oldClass == 'myIdol' || oldClass == 'myFriend')
+        {
+            $scope.selectedUser = {id:id, username:username};
+            $('#unfollowConfirmModal').modal('show');
         }
-        else
-            $scope.relation(id,callback,relation, oldClass);
+        else{
+            $scope.relation(id,callback);
+        }
     }
 
-    $scope.relation = function (id, callback, relation, oldClass) {
+    $scope.relation = function (id, callback) {
+        var relation = $('#relation_' + id);
+        var oldClass = relation.attr('class').split(' ')[1];
         var fans = $('.ifollow', relation);
         var fans_cnt = parseInt(fans.text().replace(/[\D]*/,''), 0);
 
@@ -198,7 +195,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
                     if ($scope.selectedTab == 1) {
                         $scope.setTabs(result.relation, fans_cnt);
                     }
-
+                    $('#unfollowConfirmModal').modal('hide');
                     return;
                 }
                 else if(callback == 1){
@@ -223,7 +220,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
                     }
 
                     if($scope.selectedTopTab != 'fans'){
-                        $scope.loadRelations(true, true);
+                        $scope.loadRelations(1, true);
                         return;
                     }
                 }
@@ -237,8 +234,6 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
                 $log.error('failure chang relation for user ' + $scope.profile.id, error);
             });
     }
-
-    //$scope.categories = Projects.categories;
 
     $scope.openCatalogue = function(){
         $scope.overlay = true;
@@ -254,14 +249,20 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
 
     $scope.catalogueChosen = 'creator';
 
-    $scope.chooseCatalogue = function(key, value){
+    $scope.chooseCatalogue = function(key){
         $scope.catalogueChosen = key;
         $scope.loadProjects();
-        $('#catalogue_name').text(value);
+        $('#catalogue_name').text($('#catalog_'+key).text());
     }
 
-    $scope.orders = Projects.orders;
-    $scope.orderChosen = Projects.orders[0];
+
+    $scope.orders =  [{id:'updated_at',name:"updated_at"},
+        {id:'created_at',name:"created_at"},
+        {id:'finish_at',name:"finish_at"},
+        {id:'views_cnt', name:"Popularity"},
+        {id: 'comments_cnt', name:'Comments'},
+        {id: 'followers_cnt', name:'Followers'}];
+    $scope.orderChosen = $scope.orders[0];
 
     $scope.openOrder = function(){
         $scope.overlayOrder = true;
@@ -280,7 +281,7 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         $scope.selectTab(0);
     }
 
-    $scope.init = function (id, username, admin) {
+    $scope.init = function (id, username, admin, anchor) {
         $scope.snsMenu = ["m", "v", "t", "c", "p", "s"];
         $scope.overlaySns = false;
 
@@ -291,8 +292,8 @@ appZooMov.controller("profileCtrl", function($filter, $rootScope, $scope, $timeo
         $scope.selectedTopTab = $scope.relationTabs[0];
         $scope.profile = {id:id, username:username} ;
         $scope.filters =  admin ? [{id: '!!', name:'All'},{id:1, name:"Inprogress"},{id:2,name:"Completed"},{id:3,name:"Out"}] : [{id: '!!', name:'All'},{id:1, name:"Inprogress"},{id:2,name:"Completed"}] ;
-        $scope.filterChosen = Projects.status[0];
+        $scope.filterChosen = $scope.filters[0];
         $scope.invitation = {message:"", receiver:$scope.profile};
-        $scope.loadProjects();
+        $scope.chooseCatalogue(anchor);
     }
 });

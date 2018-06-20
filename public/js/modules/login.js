@@ -3,7 +3,7 @@
  */
 
 var appZooMov = angular
-    .module('zooApp', ['ui.bootstrap','ngCookies', 'pascalprecht.translate']);
+    .module('zooApp', ['ui.bootstrap', 'pascalprecht.translate']);
 
 appZooMov.config(function($interpolateProvider, $translateProvider) {
     $interpolateProvider.startSymbol('<%');
@@ -21,23 +21,7 @@ appZooMov.config(function($interpolateProvider, $translateProvider) {
         .useSanitizeValueStrategy('escapeParameters');
 });
 
-appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
-    var userCookie = $cookieStore.get('user');
-    if(userCookie != undefined){
-        $rootScope.user = userCookie;
-        $translate.use($rootScope.user.locale);
-    }
-
-    $rootScope.getParam = function () {
-        var path = window.location.pathname;
-        if(path[path.length - 1] === '/')
-            path = path.substring(0, path.length - 2);
-        var startpath = path.lastIndexOf('/') + 1;
-        var endpath = path.lastIndexOf('?', startpath);
-        endpath = endpath > 0 ? endpath : path.length;
-        return path.substring(startpath, endpath);
-    }
-
+appZooMov.run(function ($rootScope, $translate, $http) {
     $rootScope.languages = [{id:"zh", name:"中", checked:false}, {id:"en", name:"EN", checked:true}];
     $rootScope.getCurrentLanguage = function (lang) {
         for(var i = 0; i < $rootScope.languages.length; i++)
@@ -54,15 +38,15 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
     }
 
     $rootScope.setLanguage = function (lang) {
-        $rootScope.loading();
+       // $rootScope.loading();
         $http.get('/languages/'+lang)
             .success(function () {
                 window.location.reload();
             })
     }
-    $rootScope.loading = function () {
+   /* $rootScope.loading = function () {
         $("#crazyloader").show();
-    }
+    }*/
 
     $rootScope.loaded = function () {
         $("#crazyloader").hide();

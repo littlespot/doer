@@ -1,12 +1,6 @@
 
-appZooMov.factory('Preparations', ['$resource', '$http', function($resource) {
-    var preparations = $resource('/admin/preparations/:id', null,
-        {
-            'all':{method:'GET',params:{id:null}, isArray:false},
-            'show':{method:'GET',params:{id:'@id'}, isArray:false},
-            'update': { method:'PUT' },
-            'save': { method:'POST' }
-        });
+appZooMov.factory('Preparations', ['$http', function($http) {
+    var preparations = {};
 
     preparations.setDate = function () {
         var today = new Date();

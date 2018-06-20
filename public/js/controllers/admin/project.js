@@ -49,7 +49,7 @@ appZooMov.controller("menuCtrl", function($rootScope, $scope, $timeout, $http, $
                 if (!confirm)
                     return false;
                 else
-                    window.location.href = '/admin/projects/' + id +'?step=' + forward;
+                    window.location.href = '/admin/preparations/' + id +'?step=' + forward;
             });
         }
         else

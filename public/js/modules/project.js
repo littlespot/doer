@@ -1,5 +1,5 @@
 appZooMov.factory('Projects', ['$resource', '$http', function($resource, $http) {
-    var project = $resource(window.location.origin + '/api/projects/:id', null,
+    var project = $resource('/api/projects/:id', null,
         {
             'all':{method:'GET',params:{id:null}, isArray:true},
             'show':{method:'GET',params:{id:'@id'}, isArray:false},
@@ -14,7 +14,7 @@ appZooMov.factory('Projects', ['$resource', '$http', function($resource, $http) 
         {id: 'followers_cnt', name:'Followers'}];
 
     project.sendApplication = function (recruit) {
-        $http.post(window.location.origin + '/api/applications', {
+        $http.post('/api/applications', {
                 recruit: recruit.id,
                 motivation: recruit.motivation,
                 admin: $scope.project.user.id

@@ -19,10 +19,12 @@ ol.tags, ul.tags {
   display: inline-block;
   position: relative;
   cursor: pointer;
+  height: 26px;
+  background: #fff;
 }
 
 .tag a, .tag .tail {
-  display: block;
+  display: inline;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -43,7 +45,7 @@ ol.tags, ul.tags {
   max-width: 0;
   height: 26px;
   line-height: 24px;
-  color: white;
+  color: #fff;
   background: #76B5B5;
   border: 1px solid #76B5B5;
   -webkit-transition: 0.3s ease-out;
@@ -57,14 +59,12 @@ ol.tags, ul.tags {
 }
 .tag-default{
   margin-right: 4px;
+
 }
 .tag-default a{
   width: 100%;
   text-align: center;
-  padding: 0 12px 0 8px;
-  border-style: solid;
-  border-color: #eee transparent #eee #eee;
-  border-width: 1px 0 1px 1px;
+  padding: 0 12px;
 }
 
 .tag-default:after {
@@ -73,9 +73,9 @@ ol.tags, ul.tags {
   position: absolute;
   top:5px;
   right: 0;
-  border-bottom: 7px solid #FFF;
+  border-bottom: 7px solid transparent;
   border-right:7px solid #76B5B5;
-  border-top:7px solid #fff;
+  border-top:7px solid transparent;
   background: transparent;
 }
 
@@ -159,7 +159,7 @@ ol.tags, ul.tags {
   padding: 1px 6px;
   text-align: center;
   position: relative;
-  right: -5px;
+  right: 0;
   z-index: 2;
   min-width: 20px;
 }
@@ -176,6 +176,7 @@ ol.tags, ul.tags {
   border-right: 12px solid #466b83;
   border-bottom: 12px solid transparent;
 }
+
 .clip:after{
   content:'';
   width: 0;

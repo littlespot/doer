@@ -2,8 +2,7 @@
  * Created by Jieyun on 16/10/2016.
  */
 var appZooMov = angular
-    .module('zooApp', ['ui.bootstrap', 'ui.bootstrap.tpls', 'ngAnimate', 'ngTouch', 'ngCookies','ngResource','ngSanitize', 'angular-svg-round-progressbar',
-        'pascalprecht.translate', 'angular-scroll-animate', 'angucomplete-alt']);
+    .module('zooApp', ['ui.bootstrap', 'angular-svg-round-progressbar', 'pascalprecht.translate', 'angucomplete-alt']);
 
 appZooMov.config(function($interpolateProvider, $translateProvider, $httpProvider) {
     $interpolateProvider.startSymbol('<%');
@@ -21,6 +20,17 @@ appZooMov.config(function($interpolateProvider, $translateProvider, $httpProvide
         .useSanitizeValueStrategy('escapeParameters');
 });
 appZooMov
+    .filter('range', function() {
+        return function(input, total) {
+            total = parseInt(total);
+
+            for (var i=0; i<total; i++) {
+                input.push(i);
+            }
+
+            return input;
+        };
+    })
     .filter('getById', function() {
         return function(input, id) {
             if(!input || id < 1)
@@ -38,7 +48,7 @@ appZooMov
             if(!input || id < 1)
                 return -1;
             for (var i=0; i<input.length; i++) {
-                if (input[i].user_id.equals(id)) {
+                if (input[i].user_id == id) {
                     return i;
                 }
             }
@@ -56,7 +66,7 @@ appZooMov
                 var found = -1;
                 for(var i = 0; i < arr2.length && found <0; i++){
                     var item2 = arr2[i];
-                    if(item2.id.equals(item.id))
+                    if(item2.id == item.id)
                         found = i;
                 }
 
@@ -75,12 +85,40 @@ appZooMov
         }
     });
 
-appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
+appZooMov.run(function ($rootScope) {
+    $rootScope.checkUrl = function(url){
+        url = url.trim();
+        if(url.search(/((http|ftp|https):\/\/)/) < 0){
+            return 'http://' + url;
+        }
+        else{
+            return url;
+        }
+    }
+
+    $rootScope.updateValue = function (array, val, key1, key2) {
+        if(!key1){
+            key1 = 'id';
+        }
+        if(!key2){
+            key2 = key1;
+        }
+
+        var index = -1;
+        for(var i = 0; i < array.length && index < 0; i++){
+            if(array[i][key1] == val[key2]){
+                index = i;
+                array[i] = val;
+            }
+        }
+
+        return i;
+    }
 
     $rootScope.setValue = function (array, val, callback) {
         var index = -1;
         for(var i = 0; i < array.length && index < 0; i++){
-            if(array[i].id.equals(val.id)){
+            if(array[i].id == val.id){
                 index = i;
                 array[i] = val;
             }
@@ -99,22 +137,27 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
         var index = -1;
         var result = null;
         for(var i = 0; i < array.length && index <0; i++){
-            if(array[i][key].equals(val)){
+            if(array[i][key] == val){
                 index = i;
                 result = array[i];
             }
         }
-        array.splice(index, 1)
-        return result;
+
+        if(index >= 0){
+            array.splice(index, 1);
+            return result;
+        }
+
+        return null;
     }
 
     $rootScope.languages = [{id:"zh", name:"中"}, {id:"en", name:"EN"}];
     $rootScope.setLanguage = function (lang) {
-        $rootScope.loading();
-        $http.get('/languages/'+lang)
+     //   $rootScope.loading();
+      /*  $http.get('/languages/'+lang)
             .success(function () {
                  window.location.reload();
-            })
+            })*/
     }
 
         var href = window.location.href;
@@ -134,29 +177,19 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
             $("#crazyloader").hide();
         }
 
-/*        $http.get('/lang/current')
-            .success(function (lang) {
-                for(var i = 0; i < $rootScope.languages.length; i++)
-                {
-                    if($rootScope.languages[i].id === lang){
-                        $rootScope.currentLang = $rootScope.languages[i];
-                        i = $rootScope.languages.length;
-                    }
-                }
-
-            })
-            .error(function () {
-                $rootScope.currentLang = $rootScope.languages[1];
-            });*/
-
-
     $rootScope.setPage = function (data) {
+        var pages = [];
+        var max = Math.ceil(data.total/data.per_page);
+        for(var i = 0; i < max; i++){
+            pages.push(i+1);
+        }
         return {
             show:data.last_page>1,
             currentPage: data.current_page,
             lastPage: data.last_page,
             perPage: data.per_page,
-            total:data.total
+            total:data.total,
+            pages:pages
         };
     }
 
@@ -168,7 +201,7 @@ appZooMov.run(function ($rootScope, $translate, $cookieStore, $http) {
             }
         }
 
-        return total.toFixed(2);
+        return total;
     }
 
     $rootScope.differenceInDays = function(firstdate, seconddate) {

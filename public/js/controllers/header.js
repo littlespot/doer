@@ -5,19 +5,21 @@ appZooMov.controller("headerCtrl", function($scope, $rootScope, $filter, $http, 
 
     $scope.projectIndex = [];
 
-    $scope.init = function (code) {
+    $scope.init = function (code, checked) {
         $translate.use(code);
         $rootScope.currentLang = $filter('getById')($rootScope.languages, code);
-        $http.get('/admin/messagesCount/')
-            .success(function(result){
-                $scope.messageCnt = result[0];
-                $scope.notificationCnt = result[1];
-            });
+        if(checked){
+            $http.get('/admin/messagesCount/')
+                .success(function(result){
+                    $scope.messageCnt = result[0];
+                    $scope.notificationCnt = result[1];
+                });
 
-        $http.get('/admin/preparationsCount/')
-            .success(function(result){
-                $rootScope.preparations = result;
-            });
+            $http.get('/admin/preparationsCount/')
+                .success(function(result){
+                    $rootScope.preparations = result;
+                });
+        }
     }
 
     $scope.load = function (query) {

@@ -25,12 +25,10 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
                 if(!comment || !comment.message){
                     return;
                 }
-                else if(comment.message.length < 15){
+                else if(comment.message.length > 400){
                     return;
                 }
-                else if(comment.message.length > 800){
-                    return;
-                }
+
                 $http({method:'POST',
                     url:'/admin/comment/'+attrs['relatedOption'],
                     data:{
@@ -64,7 +62,7 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
                 if(comment.mine)
                     return;
                 comment.supporting = true;
-                $http.put('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id)
+                $http.put('/admin/comment/' + attrs['relatedOption'] + '/' + comment.id)
                     .success(function (result) {
                         if(comment.supported) {
                             comment.supports_cnt -= 1;
@@ -83,55 +81,51 @@ appZooMov.directive('commentContent', function ($http, $log, $rootScope, $uibMod
 
             }
 
-            scope.deleteComment = function (comment) {
+            scope.confirmDeleteComment = function (comment) {
+                scope.commentToDelete = comment;
+                $('#deleteCommentModal').modal('show');
+            }
 
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'confirm.html',
-                    controller: function($scope) {
-                        $scope.confirm = 'confirmC';
-                    }
-                });
-
-                modalInstance.result.then(function (confirm) {
-                    if (!confirm)
-                        return;
-                    $http.delete('/admin/' + attrs['relatedOption'] + '/comment/' + comment.id)
-                        .then(function successCallback() {
-                            if (!scope.pagination.show || (scope.pagination.currentPage.equals(scope.pagination.lastPage) && scope.comments.length > 1)) {
-                                var index = -1;
-                                for (var i = 0; i < scope.comments.length && index < 0; i++) {
-                                    if (scope.comments[i].id.equals(comment.id)) {
-                                        index = i;
-                                        scope.comments_cnt -= 1;
-                                        $("#sup_comments").text(scope.comments_cnt);
-                                        scope.comments.splice(index, 1);
-                                    }
+            scope.deleteComment = function () {
+                var comment = scope.commentToDelete;
+                $http.delete('/admin/comment/' + attrs['relatedOption'] + '/' + comment.id)
+                    .then(function successCallback() {
+                        if (!scope.pagination.show || (scope.pagination.currentPage.equals(scope.pagination.lastPage) && scope.comments.length > 1)) {
+                            var index = -1;
+                            for (var i = 0; i < scope.comments.length && index < 0; i++) {
+                                if (scope.comments[i].id == comment.id) {
+                                    index = i;
+                                    scope.comments_cnt -= 1;
+                                    $("#sup_comments").text(scope.comments_cnt);
+                                    scope.comments.splice(index, 1);
                                 }
                             }
-                            else {
-                                if(scope.pagination.currentPage > 1 && scope.comments.length == 1){
-                                    scope.pagination.currentPage -= 1;
-                                }
-
-                                $http.get('/api/comments/' + scope.id + '?page=' + scope.pagination.currentPage)
-                                    .success(function (result) {
-                                        scope.comments = result.data;
-                                        scope.comments_cnt = result.total;
-                                        $("#sup_comments").text(scope.comments_cnt);
-                                        scope.pagination = $rootScope.setPage(result);
-                                    })
-                                    .error(function (err) {
-                                        $log.error('failure loading comments for project ' + scope.id + ' page ' + scope.pagination.currentPage, err);
-                                    })
+                        }
+                        else {
+                            if(scope.pagination.currentPage > 1 && scope.comments.length == 1){
+                                scope.pagination.currentPage -= 1;
                             }
 
-                            comment.deleting = false;
+                            $http.get('/api/comments/' + scope.id + '?page=' + scope.pagination.currentPage)
+                                .success(function (result) {
+                                    scope.comments = result.data;
+                                    scope.comments_cnt = result.total;
+                                    $("#sup_comments").text(scope.comments_cnt);
+                                    scope.pagination = $rootScope.setPage(result);
+                                })
+                                .error(function (err) {
+                                    $log.error('failure loading comments for project ' + scope.id + ' page ' + scope.pagination.currentPage, err);
+                                })
+                        }
 
-                        }, function errorCallback(err) {
-                            $log.error('faled to delete commet', err);
-                        });
-                })
+                        scope.commentToDelete = null;
+                        $('#deleteCommentModal').modal('hide');
+
+                    }, function errorCallback(err) {
+                        scope.commentToDelete = null;
+                        $('#deleteCommentModal').modal('hide');
+                        $log.error('faled to delete commet', err);
+                    });
             }
         }
     }
