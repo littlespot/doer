@@ -66,5 +66,13 @@ return ["SLOGAN"=>"WHERE DREAMS COME TRUE",
     "div1"=>"Projects&nbsp;sorted by&nbsp;",
     "div2"=>"&nbsp;in need of&nbsp;",
     "div3"=>"located in&nbsp;"
-  ]
+  ],
+    "BUTTONS"=>[
+        "edit"=>"Edit",
+        "delete"=>"Delete",
+        "submit"=>"Submit",
+        "send"=>"Send",
+        "confirm"=>"Confirm",
+        "cancel"=>"Cancel",
+    ]
 ];

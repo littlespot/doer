@@ -6,13 +6,21 @@
     <title>ZOOMOV</title>
     <link rel="icon" href="/favicon.ico">
     <!-- Bootstrap core CSS -->
-    <link href="/bower_components/bootstrap/css/bootstrap.css" rel="stylesheet" />
-    <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/base.css" rel="stylesheet" type="text/css">
-    <link href="/css/login.css" rel="stylesheet" type="text/css" >
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/bower_components/jquery/jquery-2.2.1.min.js"></script>
+
+    <link rel="stylesheet" href="/css/animate.min.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <link rel="stylesheet" href="/css/base.css">
+
+    <script src="/bower_components/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/bower_components/jquery/popper.min.js"></script>
     <script src="/bower_components/bootstrap/js/bootstrap.min.js"></script>
+
+    <!--
+    <script src="/bower_components/bootstrap/js/bootstrap-hover-dropdown.min.js"></script>
+    -->
+    <script src="/bower_components/assets/ie-emulation-modes-warning.js"></script>
     <script src="/bower_components/assets/ie-emulation-modes-warning.js"></script>
     <style>
         body{
@@ -29,41 +37,60 @@
         }
         #main{
             z-index: 10;
+            height: 100%;
+            min-height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+
+        div.logo{
+            height: 40px;
+            width: 100%;
+            text-align: right;
+            background: url('/images/logo.png') no-repeat top center;
+            background-size: contain;
         }
     </style>
 </head>
 <style id=transit></style>
-<body>
+<body class="bg-secondary">
+
 @yield('background')
+
 @include('templates.crazy-loader')
-<div id="main">
-    <div class="header">
-        <div class="logo"></div>
-        <h4>{{trans('layout.SLOGAN')}}</h4>
+
+<div class="container">
+
+    <div class="logo" >
+
+        <div class="dropdown" id="languageBar">
+            <!--<div class="dropdown-toggle btn btn-default text-uppercase"
+                 data-toggle="dropdown" role="button"
+                 aria-haspopup="true" aria-expanded="false">
+                <span class="btn-sq-md text-uppercase" ng-bind="currentLang.name"></span>
+            </div>
+            <ul class="dropdown-menu">
+                <li ng-repeat="l in languages" ng-if="l.id != '{{app()->getLocale()}}'" class="btn btn-primary"
+                    ng-click="setLanguage(l.id);">
+                    <span ng-bind="l.name"></span>
+                </li>
+            </ul>-->
+        </div>
+    </div>
+    <h5 class="mt-2 font-lg text-center text-muted">{{trans('layout.SLOGANS.home')}}</h5>
+</div>
+<div id="main" class="d-flex flex-column justify-content-center" >
+    <div id="content" class="container d-flex justify-content-center" ng-controller="loginCtrl"  ng-init="init('{{app()->getLocale()}}')">
+        @yield('content')
 
     </div>
-    <div id="content" class="row">
-        @yield('content')
-    </div>
 </div>
-<div class="dropdown" id="languageBar">
-    <div class="dropdown-toggle btn btn-default text-uppercase"
-         data-toggle="dropdown" role="button"
-         aria-haspopup="true" aria-expanded="false">
-        <span class="btn-sq-md text-uppercase" ng-bind="currentLang.name"></span>
-    </div>
-    <ul class="dropdown-menu">
-        <li ng-repeat="l in languages" ng-if="l.id != '{{Lang::locale()}}'" class="btn btn-primary"
-            ng-click="setLanguage(l.id);">
-            <span ng-bind="l.name"></span>
-        </li>
-    </ul>
-</div>
+<!--
 <form id="currentLangForm" method = 'POST' action = '/languages' class = 'container text-center' style="z-index: 10000">
     {{ csrf_field() }}
     <input name="locale" id="current_local" type="hidden" value="zh" />
 </form>
-
+--
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="/bower_components/assets/ie10-viewport-bug-workaround.js"></script>
 <script src="/bower_components/angular/angular.min.js" ></script>
@@ -72,7 +99,6 @@
 <script src="/bower_components/angular/angular-animate.min.js"></script>
 <script src="/bower_components/angular/angular-touch.min.js"></script>
 <script src="/bower_components/bootstrap/js/ui-bootstrap-tpls.min.js"></script>
-<script src="/bower_components/angular/angular-cookies.min.js"></script>
 <script src="/js/modules/login.js"></script>
 <script src="/js/directives/common.js"></script>
 @yield('script')

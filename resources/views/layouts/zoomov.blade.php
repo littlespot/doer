@@ -1,302 +1,192 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="zooApp" >
+<html lang="en"  ng-app="zooApp" >
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta charset="utf-8">
+    <title>{{ config('app.name', 'ZOOMOV') }}</title>
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="icon" href="/favicon.ico">
-    <!-- Bootstrap core CSS -->
+
     @section('header')
-    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <link rel="stylesheet" href="/css/animate.min.css">
     <link rel="stylesheet" href="/bower_components/bootstrap/css/bootstrap.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/bower_components/angular/angucomplete-alt.css" type="text/css">
-    <link rel="stylesheet" href="/css/tag.css" type="text/css">
+
     <link rel="stylesheet" href="/css/base.css" type="text/css">
-    <link rel="stylesheet" href="/css/common.css" type="text/css">
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/bower_components/jquery/jquery-2.2.1.min.js"></script>
+
+    <script src="/bower_components/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/bower_components/jquery/popper.min.js"></script>
     <script src="/bower_components/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/bower_components/assets/ie-emulation-modes-warning.js"></script>
 
-        <style>
-            .angucomplete-image-holder.projects{
-                background-size: contain;
-            }
+    @show
 
-            .angucomplete-image.projects{
-                border-radius: 0;
-                width: 48px;
-                height: 27px;
-            }
-        </style>
-        <!--
-<script language="JavaScript">
-
-  if (window.Event)
-      document.captureEvents(Event.MOUSEUP);
-
-  function nocontextmenu()
-  {
-      event.cancelBubble = true
-      event.returnValue = false;
-
-      return false;
-  }
-
-  function norightclick(e)
-  {
-      if (window.Event)
-      {
-          if (e.which == 2 || e.which == 3)
-              return false;
-      }
-      else
-      if (event.button == 2 || event.button == 3)
-      {
-          event.cancelBubble = true
-          event.returnValue = false;
-          return false;
-      }
-
-  }
-
-  document.oncontextmenu = nocontextmenu; // for IE5+
-  document.onmousedown = norightclick; // for all others
-
-      </script>-->
-@show
-    <!-- Scripts -->
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-    </script>
 </head>
-<body class="'{{app()->getLocale()}}'">
-<nav class="navbar navbar-default">
-    <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#top-navbar-collapse" aria-expanded="false">
-                <span>&#9776;</span>
-            </button>
-            <a class="navbar-brand" href="/home">
-                <span>ZOOMOV</span>
-                <img alt="ZOOMOV" src="/images/logo.png" />
-            </a>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="top-navbar-collapse" ng-controller="headerCtrl" ng-init="init('{{Lang::locale()}}')">
-            <ul class="nav navbar-nav" id="navleft">
-                <li ng-class="{active: currentPath == 'discover'}">
-                    <a href="/discover">{{trans("layout.MENU.discover")}}</a>
-                </li>
-                <li ng-class="{active: currentPath == 'video'}">
-                    <a href="/films">{{trans("layout.MENU.videos")}}</a>
-                </li>
-                <li ng-class="{active: currentPath == 'preparations'}">
-                    <a href="/preparations">{{trans("layout.MENU.creation")}}</a>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right" id="navright" style="margin: 0">
-                <li ng-class="{active: $location.path().indexOf('notifications') > 0}">
-                    <a href="/notifications" class="fa fa-bell-o"></a>
-                    <sup ng-if="notificationCnt>0" ng-bind="notificationCnt"></sup>
-                </li>
-                <li ng-class="{active: $location.path().indexOf('messages') > 0}">
-                    <a href="/messages" class="fa fa-envelope-o"></a>
-                    <sup ng-if="messageCnt > 0" ng-bind="messageCnt"></sup>
-                </li>
-                @if(Auth::check())
-                <li class="dropdown" id="account" >
-                    <div class="dropdown-toggle"
-                       data-toggle="dropdown" role="button"
-                       aria-haspopup="true" aria-expanded="false">
-                        <img id="avatars-img" class="img-circle"
-                             src="/context/avatars/{{Auth::id()}}.small.jpg?{{time()}}"
-                             onError="this.onerror=null;this.src='/images/avatar.png';"/>
+<body id="top" class="bg-secondary">
+
+@include('templates.crazy-loader')
+
+<div id="container">
+    <nav id="topNav" ng-controller="headerCtrl" ng-init="init('{{app()->getLocale()}}', '{{auth()->check()}}')" class="container navbar sticky-top navbar-expand-lg">
+        <a class="navbar-brand" href="{{env('APP_URL')}}">
+            <img src="/images/logo.png" class="img-fluid" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto"  id="leftBar">
+                <li class="nav-item dropdown">
+                    <a href="/discover" id="projectDropdown" class="nav-link dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="600" data-close-others="false">
+                        <span>{{trans("layout.MENU.discover")}}</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="projectDropdown">
+                        <a class="dropdown-item" href="/discover">{{trans("layout.MENU.project_list")}}</a>
+                        <a class="dropdown-item" href="/profile">{{trans("layout.MENU.my_projects")}}</a>
+                        <a class="dropdown-item" href="/profile?anchor=follower">{{trans("layout.MENU.project_favorite")}}</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="/admin/preparations">{{trans('layout.MENU.project_creation')}}</a>
                     </div>
-                    <ul class="dropdown-menu">
-                        @if(!Auth::user()->professional)
-                        <li ng-class="{active: $route.current.scope.name == 'profile'}">
-                            <a class="btn" ng-href="/profile/{{Auth::id()}}" class="separator">
-                                <span class="text-info">{{trans("layout.MENU.profile")}}</span>
-                            </a>
-                        </li>
-                        @endif
-                        <li ng-if="preparations.length">
-                            <a href="/account" class="btn btn-info">{{trans("layout.MENU.preparations")}}</a>
-                        </li>
-                        <li>
-                            <a class="btn" href="/personal">
-                                <span class="text-primary">{{trans("layout.MENU.person")}}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="btn" href="{{ route('logout') }}"
-                               onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                <span class="text-important">{{trans("layout.MENU.signout")}}</span>
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-                        </li>
-                    </ul>
                 </li>
-                @endif
+                <li class="nav-item dropdown">
+                    <a  href="/festivals" id="festivalDropdown" class="nav-link dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="600" data-close-others="false">
+                        <span>{{trans("layout.MENU.festivals")}}</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="festivalDropdown">
+                        <a href="/festivals" class="dropdown-item">{{trans("layout.MENU.festival_list")}}</a>
+                        <a href="/entries" class="dropdown-item">{{trans("layout.MENU.festival_inscription")}}</a>
+                        <a href="/archives" class="dropdown-item">{{trans("layout.MENU.films")}}</a>
+                        <a href="/myfestivals" class="dropdown-item">{{trans("layout.MENU.festival_favorite")}}</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/archive/creation" class="dropdown-item text-danger">{{trans("layout.MENU.film_creation")}}</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="/archive/creation">{{trans("layout.MENU.creation")}}</a>
+                </li>
             </ul>
+            @if(auth()->check())
+            <div id="rightBar" class="form-inline my-2 my-lg-0" >
+                {{ csrf_field() }}
+                <div class="input-group bg-white">
+                    <div class="input-group-prepend">
+                        <button class="btn "><span class="fa fa-search"></span></button>
+                    </div>
+                    <div angucomplete-alt id="searchinput" input-name="search"
+                         placeholder="{{trans('layout.MENU.search')}}"
+                         pause="100"
+                         selected-object="itemSelected"
+                         remote-url="{{config('url')}}/api/search/"
+                         search-fields="title,description"
+                         title-field="title"
+                         description-field="description"
+                         image-uri="/storage"
+                         image-field="image"
+                         image-error="/icons/waiting.svg"
+                         minlength="1"
+                         clear-selected = "true"
 
-            <form id="zooHeaderSearch" class="navbar-form navbar-right" role="search" style="margin:0;padding: 0;">
-                <div class="btn" style="padding-top: 9px"><span class="fa fa-search"></span></div>
-                <div angucomplete-alt id="searchinput" input-name="search"
-                    placeholder="{{trans('layout.MENU.search')}}"
-                    pause="100"
-                    selected-object="itemSelected"
-                    remote-url="{{config('url')}}/api/search/"
-                    search-fields="title,description"
-                    title-field="title"
-                    description-field="description"
-                    image-uri="/context"
-                    image-field="image"
-                    image-error="/icons/waiting.svg"
-                    minlength="1"
-                    clear-selected = "true"
-                    input-class="form-control"
-                    match-class="highlight"
-                    text-no-results="{{trans('layout.MENU.none')}}"
-                    text-searching="{{trans('layout.MENU.searching')}}">
+                         match-class="highlight"
+                         text-no-results="{{trans('layout.MENU.none')}}"
+                         text-searching="{{trans('layout.MENU.searching')}}"></div>
                 </div>
+                <ul class="navbar-nav" role="group">
+                    <li class="nav-item">
+                        <a class="nav-link btn" href="/notifications">
+                            <i class=" fa fa-bell-o"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link  btn" href="/messages">
+                            <i class=" fa fa-envelope-o"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a id="personDropdown" class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img id="avatars-img" class="rounded-circle"
+                                 src="/storage/avatars/{{auth()->id()}}.small.jpg?{{time()}}"
+                                 onError="this.onerror=null;this.src='/context/avatars/default.png';"/>
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST" class="dropdown-menu" aria-labelledby="personDropdown">
+                            <a href="/profile" class="dropdown-item">{{trans("layout.MENU.profile")}}</a>
+                            <a href="/account" class="dropdown-item">{{trans("layout.MENU.preparations")}}</a>
+                            <a class="dropdown-item" href="/personal">
+                                {{trans("layout.MENU.person")}}
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item"  type="submit">
+                                <span class="text-danger">{{trans("layout.MENU.signout")}}</span>
+                            </button>
 
-             <!--   <angucomplete-alt id="searchinput" input-name="search"
-                                  placeholder="{{trans('layout.MENU.search')}}"
-                                  pause="100"
-                                  selected-object="projectSelected"
-                                  url="http://myserver.com/api/user/find?s="
-                                  search-fields="title,username"
-                                  title-field="title"
-                                  description-field="username"
-                                  image-uri="/context/projects"
-                                  image-field="id"
-                                  image-error="icons/waiting.svg"
-                                  minlength="1"
-                                  clear-selected = "true"
-                                  input-class="form-text"
-                                  match-class="highlight"
-                                  text-no-results="{{trans('layout.MENU.none')}}"
-                                  text-searching="{{trans('layout.MENU.searching')}}"/> -->
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            @else
+            <form class="form-inline my-2 my-lg-0" >
+                <a class="btn btn-outline-primary s my-2 my-sm-0" href="/login">{{trans('auth.login')}}</a>
+                <a class="btn btn-primary" href="/register">{{trans('auth.create')}}</a>
             </form>
+            @endif
         </div>
-    </div>
-</nav>
-<div class="affix fixed-right dropdown" id="language" style="top:0">
-    <div class="dropdown-toggle"
-       data-toggle="dropdown" role="button"
-       aria-haspopup="true" aria-expanded="false">
-        <span class="btn-sq-md text-uppercase" ng-bind="currentLang.name"></span>
-    </div>
-    <ul class="dropdown-menu">
-        <li ng-repeat="l in languages" ng-if="l.id != '{{App::getLocale()}}'" class="btn btn-primary"
-            ng-click="setLanguage(l.id);">
-            <span ng-bind="l.name"></span>
-        </li>
-    </ul>
-</div>
-<div class="padding-top-lg">
-    <input type="hidden" name="csrfmiddlewaretoken" value="<?php echo csrf_token(); ?>">
-    @yield('content')
-</div>
+    </nav>
 
-<div class="footer">
-    <div class="container footer-content">
-        <div class="row">
-            <div class="col-md-2 text-center">
-                <div>
-                    <a href="/">{{trans("layout.FOOTER.home")}}</a>
-                </div>
-                <div>
-                    <a href="/discover">{{trans("layout.FOOTER.discover")}}</a>
-                </div>
-                <div>
-                    <a href="/preparations">{{trans("layout.FOOTER.create")}}</a>
-                </div>
-                <div>
-                    <a href="/personal">{{trans("layout.FOOTER.profile")}}</a>
-                </div>
-                <br/>
-                <div><a href="/login">{{trans("layout.FOOTER.login")}}</a></div>
-                <div><a href="/register">{{trans("layout.FOOTER.register")}}</a></div>
-                <br/>
-                <div><span>{{trans("layout.FOOTER.search")}}</span></div>
-            </div>
-            <div class="col-md-2 text-center">
-                <div><span>{{trans("layout.FOOTER.zoomov")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.help")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.rules")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.faq")}}</span></div>
-                <br/>
-                <br/>
-                <div><span>{{trans("layout.FOOTER.terms")}}</span></div>
-                <div><a href="/privacy" target="_blank">{{trans("layout.FOOTER.privacy")}}</a></div>
-                <div><span>{{trans("layout.FOOTER.cookies")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.copyright")}}</span></div>
-            </div>
-            <div class="col-md-2 text-center">
-                <div><span>{{trans("layout.FOOTER.us")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.timeline")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.news")}}</span></div>
-                <div><a href="/contact" target="_blank">{{trans("layout.FOOTER.contact")}}</a></div>
-                <div><a href="/join" target="_blank">{{trans("layout.FOOTER.join")}}</a></div>
-                <div><span>{{trans("layout.FOOTER.verification")}}</span></div>
-                <br/>
-                <div><span>{{trans("layout.FOOTER.activities")}}</span></div>
-                <div><span>{{trans("layout.FOOTER.festival")}}</span></div>
-            </div>
-            <div class="col-md-2  text-center">
-                <div><span>{{trans("layout.FOOTER.languages")}}</span></div>
-                <div ng-click="setLanguage('zh')">简体中文</div>
-                <div>繁体中文</div>
-                <div ng-click="setLanguage('en')">English</div>
-                <div ng-click="setLanguage('fr')">Française</div>
-            </div>
-            <div class="col-md-2 text-center icon" >
-                <div><span>{{trans("layout.FOOTER.newsletter")}}</span></div>
-                <div>
-                    <a href="weibo.com/zoomov" target="_blank"><img src="/images/icons/weibo.svg" /></a>
-                </div>
-                <div>
-                    <a href="twitter.com/zoomov_com" target="_blank"><img src="/images/icons/twitter.svg" /></a>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <img src="/images/qcode.jpg" class="img-responsive" />
-            </div>
-        </div>
+    <div class="content">
+        @yield('content')
     </div>
-</div>
-<div class="affix fixed-bottom fixed-right">
-    <div>
-        <div class='btn btn-sm-svg' id="toTop" onClick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <?php echo file_get_contents(public_path("/images/icons/backtoup.svg")); ?>
-        </div>
-    </div>
-    <div>
-        <div class='btn btn-sm-svg' id="toHelp">
-            <?php echo file_get_contents(public_path("/images/icons/help.svg")); ?>
-        </div>
-    </div>
-</div>
 
-
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <footer id="copyright" class="pt-3 bg-dark text-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                    <p>
+                        <a href="#" class="btn">{{trans("layout.FOOTER.help")}}</a>
+                        <a href="/discover" class="btn">{{trans("layout.FOOTER.discover")}}</a>
+                        <a href="/festivals"  class="btn">{{trans("layout.FOOTER.festival")}}</a>
+                    </p>
+                    <p>
+                        <a href="/contracts" class="btn">{{trans("layout.FOOTER.rules")}}</a>
+                        <a href="/terms" class="btn">{{trans("layout.FOOTER.terms")}}</a>
+                        <a href="/terms" class="btn">{{trans("layout.FOOTER.faq")}}</a>
+                    </p>
+                </div>
+                <div class="col-md-6 col-xs-12 text-right">
+                    <p class="pr-3">
+                        <a href="/languages/zh">
+                            简体中文
+                        </a>
+                    </p>
+                    <p class="pr-3">
+                        <a href="/languages/en">
+                            English
+                        </a>
+                    </p>
+                    <p>
+                        <ul class="list-inline">
+                            <li class="list-inline-item "><a href="#" class="btn fa fa-facebook"></a></li>
+                            <li class="list-inline-item"><a href="twitter.com/zoomov_com" class="btn fa fa-twitter"></a></li>
+                            <li class="list-inline-item "><a href="weibo.com/zoomov" class="btn fa fa-weibo"></a></li>
+                            <li class="list-inline-item "><a href="#" class="btn fa fa-wechat"></a></li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center small">
+                    <p class="wow bounceIn" data-wow-delay="0.3s">
+                        苏ICP备17002583号-1 &copy; 2016-{{date('Y')}} zoomov.com all rights reserved
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
 <script src="{{ URL::asset('bower_components/assets/ie10-viewport-bug-workaround.js')}}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular.min.js')}}" ></script>
 <script src="{{ URL::asset('bower_components/angular/angular-translate.min.js')}}"></script>
@@ -309,27 +199,17 @@
 <script src="{{ URL::asset('bower_components/angular/angular-messages.min.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular-resource.min.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular-sanitize.min.js') }}"></script>
-<script src="{{ URL::asset('bower_components/bootstrap/js/ui-bootstrap-tpls.min.js') }}"></script>
-<script src="{{ URL::asset('bower_components/angular/roundProgress.js') }}"></script>
+<script src="{{ URL::asset('bower_components/bootstrap/js/ui-bootstrap-tpls-2.5.0.min.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angular-scroll-animate.js') }}"></script>
 <script src="{{ URL::asset('bower_components/angular/angucomplete-alt.js') }}"></script>
+<script src="{{ URL::asset('bower_components/angular/roundProgress.js') }}"></script>
 <script src="{{ URL::asset('js/modules/zoomovApp.js') }}"></script>
 <script src="{{ URL::asset('js/controllers/header.js') }}"></script>
-@yield('script')
-<script type="text/javascript">
-    $(window).scroll(function() {
-        if ($(this).scrollTop()) {
-            $('#toHelp').animate({"bottom": '45px'}, 500);
-            $('#toTop:hidden').stop(true, true).fadeIn();
-            $('.overlay').css("top", 0);
-        } else {
-            $('#toHelp').animate({"bottom": '10px'}, 200);
-            $('#toTop').stop(true, true).fadeOut();
-            $('.overlay').css("top", 60);
-        }
-    });
-
-
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>
+@yield('script')
 </body>
 </html>

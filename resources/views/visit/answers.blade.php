@@ -16,7 +16,7 @@
         <div class="flex-rows">
             <div>
                 <a href="/profile/{{$user->id}}" class="inner">
-                    <img class="img-circle img-responsive" src="/context/avatars/{{$user->id}}.small.jpg">
+                    <img class="img-circle img-fluid" src="/storage/avatars/{{$user->id}}.small.jpg">
                 </a>&nbsp;
                 <a href="/profile/{{$user->id}}" class="inner">{{$user->username}}</a>
             </div>

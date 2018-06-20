@@ -10,7 +10,7 @@
         <button class="btn btn-danger" type="button" ng-click="$close(true)">{{trans("project.BUTTONS.confirm")}}</button>
     </div>
 </script>
-<div class="container content margin-bottom-lg margin-top-lg" ng-controller="reportNewCtrl" ng-init="init()">
+<div class="container content py-5" ng-controller="reportNewCtrl" ng-init="init()">
     <script type="text/ng-template" id="error.html">
         <div class="modal-body" id="modal-body">
             <h3 translate="FAIL"></h3>
@@ -115,11 +115,11 @@
                     <a href="/project/{{$id}}" target="_blank">{{$title}}</a>
                 </h5>
                 <div>
-                    <img class="img-responsive" src="/context/projects/{{$id}}.thumb.jpg" />
+                    <img class="img-fluid" src="/storage/projects/{{$id}}.thumb.jpg" />
                 </div>
                 <div class="blockquote-reverse margin-top-sm">
                     <a class="inner" href="/profile/{{$user_id}}">
-                        <img class="img-circle img-responsive" src="/context/avatars/{{$user_id}}.small.jpg" />
+                        <img class="img-circle img-fluid" src="/storage/avatars/{{$user_id}}.small.jpg" />
                     </a>
                     <a id="user" class="inner" href="/profile/{{$user_id}}">
                         {{$username}}

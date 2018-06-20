@@ -3,7 +3,7 @@
         <div class="col-md-1 flex-cols text-center">
             <div class="margin-top-sm ">
                 <a class="text-center margin-top-sm" href="/profile/<%q.user_id%>">
-                    <img class="center img-circle img-responsive" src="/context/avatars/<%q.user_id%>.small.jpg" />
+                    <img class="center img-circle img-fluid" src="/storage/avatars/<%q.user_id%>.small.jpg" />
                 </a>
                 <div ng-if="q.mine" class="text-info">
                     <span class="fa" ng-class="{'fa-bookmark-o':!q.followers_cnt, 'fa-bookmark':q.followers_cnt}"></span>

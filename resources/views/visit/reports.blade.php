@@ -11,215 +11,115 @@
         <button class="btn btn-danger" type="button" ng-click="$close(true)">{{trans("project.BUTTONS.confirm")}}</button>
     </div>
 </script>
-<div class="container">
-    <div class="flex-rows">
-        <div>
-            <a href="{{URL::asset('profile')}}/{{$user->id}}" class="inner">
-                <img class="img-circle img-responsive" src="{{URL::asset('context/avatars')}}/{{$user->id}}.small.jpg">
-            </a>&nbsp;
-            <a href="{{URL::asset('profile')}}/{{$user->id}}" class="inner">{{$user->username}}</a>
-        </div>
-        <div class="text-default small">
-            <span class="glyphicon"><?php echo file_get_contents(public_path("/images/icons/location.svg")); ?></span>
-            <span>{{$user->city_name}}&nbsp;({{$user->sortname}})</span>
-        </div>
-    </div>
-    <div class="tags margin-top-md padding-left-lg">
-        @foreach($occupations as $role)
-            <aside class='diamond text-center text-capitalize'><span translate="occupation.{{$role->name}}"></span></aside>
-        @endforeach
-    </div>
-</div>
-<br>
 <div ng-controller="reportsCtrl" ng-init="init('{{$user->id}}','{{$tab}}')">
-    <div class="container content margin-top-md margin-bottom-lg" style="position: relative">
-        <uib-tabset justified="true">
-            <uib-tab index="1" select="selectTab('writes')">
-                <uib-tab-heading>
-                    <span id="tab-writes">{!! trans('project.REPORT.writes', ['cnt'=>$user->writes_cnt]) !!}</span>
-                </uib-tab-heading>
-                <div ng-if="results.length == 0">
-                    @include('templates.empty');
-                </div>
-                <div ng-repeat="q in results">
-                    <div class="row margin-top-sm">
-                        <div class="col-md-1 flex-top text-center">
-                            <div class="calendar">
-                                <div class="calendar-header" translate="month.short.<%q.month%>"></div>
-                                <div class="calendar-body"><%q.day%></div>
-                                <div class="calendar-footer"><%q.year%></div>
-                            </div>
-                        </div>
-                        <div class="col-md-11" >
-                            <div class="comment-container">
-                                @if($admin == 1)
-                                    <a class="btn right-btn" href="/admin/reports/<%q.id%>" target="_blank">
-                                        <span class="fa fa-edit"></span>
-                                    </a>
-                                @endif
-                                <div class="flex-rows">
-                                    <a class="text-info" href="/reports/<%q.id%>" target="_blank">
-                                        <label ng-bind="q.title"></label>
-                                    </a>
-                                </div>
-                                <div ng-bind="q.synopsis"></div>
-                                <div class="blockquote-reverse">
-                                    <a class="text-chocolate" href="/project/<%q.project_id%>" target="_blank" ng-bind="q.project_title"></a>
-                                </div>
-                                <div class="flex-rows" ng-class="{'br':!$last}">
-                                    @if($admin == 1)
-                                        <div class="text-info">
-                                            <span ng-class="{'fa-heart-o' :!q.lovers_cnt, 'fa-heart': q.lovers_cnt}"
-                                                  class="btn btn-sm fa"></span>
-                                            <span ng-if="q.lovers_cnt > 0" ng-bind="q.lovers_cnt"></span>
-                                        </div>
-                                    @else
-                                        <div class="text-important" id="favorite_<%q.id%>">
-                                           <span ng-class="{'fa-heart-o' :!q.mylove, 'fa-heart': q.mylove}"
-                                                 class="btn btn-sm fa" ng-disabled="q.loving" ng-click="loveReport(q, 0)"></span>
-                                            <span ng-if="q.lovers_cnt > 0" ng-bind="q.lovers_cnt"></span>
-                                       </div>
-                                    @endif
-                                        <div class="text-info">
-                                            <span class="fa" ng-class="{'fa-comment-o':!q.comments_cnt, 'fa-commenting-o':q.comments_cnt}"></span>
-                                            <span ng-if="q.comments_cnt" ng-bind="q.comments_cnt"></span>
-                                        </div>
-                                    <div>&nbsp;</div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="container">
+        <div class="row ">
+            <div id="profileRelation" class="align-self-top col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                <div class="text-center float-left py-5">
+                    <a href="/profile/{{$user->id}}">
+                        <img class="rounded-circle img-fluid" style="border: 1px solid #999;width: 120px"  src="/storage/avatars/{{$user->id}}.jpg?{{time()}}" />
+                    </a>
+                    <div class="pt-3">
+                        <a class="text-info" href="/profile/{{$user->id}}">{{$user->username}}</a>
+                    </div>
+                    <div class="text-muted text-right">
+                        <span class="fa fa-map-marker"></span>
+                        <span>{{$user->city_name}} ({{$user->country}})</span>
                     </div>
                 </div>
-            </uib-tab>
-            <uib-tab index="2" select="selectTab('loves')">
-                <uib-tab-heading>
-                    <span id="tab-loves">{!! trans('project.REPORT.loves', ['cnt'=>$user->lovers_cnt]) !!}</span>
-                </uib-tab-heading>
-                <div ng-if="results.length == 0">
-                    @include('templates.empty');
+            </div>
+            <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12 d-flex flex-column justify-content-between">
+                <div></div>
+                <div class="pl-2">
+                    <h5>
+                        @foreach($occupations as $role)
+                            <div class='badge badge-pill badge-info text-capitalize mr-3'>{{$role->name}}</div>
+                        @endforeach
+                    </h5>
                 </div>
-                <div ng-repeat="q in results" class="margin-top-md">
-                    <div class="row">
-                        <div class="col-md-1 flex-top text-center">
-                            <div class="calendar">
-                                <div class="calendar-header" translate="month.short.<%q.month%>"></div>
-                                <div class="calendar-body"><%q.day%></div>
-                                <div class="calendar-footer"><%q.year%></div>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-                            <div class="comment-container">
-                                <a ng-if="q.mine" class="btn right-btn" href="/admin/reports/<%q.id%>" target="_blank">
-                                    <span class="fa fa-edit"></span>
-                                </a>
-                                <a class="text-primary" href="/reports/<%q.id%>" target="_blank">
-                                    <label ng-bind="q.title"></label>
-                                </a>
-                                <div>
-                                    <span class="small text-muted" ng-bind="q.created_at | limitTo:16"></span>&nbsp;
-                                    <a class="title" href="{{URL::asset('profile')}}/<%q.user_id%>" target="_blank">
-                                        <span ng-bind="q.username"></span>
-                                    </a>
-                                </div>
-                                <div ng-bind="q.synopsis"></div>
-                                <div class="blockquote-reverse" href="{{URL::asset('project')}}/<%q.project_id%>" target="_blank" ng-bind="q.project_title">
-                                </div>
-                                <div class="flex-rows" ng-class="{'br': !$last }">
-                                    <div ng-if="q.mine" class="text-info">
-                                        <span class="fa fa-heart"></span>
-                                        <span ng-bind="q.lovers_cnt"></span>
-                                    </div>
-                                    <div ng-if ="!q.mine" class="text-important" id="favorite_<%q.id%>" >
-                                       <span ng-class="{'fa-heart-o' :!q.mylove, 'fa-heart': q.mylove}" ng-disabled ='q.loving'
-                                             ng-click="loveReport(q, '{{$admin}}')"
-                                             class="btn btn-sm fa" ></span>
-                                        <span ng-bind="q.lovers_cnt"></span>
-                                    </div>
-                                    <div class="text-info">
-                                        <span class="fa" ng-class="{'fa-comment-o' :!q.comments_cnt, 'fa-commenting-o': q.comments_cnt}"></span>
-                                        <span ng-if="q.comments_cnt > 0" ng-bind="q.comments_cnt"></span>
-                                    </div>
-                                    <div></div>
-                                </div>
-                                <div class="loader-content" ng-if="q.deleting"><div class="loader"></div> </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </uib-tab>
-            <uib-tab index="3" select="selectTab('comments')">
-                <uib-tab-heading>
-                    <span id="tab-comments">{!! trans('project.REPORT.comments', ['cnt'=>$user->comments_cnt]) !!}</span>
-                </uib-tab-heading>
-                <div ng-if="results.length == 0">
-                    @include('templates.empty');
-                </div>
-                <div ng-repeat="q in results" class="margin-top-md">
-                    <div class="row">
-                        <div class="col-md-1 flex-top text-center">
-                            <div class="calendar">
-                                <div class="calendar-header" translate="month.short.<%q.month%>"></div>
-                                <div class="calendar-body"><%q.day%></div>
-                                <div class="calendar-footer"><%q.year%></div>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-                            <div class="comment-container">
-                                @if($admin)
-                                <span class="btn right-btn" ng-click="deleteComment(q)">
-                                    <span class="fa fa-trash"></span>
-                                </span>
-                                @endif
-                                <div ng-bind="q.message"></div>
-                                <div class="blockquote-reverse">
-                                    <a class="text-primary" href="{{URL::asset('/api/report')}}/<%q.report_id%>" target="_blank">
-                                        <label ng-bind="q.title"></label>
-                                    </a>
-                                    <div>
-                                        <span class="text-mutted small" ng-bind="q.created_at|limitTo:16"></span>&nbsp;
-                                        <a class="title" href="{{URL::asset('profile')}}/<%q.user_id%>" ng-bind="q.username"></a>
-                                    </div>
-                                </div>
-                                <div class="flex-rows" ng-class="{'br': !$last }">
-                                    @if($admin)
-                                    <div class="text-info">
-                                        <span class="fa" ng-class="{'fa-star-o':!q.supports_cnt,'fa-star':q.supports_cnt}"></span>
-                                        <span ng-if="q.supports_cnt" ng-bind="q.supports_cnt"></span>
-                                    </div>
-                                    @else
-                                    <div class="text-warning" id="favorite_<%q.id%>" >
-                                       <span ng-class="{'fa-star-o' :!q.mysupport, 'fa-star': q.mysupport}" ng-disabled ='q.supporting'
-                                             ng-click="supportComment(q)"
-                                             class="btn btn-sm fa" >
-                                       </span>
-                                        <span ng-if="q.supports_cnt"  ng-bind="q.supports_cnt"></span>
-                                    </div>
-                                    @endif
-                                </div>
-                                <div class="loader-content" ng-if="q.deleting"><div class="loader"></div> </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </uib-tab>
-        </uib-tabset>
-        <div class="text-center" ng-show="pagination.show">
-            <ul uib-pagination ng-change="pageChanged()"
-                max-size="5"
-                rotate = true
-                items-per-page ="pagination.perPage"
-                boundary-links="true"
-                total-items="pagination.total"
-                ng-model="pagination.currentPage"
-                class="pagination-sm"
-                previous-text="&lsaquo;"
-                next-text="&rsaquo;"
-                first-text="&laquo;"
-                last-text="&raquo;"></ul>
+
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="nav-item">
+                        <a class="nav-link" ng-class="{'active':selectedTab=='writes'}" href="javascript:void(0)" ng-click="selectTab('writes')">{!! trans('project.REPORT.writes', ['cnt'=>$user->writes_cnt]) !!}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" ng-class="{'active':selectedTab=='loves'}" href="javascript:void(0)" ng-click="selectTab('loves')">{!! trans('project.REPORT.loves', ['cnt'=>$user->lovers_cnt]) !!}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" ng-class="{'active':selectedTab=='comments'}" href="javascript:void(0)" ng-click="selectTab('comments')">{!! trans('project.REPORT.comments', ['cnt'=>$user->comments_cnt]) !!}</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="loader-content" ng-if="loading"><div class="loader"></div> </div>
+    </div>
+    <div class="container content bg-white py-5">
+        <div ng-if="results.length == 0">
+            @include('templates.empty')
+        </div>
+        <div ng-repeat="q in results">
+            <div class="row py-3">
+                <div class="align-self-top col-lg-2 col-md-3 col-sm-4 col-xs-12 text-center">
+                    <div class="calendar px-3">
+                        <div class="calendar-header" translate="month.short.<%q.month%>"></div>
+                        <div class="calendar-body"><%q.day%></div>
+                        <div class="calendar-footer"><%q.year%></div>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-8 col-sm-6 col-xs-8 d-flex flex-column justify-content-between border-left ml-2">
+                    <div>
+                        <a class="text-info" href="/reports/<%q.id%>" target="_blank">
+                            <label ng-bind="q.title"></label>
+                        </a>
+                        <a class="btn text-muted" ng-if="q.mine" href="/admin/reports/<%q.id%>" target="_blank">
+                            <span class="fa fa-edit"></span>
+                        </a>
+                    </div>
+                    <div class="text-right">
+                        <a ng-if="selectedTab == 'writes'" class="text-info" href="/profile/{{$user->id}}">{{$user->username}}</a>
+                        <a ng-if="selectedTab != 'writes'" class="text-info" href="/profile/<%q.user_id%>" ng-bind="q.username">{{$user->username}}</a>
+                        @
+                        <a class="text-info" href="/project/<%q.project_id%>" target="_blank" ng-bind="q.project_title"></a>
+                    </div>
+                    <div class="py-3" ng-bind="q.synopsis"></div>
+
+                    <div class="d-flex" ng-class="{'br':!$last}">
+                        <div class="text-danger" id="favorite_<%q.id%>">
+                           <span ng-class="{'fa-heart-o' :!q.mylove, 'fa-heart': q.mylove}"
+                                 class="btn btn-sm fa" ng-disabled="q.loving" ng-click="loveReport(q, 0)"></span>
+                            <span ng-if="q.lovers_cnt > 0" ng-bind="q.lovers_cnt"></span>
+                        </div>
+                        <div class="text-info ml-5">
+                            <span class="fa" ng-class="{'fa-comment-o':!q.comments_cnt, 'fa-commenting-o':q.comments_cnt}"></span>
+                            <span ng-if="q.comments_cnt" ng-bind="q.comments_cnt"></span>
+                        </div>
+                        <hr/>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <nav class="container pt-2" ng-show="pagination.show">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item" ng-repeat="i in pagination.pages" ng-class="{'active':i==pagination.currentPage}" ng-click="pageChanged(i)">
+                    <a class="page-link" href="#" ng-bind="i"></a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
+
 @endsection
 @section('script')
     <script src="/js/controllers/user/report.js"></script>

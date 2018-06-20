@@ -77,7 +77,7 @@
     <tbody>
         <tr ng-repeat="member in team" ng-class="{'deleted':member.deleted}">
             <td style="padding: 0; vertical-align: middle">
-                <img ng-if="!member.outsider" class="img-circle img-responsive center" src="/context/avatars/<%member.user_id%>.small.jpg" />
+                <img ng-if="!member.outsider" class="img-circle img-fluid center" src="/storage/avatars/<%member.user_id%>.small.jpg" />
             </td>
             <td>
                 <span ng-if="teamInEdit.id != member.id">
@@ -132,7 +132,7 @@
                         search-fields="username"
                         title-field="username"
                         description-field="location"
-                        image-uri="/context/avatars"
+                        image-uri="/storage/avatars"
                         image-field="id"
                         minlength="1"
                         override-suggestions="true"

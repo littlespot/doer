@@ -13,6 +13,7 @@ return [
     |
     */
     'login' => 'Login',
+    'create' => 'Register',
     'another'=>'Login with another account',
     'login_remember' => 'Remember Me',
     'help' => 'Help',

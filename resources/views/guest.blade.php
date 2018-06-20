@@ -14,7 +14,7 @@
     <br/>
     <div class="flex-rows">
         <div class="poster-panel">
-            <img src="/context/projects/{{$id}}.jpg" />
+            <img src="/storage/projects/{{$id}}.jpg" />
         </div>
         <div class="info-panel flex-cols">
             <div>
@@ -39,7 +39,7 @@
             <div class="synopsis">{{ $synopsis }}</div>
             <div>
                 <a class="inner" target="_blank" href="/profile/{{$user_id}}">
-                    <img class="img-circle img-responsive" src="/context/avatars/{{$user_id}}.small.jpg" />
+                    <img class="img-circle img-fluid" src="/storage/avatars/{{$user_id}}.small.jpg" />
                 </a>
                 <a id="user" class="inner" target="_blank" href="/profile/{{$user_id}}">
                     {{$username}}
@@ -175,18 +175,9 @@
                 <hr/>
             @endforeach
             <div class="pubs">
-                <?php
-                $handle = opendir(public_path('/context/pubs'));
-                while (false !== ($file = readdir($handle))) {
-                    list($filesname,$kzm)=explode(".",$file);
-                    if(strcasecmp($kzm,"gif")==0 or strcasecmp($kzm, "jpg")==0 or strcasecmp($kzm, "png")==0)
-                    {
-                        if (!is_dir('./'.$file)) {
-                            echo "<div><img src=\"/context/pubs/$file\"></div>";
-                        }
-                    }
-                }
-                ?>
+                @foreach(Storage::disk('public')->files('pubs') as $file)
+                    <div><img src="/storage/{{$file}}" class="img-fluid"></div>
+                @endforeach
             </div>
         </div>
     </div>

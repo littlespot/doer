@@ -15,34 +15,71 @@ Route::get('contracts', function()
 {
     return View::make('condition');
 });
+Route::get('terms', function()
+{
+    return View::make('terms');
+});
 Route::get('inaccessible', function()
 {
     return View::make('inaccessible');
 });
 
-Route::get('terms', function()
-{
-    return View::make('terms');
-});
-
-
-Route::resource('users', 'UserController',
-    array('only' => array('index','show')));
+Route::get('/festivals/{id}', 'FestivalController@show');
 
 Route::resource('occupations', 'OccupationController',
     array('only' => array('index','show')));
+Route::get('/', 'HomeController@show');
+Route::get('/index', 'HomeController@welcome');
+Route::get('/discover', 'ProjectController@discover');
+Route::get('/festival', 'FestivalController@index');
+Route::get('api/filter', 'ProjectController@refresh');
+Route::get('api/festivals', 'FestivalController@display');
+Route::resource('users', 'UserController',
+    array('only' => array('index','show')));
+Auth::routes();
+Route::get('/logout', 'Auth\LoginController@logout');
+Route::get('/activation/{key}/{uid}', 'Auth\RegisterController@activation');
 
 Route::resource('languages', 'LanguageController');
 
 Route::group(['middleware' =>  ['active']], function () {
 
-    Route::get('/synopsis/film/{id}', 'FilmController@getSynopsis');
-    Route::get('/makers', 'FilmController@getMakers');
-    Route::get('/makers/{id}/{except}', 'FilmController@getMakersWithAddress');
+/*
+    Route::get('/alipay/pay','AlipayController@pay');
+
+    Route::post('/alipay/paid','AlipayController@result');
+*/
+    Route::get('api/rules', 'FestivalController@getRelatedRules');
+
+    Route::get('myprojects', 'projectController@favorites');
+
+    Route::get('festivals', 'FestivalController@index');
+    Route::post('festivals', 'FestivalController@store');
+    Route::put('festivals/{id}', 'FestivalController@update');
+
+    Route::get('myfestivals', 'FestivalController@favorites');
+    Route::get('my/festivals', 'FestivalController@mine');
+    Route::get('/units/{id}', 'FestivalController@unit');
+    Route::post('/units/{id}', 'FestivalController@inscription');
+    Route::post('/rules/{id}', 'FestivalController@validFilm');
+
+
+    Route::resource('projects', 'ProjectController',
+        array('only' => array('index','show')));
     Route::get('/contacts', 'FilmController@getContacts');
 
-    Route::resource('films', 'FilmController');
+    Route::resource('archives', 'ArchiveController');
+    Route::resource('plays', 'PlayController');
+    Route::resource('movies', 'MovieController');
+    Route::resource('entries', 'EntryController');
+    Route::resource('filmaker', 'FilmakerController');
+    Route::put('filmaker/contact/{id}/{contact_id}', 'FilmakerController@changeContact');
+    Route::post('filmaker/contact/{id}', 'FilmakerController@contact');
+    Route::delete('filmaker/contact/{id}', 'FilmakerController@deleteContact');
+
+    Route::resource('movies', 'MovieController');
     Route::resource('profile', 'ProfileController');
+    Route::post('contact', 'AccountController@contact');
     Route::resource('account', 'AccountController',
         array('only' => array('index','show')));
 /*
@@ -57,12 +94,8 @@ Route::group(['middleware' =>  ['active']], function () {
 
     Route::get('project/{id}', 'ProjectController@detail');
 
-    Route::get('preparations', 'PreparationController@create');
-
     Route::get('report/{id}','ReportController@create');
     Route::get('reports/{id}', 'ReportController@show');
-
-    Route::get('discover', 'ProjectController@index');
 
     Route::get('contact', function (){
         return view('contact');
@@ -76,28 +109,32 @@ Route::group(['middleware' =>  ['active']], function () {
         return view('privacy');
     });
 
-    Route::get('/', 'HomeController@display')->name('home');
-    Route::get('home', 'HomeController@display')->name('home');
+    Route::get('/home', 'HomeController@display')->name('home');
+
+    Route::resource('entry', 'EntryController');
 });
 
-Auth::routes();
 Route::get('guest/{id}', 'GuestController@show');
 Route::get('personal', 'AccountController@detail')->middleware('auth');
 
 Route::group(['middleware' =>  ['auth']], function (){
     Route::post('crop', 'PictureController@crop');
-    Route::post('upload', 'PictureController@upload');
+    Route::post('uploads', 'PictureController@upload');
 
     Route::resource('account', 'AccountController',
         array('only' => array('update', 'store')));
-
+    Route::post('accountInfo', 'AccountController@info');
+    Route::post('accountOccupation', 'AccountController@saveOccupation');
+    Route::delete('accountOccupation/{id}', 'AccountController@removeOccupation');
+    Route::post('accountPresentation', 'AccountController@presentation');
     Route::resource('sns', 'SnsController');
 
     Route::resource('locations', 'LocationController',
-        array('only' => array('index','show')));
-    Route::get('country/{id}', 'LocationController@cities');
-    Route::get('department/{id}', 'LocationController@department');
-    Route::get('cities/{id}', 'LocationController@city');
+        array('only' => array('index','show', 'update')));
+    Route::get('country/{id}', 'LocationController@citiesByCountry');
+    Route::get('departments/{id}', 'LocationController@departments');
+    Route::get('departCities/{id}', 'LocationController@departCities');
+    Route::get('cities/{id}', 'LocationController@cities');
 });
 
 // API ROUTES ==================================
@@ -106,30 +143,19 @@ Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
 
     Route::get('home/projects',  'HomeController@index');
 
-    Route::get('filter', 'ProjectController@refresh');
-/*
-    Route::get('questions/{id}', 'QuestionController@display');
-    Route::get('questionRelated/{id}', 'QuestionController@relates');
-    Route::get('questionTags', 'QuestionController@tags');
-
-    Route::post('questionFollow', 'QuestionController@follow');
-
-    Route::resource('answers', 'QuestionAnswerController',
-        array('only' => array('index','show')));
-*/
     Route::resource('recruitments', 'RecruitmentController',
         array('only' => array('index','show')));
 
     Route::get('profile/creator/{id}', 'ProfileController@plans');
     Route::get('profile/participator/{id}', 'ProfileController@members');
     Route::get('profile/follower/{id}', 'ProfileController@follows');
-    Route::get('profile/lover/{id}', 'ProfileController@follows');
+    Route::get('profile/lover/{id}', 'ProfileController@loves');
 
     Route::get('common/projects/{id}', 'ProjectController@commonFollowers');
     Route::get('common/friends/{id}', 'RelationController@commonFriends');
 
-    Route::resource('users', 'UserController',
-        array('only' => array('index','show')));
+    Route::resource('sponsors', 'SponsorController',
+        array('only' => array('update','store', 'destroy')));
 
     Route::get('my', function (){
         return Auth::user();
@@ -188,48 +214,66 @@ Route::group(['prefix' => 'api', 'middleware' =>  ['active']], function() {
     Route::get('fans/{id}', 'RelationController@fans');
     Route::get('idols/{id}', 'RelationController@idols');
 });
-Route::group(['prefix' => 'film', 'middleware' =>  ['active']], function() {
-    Route::get('/{id}/{step}',  'FilmController@home');
-    Route::get('/{id}', 'FilmController@previewForm');
 
-    Route::post('/title', 'FilmController@postTitle');
-    Route::post('/time', 'FilmController@postTime');
-    Route::post('/production', 'FilmController@postProduction');
-    Route::post('/format', 'FilmController@postFormat');
-    Route::post('/screen', 'FilmController@postScreen');
-    Route::post('/producer', 'FilmController@postProducer');
-    Route::post('/rights', 'FilmController@postRights');
+Route::group(['prefix'=>'archive', 'middleware'=>['active']], function (){
+    Route::get('/creation', 'ArchiveController@creation');
+    Route::get('/contacts', 'ArchiveController@getContacts');
+    Route::get('/makers', 'ArchiveController@getMakers');
 
-    Route::put('/screen/{format}', 'FilmController@screenFormat');
-    Route::put('/{id}/maker/{person}', 'FilmController@saveMaker');
+    Route::post('/{id}/title', 'ArchiveController@saveTitle');
+    Route::delete('/{id}/title/{lang_id}', 'ArchiveController@removeTitle');
 
+    Route::post('/{id}/synopsis', 'ArchiveController@saveSynopsis');
+    Route::delete('/{id}/synopsis/{lang_id}', 'ArchiveController@removeSynopsis');
 
-    Route::post('/genre', 'FilmController@postGenre');
-    Route::post('/synopsis', 'FilmController@postSynopsis');
-    Route::post('/director', 'FilmController@postDirector');
-    Route::post('/credit', 'FilmController@postCredit');
+    Route::post('/{id}/productions',  'ArchiveController@saveProductions');
+    Route::delete('/{id}/productions/{country_id}', 'ArchiveController@removeProduction');
 
-    Route::post('/{id}/festival',  'FilmController@saveFestival');
-    Route::post('/{id}/diffusion',  'FilmController@saveDiffusion');
-    Route::post('/{id}/theater',  'FilmController@saveTheater');
+    Route::post('/{id}/languages',  'ArchiveController@saveLanguages');
+    Route::delete('/{id}/languages/{language_id}', 'ArchiveController@removeLanguage');
 
-    Route::post('/{id}/synopsis', 'FilmController@saveSynopsis');
-    Route::post('/{id}/credit', 'FilmController@saveCredit');
-    Route::post('/{id}/upload/{format}', 'FilmController@upload');
+    Route::post('/{id}/upload/{format}', 'ArchiveController@saveFile');
+    Route::post('/{id}/remove/{format}', 'ArchiveController@removeFile');
 
-    Route::post('/{id}/preview', 'FilmController@preview');
-    Route::post('/{id}/remove/{format}', 'FilmController@remove');
+    Route::put('/{id}/country', 'ArchiveController@updateCountry');
+    Route::put('/{id}/conlange', 'ArchiveController@updateConlange');
 
-    Route::delete('/{id}/synopsis/{lang_id}', 'FilmController@descrotySynopsis');
-    Route::delete('/{format}/{id}', 'FilmController@descrotyTable');
-    Route::delete('/screen/{format}/{id}', 'FilmController@descrotyScreenFormat');
-    Route::delete('/maker/{format}/{id}', 'FilmController@descrotyMaker');
-
+    Route::post('maker/{format}', 'ArchiveController@saveMaker');
+    Route::delete('/{id}/maker', 'ArchiveController@deleteMakers');
+    Route::get('/{id}/{position}', 'ArchiveController@getPosition');
 });
-Route::group(['middleware' =>  ['professional']], function() {
-    Route::get('api/videos', 'VideoController@refresh');
 
-    Route::resource('videos', 'VideoController');
+Route::group(['prefix' => 'play', 'middleware' =>  ['active']], function() {
+    Route::get('/{id}/upload',  'PlayController@uploadForm');
+    Route::put('/{id}/credit', 'PlayController@saveCredits');
+    Route::delete('/{id}/credit', 'PlayController@deleteCredits');
+    Route::post('/{id}/complete', 'PlayController@complete');
+});
+
+Route::group(['prefix' => 'movie', 'middleware' =>  ['active']], function() {
+
+    Route::post('/{id}/festival', 'ArchiveController@saveFestival');
+    Route::delete('/{id}/festival/{festival_id}', 'ArchiveController@removeFestival');
+
+    Route::post('/{id}/diffusion', 'MovieController@saveDiffusion');
+    Route::delete('/{id}/diffusion/{diffusion_id}', 'MovieController@removeDiffusion');
+
+    Route::post('/{id}/theater', 'ArchiveController@saveTheater');
+    Route::delete('/{id}/theater/{theater_id}', 'ArchiveController@removeTheater');
+
+    Route::post('/{id}/shootings',  'MovieController@saveShootings');
+    Route::delete('/{id}/shootings/{country_id}', 'MovieController@removeShooting');
+
+
+    Route::post('{id}/screen/{format}', 'MovieController@saveScreen');
+    Route::delete('{id}/screen/{format}', 'MovieController@removeScreen');
+
+    Route::put('/credit', 'MovieController@createCredits');
+    Route::post('/{id}/credit', 'MovieController@saveCredits');
+    Route::delete('/{id}/credit', 'MovieController@deleteCredits');
+
+    Route::post('/{id}/preview', 'MovieController@savePreview');
+    Route::post('/{id}/complete', 'MovieController@complete');
 });
 
 Route::group(['prefix' => 'person', 'middleware' =>  ['active']], function() {
@@ -247,21 +291,18 @@ Route::group(['prefix' => 'person', 'middleware' =>  ['active']], function() {
 });
 
 Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
-    Route::resource('users', 'UserController',
-        array('only' => array('update','store')));
+    Route::put('users', 'UserController@update');
+    Route::post('users', 'UserController@store');
 
     Route::resource('projects', 'ProjectController',
         array('only' => array('update', 'store', 'destroy')));
 
-    Route::get('projects/{id}', 'ProjectController@edit');
+    Route::get('projects/{id}', 'PreparationController@show');
     Route::post('projects/description', 'ProjectController@description');
     Route::post('finish', 'ProjectController@finish');
 
     Route::resource('teams', 'TeamController',
         array('only' => array('update', 'store', 'destroy')));
-
-    /*Route::resource('answers', 'QuestionAnswerController',
-        array('only' => array('update','store', 'destroy')));*/
 
     Route::resource('preparations', 'PreparationController');
 
@@ -284,15 +325,16 @@ Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
 
     Route::resource('scripts', 'ScriptController',
         array('only' => array('update','store', 'destroy')));
+
     Route::resource('budgets', 'BudgetController',
         array('only' => array('update','store', 'destroy')));
-    Route::resource('sponsors', 'SponsorController',
-        array('only' => array('update','store', 'destroy')));
+
     Route::resource('recruitment', 'RecruitmentController',
         array('only' => array('update','store', 'destroy')));
 
     Route::resource('invitations', 'InvitationController',
         array('only' => array('update','store', 'destroy')));
+
     Route::resource('applications', 'ApplicationController',
         array('only' => array('update','store', 'destroy')));
 
@@ -310,9 +352,5 @@ Route::group(['prefix' => 'admin', 'middleware' =>  ['active']], function() {
     Route::get('preparationsCount', 'AccountController@preparations');
     Route::get('messagesCount', 'AccountController@messages');
 
-    /* Route::get('question/{id}', 'QuestionController@edit');
-     Route::post('question', 'QuestionController@change');
-
-     Route::resource('questions', 'QuestionController',
-         array('only' => array('update','store', 'destroy')));*/
+    Route::delete('notifications/{id}', 'ProfileController@removeNotification');
 });

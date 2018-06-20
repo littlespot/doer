@@ -46,92 +46,130 @@
     </div>
 @endsection
 @section('content')
-    <div class="col-xs-12" ng-controller="loginCtrl" ng-init="init('{{App::getLocale()}}')">
-        <div class="inner">
-            <div class="middle">
-                @if(!is_null(session('message')))
-                    {{session('message')}}
-                @endif
-                <form name="zooform" id="zooform" novalidate class="fixed-form grey" method="POST" action="/login">
-                    {{ csrf_field() }}
-                    @if(is_null($user))
-                    <div class="avatar">
-                        <img id="avatar" class="img-circle img-responsive center"
-                             ng-src="/images/avatar.png" />
-                    </div>
-                    <div class="form-group">
-                        <input id="email" type="email" class="form-text" name="email" placeholder="{{trans('auth.email')}}"
-                               ng-model="email" ng-init="setEmail('{{ old('email') }}')"
-                               ng-keyup="$event.keyCode == 13 && getUser(zooform.$valid)"
-                               required autofocus />
+    <div>
+        <form name="zooform" id="zooform" novalidate method="POST" action="/login" class="bg-white pt-3 pb-3 pl-4 pr-4" style="width: 360px">
+            {{ csrf_field() }}
+            @if(is_null($user))
+                <div class="mt-1 row">
+                    <div class="col-md-4">
 
-                        @if ($errors && count($errors) > 0)
-                        <div class="text-danger small" role="alert">
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <img id="avatar" class="rounded-circle img-fluid border border-secondary"
+                             ng-src="/context/avatars/default.png" />
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+                <div class="mt-3 form-group">
+                    <input id="email" type="email" class="form-control" name="email" placeholder="{{trans('auth.email')}}"
+                           ng-model="email" ng-init="setEmail('{{ old('email') }}')"
+                           ng-keyup="$event.keyCode == 13 && getUser(zooform.$valid)"
+                           required autofocus />
+
+                    @if ($errors && count($errors) > 0)
+                        <div class="text-danger mt-1" role="alert">
                             @foreach ($errors->all() as $error)
                                 {{ $error }}
                             @endforeach
                         </div>
-                        @else
-                        <div class="text-danger small" role="alert" ng-show="zooform.email.$touched || zooform.submitted">
+                    @else
+                        <div class="text-danger mt-1" role="alert" ng-show="zooform.email.$touched || zooform.submitted">
                             <span ng-show="zooform.email.$error.required">{{trans('auth.error_email_required')}}</span>
                             <span ng-show="zooform.email.$error.email">{{trans('auth.error_email_invalid')}}</span>
                         </div>
+                    @endif
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-block" ng-disabled="zooform.$invalid">{{trans('auth.next')}}</button>
+                </div>
+            @elseif(is_null($user->active))
+                <div class="mt-1 row">
+                    <div class="col-md-4">
+
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <img id="avatar" class="rounded-circle img-fluid border border-secondary"
+                             ng-src="/context/avatars/default.png" />
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+                <h4 class="text-center text-info">{{$user->username}}</h4>
+                <div class="mt-3 form-group">
+                    <div>{!! trans('auth.active') !!}</div>
+                </div>
+                <div class="form-group text-center">
+                    <a class="btn btn-primary" href="{{config('app.url')}}">{{trans('layout.BUTTONS.welcome')}}</a>
+                </div>
+            @else
+                <div class="mt-1 row">
+                    <div class="col-md-4">
+
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <img id="avatar" class="rounded-circle img-fluid"
+                             ng-src="/storage/avatars/{{$user->id}}.jpg?{{time()}}"
+                             onError="this.onerror=null;this.src='/context/avatars/default.png';"/>
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+                <h4 class="text-center text-info">{{$user->username}}</h4>
+                <div class="form-group{{ ($errors->has('password')) ? 'error' : '' }}">
+                    <input id="email" type="hidden" name="email" value="{{$user->email}}" readonly="readonly">
+                    <input type="password" ng-model="password" class="form-control" ng-minlength="6" ng-maxlength="16"
+                           name="password"  placeholder="{{trans('auth.password')}}"
+                           ng-keyup="$event.keyCode == 13 && login(zooform.$valid)"
+                           required autofocus />
+                    <div class="text-danger small" role="alert">
+                        @if ($errors && count($errors) > 0)
+                            @foreach ($errors->all() as $error)
+                                {{ $error }}
+                            @endforeach
+                        @else
+                            <span ng-show="zooform.password.$error.required">{{trans('auth.error_password_required')}}</span>
                         @endif
                     </div>
-                    <div class="form-group text-center">
-                        <button type="submit" class="btn btn-primary btn-inverse btn-block" ng-disabled="zooform.$invalid">{{trans('auth.next')}}</button>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-primary checkbox-inline">
+                        <input type="checkbox" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }} />
+                        <label for="remember"></label><span>{!! trans('auth.login_remember') !!}</span>
                     </div>
-                    @else
-                        <div class="avatar">
-                            <img id="avatar"  class="img-circle img-responsive center"
-                                 ng-src="/context/avatars/{{$user->id}}.jpg?{{time()}}"
-                                 onError="this.onerror=null;this.src='/images/avatar.png';"/>
-                        </div>
-                        <h4 class="text-center text-info">{{$user->username}}</h4>
-                        <div class="form-group{{ ($errors->has('password')) ? 'error' : '' }}">
-                            <input id="email" type="email" name="email" value="{{$user->email}}" readonly="readonly" style="display: none;">
-                            <input type="password" ng-model="password" class="form-text" ng-minlength="6" ng-maxlength="16"
-                                   name="password"  placeholder="{{trans('auth.password')}}"
-                                   ng-keyup="$event.keyCode == 13 && login(zooform.$valid)"
-                                   required autofocus />
-                            <div class="text-danger small" role="alert">
-                                @if ($errors && count($errors) > 0)
-                                    @foreach ($errors->all() as $error)
-                                        {{ $error }}
-                                    @endforeach
-                                @else
-                                    <span ng-show="zooform.password.$error.required">{{trans('auth.error_password_required')}}</span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class=" checkbox checkbox-small ">
-                                <input type="checkbox" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }} />
-                                <label for="remember"></label><span>{!! trans('auth.login_remember') !!}</span>
-                            </div>
-                        </div>
-                        <div class="form-group text-center">
-                            <button type="submit" class="btn btn-primary btn-inverse btn-block" ng-disabled="zooform.$invalid">{{trans('auth.login')}}</button>
-                        </div>
-                        @endif
-                </form>
-                @if(!is_null($user))
-                <div class="text-center">
-                    <p>
-                        <a class="title small" href="{{ route('password.request') }}">{{trans('passwords.forget')}}</a>
-                    </p>
-                    <p>
-                        <a class="small text-default" href="relogin">{{trans('auth.another')}}</a>
-                    </p>
                 </div>
-                @endif
-                <div class="text-center">
-                    <p><a class="small text-default" href="{{ route('register') }}">{{trans('auth.register')}}</a></p>
-                    <p><a href="" class="small text-important">{{trans('auth.help')}}</a> </p>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-inverse btn-block" ng-disabled="zooform.$invalid">{{trans('auth.login')}}</button>
                 </div>
-            </div>
+            @endif
+        </form>
+        <div class="text-center">
+            @if(is_null($user))
+                <a class="small text-default" href="{{ route('register') }}">{{trans('auth.register')}}  </a>
+                <br/>
+                <a href="" class="small text-important">{{trans('auth.help')}}</a>
+            @elseif(is_null($user->active))
+                <div>
+                    <a class="title small" href="/discover">{{trans('layout.BUTTONS.discover_projects')}}</a>
+                </div>
+                <div>
+                    <a class="small text-default" href="/festivals">{{trans('layout.BUTTONS.discover_festivals')}}</a>
+                </div>
+            @else
+                <div>
+                    <a class="title small" href="{{ route('password.request').'?id='.$user->id }}">{{trans('passwords.forget')}}</a>
+                </div>
+                <div>
+                    <a class="small text-default" href="login?new">{{trans('auth.another')}}</a>
+                </div>
+            @endif
+
         </div>
     </div>
+
 @endsection
 @section('script')
     <script src="/js/controllers/auth/login.js"></script>
@@ -173,13 +211,14 @@
                 dasL.height(lWidth * 3.2);
                 dasL.width(lWidth);
 
-                dasR.width(rWidth);
                 dasR.height(rWidth * 3.17);
+                dasR.width(rWidth);
 
                 $("#layers").show();
 
                 var margin = $(window).height() - $('.header').height() - 330 * xScale;
                 $('#content').height(margin);
+                $('#main').css('top', -lWidth * 3.2 - 40)
                 var xLinit = $(window).width() * 0.58, xRinit = $(window).width() * 0.46;
                 var lTurn =  $(window).width() * 0.1 - lWidth/2, rTurn = $(window).width() * 0.91;
                 var yLMax =  -295 * xScale, yRMax =  -255 * xScale;

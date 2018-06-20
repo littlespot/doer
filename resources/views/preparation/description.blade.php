@@ -1,48 +1,45 @@
 @extends('preparation.top')
 
 @section('tabcontent')
-<div class="content-margin" ng-controller="preparationCtrl" ng-init="loaded()">
-    <br>
-    <form id="descriptionForm" onsubmit="mySubmit()"
+<div class="p-5 bg-white" ng-controller="preparationCtrl" ng-init="init({{strlen(strip_tags($project->description))}})">
+    @if ($errors && count($errors) > 0)
+        <ul class="alert alert-danger small px-5" role="alert">
+            @foreach ($errors->all() as $error)
+                <li class="py-1">{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+    <form id="descriptionForm"
           action="/admin/preparation" method="POST" name="descriptionForm" role="form">
         {{ csrf_field() }}
         <input type="hidden" value="{{$project->id}}" name="id">
         <input type="hidden" value="0" name="sendFlag" id="sendFlag">
-        @include('templates.editor', ['content'=>$project->description, 'picture'=>'projects', 'parent_id'=>$project->id])
-        @if ($errors->has('content'))
-            <div class="text-danger small">
-                <span>{{ $errors->first('content') }}</span>
-            </div>
-        @else
-            <div class="error" role="alert" ng-class="{'visible':descriptionForm.content.$touched}">
-                <span ng-show="error.required">{{trans('project.ERRORS.require.question_content ')}}</span>
-                <span ng-show="error.maxlength">{{trans('project.ERRORS.maxlength.question_content', ['cnt'=>100])}}</span>
-                <span ng-show="error.minlength">{{trans('project.ERRORS.minlength.question_content', ['cnt'=>4])}}</span>
-            </div>
-        @endif
-        <div class="flex-rows">
-            <div class="small text-danger">{{trans("project.PAGE")}}</div>
-            <div>
-                <a class="btn btn-default" href="/admin/preparations/{{$project->id}}?step=0">
-                    <span class="fa fa-arrow-left"></span>
-                </a>
-                <button class="btn btn-primary" type="submit">
-                    {{trans('layout.BUTTONS.continue')}}
-                </button>
+        <div ng-show="project.description">
+            @include('templates.editor', ['content'=>$project->description, 'picture'=>'projects', 'parent_id'=>$project->id])
+            <div class="error" role="alert" ng-class="{'visible':errors}">
+                {{trans('project.ERRORS.minlength.description', ['cnt'=>200])}}
             </div>
         </div>
+        <div ng-show="!project.description" style="word-wrap: break-word">
+            {!! $project->description !!}
+        </div>
     </form>
-    <script>
-        function mySubmit() {
-            $('#editor').find('div[data-role=image] img').each(function () {
-                var input = $('<input type="hidden" name="images[]">');
-                var src = $(this).attr('src');
-                input.val(src.substring(src.lastIndexOf('/')+1));
-                $('#descriptionForm').append(input);
-            });
-            $('#editor-content').text($('#editor').html());
-        }
-    </script>
+    <div class="text-right py-5">
+        <a class="btn btn-outline-danger" href="/admin/preparations/{{$project->id}}?step=0" ng-show="!project.description" >
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <div class="btn btn-primary" ng-click="project.description = true" ng-show="!project.description" >
+            {{trans('layout.BUTTONS.edit')}}
+        </div>
+        @if(strlen(strip_tags($project->description)) > 200 && !$errors->has('description'))
+        <div class="btn btn-outline-danger" ng-click="project.description = false" ng-show="project.description" >
+            {{trans('layout.BUTTONS.cancel')}}
+        </div>
+        @endif
+        <button class="btn btn-primary" type="submit" ng-show="project.description" ng-disabled="descriptionForm.$invalid" ng-click="save()">
+            {{trans('layout.BUTTONS.continue')}}
+        </button>
+    </div>
 </div>
 @endsection
 @section('tabscript')

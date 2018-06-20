@@ -2,175 +2,194 @@
 
 @section('content')
     <link rel="stylesheet" href="{{ URL::asset('css/profile.css') }}" type="text/css">
-    <link href="{{ URL::asset('css/projects.css')}}" rel="stylesheet" />
-    <link href="{{ URL::asset('css/gallery.css')}}" rel="stylesheet" />
-<div id="profile" class="content " ng-controller="profileCtrl as $ctrl" style="overflow-y: hidden" ng-init="init('{{$user->id}}', '{{$user->username}}', '{{$admin}}')">
-        <script type="text/ng-template" id="confirm.html">
-        <div class="modal-body" id="modal-body">
-            <h3 translate="project.MESSAGES.confirmR" translate-values="{'user': selectedUser}"></h3>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-default" type="button" ng-click="$close(false)">
-                {{trans("project.BUTTONS.cancel")}}
-            </button>
-            <button class="btn btn-danger" type="button" ng-click="$close(true)">{{trans("project.BUTTONS.confirm")}}</button>
-        </div>
-    </script>
-    <div class="overlay ng-hide" ng-show="overlay" ng-click="overlay=false;">
-        <div>
-            <div class="category">
-                <div ng-repeat="c in filters" ng-click="setFilter(c)">
-                    <span class="link" ng-class="{active:filterChosen.id==c.id}" translate="user.Project.<%c.name%>"></span>
+    <link rel="stylesheet" href="/css/tag.css" type="text/css">
+    <link rel="stylesheet" href="/css/projects.css" type="text/css">
+<div id="profile" class="content " ng-controller="profileCtrl as $ctrl" style="overflow-y: hidden" ng-init="init('{{$user->id}}', '{{$user->username}}', '{{$admin}}', '{{$anchor}}')">
+    <div class="modal fade" id="unfollowConfirmModal" tabindex="-1" role="dialog" aria-labelledby="unfollowConfirmModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <h3 translate="project.MESSAGES.confirmR" translate-values="{'user': selectedUser.username}"></h3>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal" >
+                        {{trans("project.BUTTONS.cancel")}}
+                    </button>
+                    <button class="btn btn-danger" type="button" ng-click="relation(selectedUser.id,2)">{{trans("project.BUTTONS.confirm")}}</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="overlay ng-hide" ng-show="overlayOrder" ng-click="overlayOrder=false;">
-        <div>
-            <div class="category">
-                <div ng-repeat="c in orders"  ng-click="setOrder(c)">
-                    <span class="link" ng-class="{active:orderChosen.id==c.id}" translate="user.Project.<%c.name%>" ></span>
+    <div class="modal fade bd-example-modal-lg" id="recomFilterModal" tabindex="-1" role="dialog" aria-labelledby="recomFilterModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body text-center">
+                    <h5 ng-repeat="c in filters" ng-click="setFilter(c)" class="p-3 btn-link text-white" ng-class="{'text-danger':filterChosen.id==c.id}"
+                        data-dismiss="modal" aria-label="Close">
+                        <span translate="user.Project.<%c.name%>"></span>
+                    </h5>
                 </div>
             </div>
         </div>
     </div>
-    <div class="jumbotron container">
-        <div class="flex-rows">
-            <div id="profileRelation" class="panel-content flex-top margin-top-xs">
-                <img class="img-circle margin-bottom-sm" src="/context/avatars/{{$user->id}}.jpg?{{time()}}" />
-                @include('templates.relation')
-                <div class="relation-circle padding-top-xs">
-                    <div class="btn-squash text-uppercase btn-text-info" ng-class = "{'btn-text-success': selectedTab == 1}" ng-click="selectTab(1)">
-                        {{trans("layout.LABELS.relations")}}
+    <div class="modal fade bd-example-modal-lg" id="orderFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderFilterModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body text-center">
+                    <h5 ng-repeat="c in orders" ng-click="setOrder(c)" class="p-3 btn-link text-white" ng-class="{'text-danger':orderChosen.id==c.id}"
+                        data-dismiss="modal" aria-label="Close">
+                        <span translate="user.Project.<%c.name%>"></span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container py-5">
+        <div class="jumbotron bg-white d-flex justify-content-between">
+            <div id="profileRelation" class="align-self-top" style="min-width: 150px">
+                <div class="text-center float-left">
+                    <img class="rounded-circle img-fluid" style="border: 1px solid #999;width: 120px"  src="/storage/avatars/{{$user->id}}.jpg?{{time()}}" />
+
+                    <div class="pt-3">
+                        @include('templates.relation')
+                    </div>
+                    <div class="relation-circle pt-1">
+                        <div class="btn btn-md text-uppercase px-3" ng-class = "{'btn-outline-info':selectedTab != 1, 'btn-info': selectedTab == 1}" ng-click="selectTab(1)">
+                            {{trans("layout.LABELS.relations")}}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="flex-cols margin-horizonal-lg">
-                <div class="flex-rows">
-                    <div class="font-l text-info">{{$user->username}}</div>
-                    <div class="text-default small">
-                        <span class="glyphicon"><?php echo file_get_contents(public_path("/images/icons/location.svg")); ?></span>
-                        <span>{{$city->name}} ({{$city->sortname}})</span>
+            <div class="col-lg-8 col-md-6 col-xs-12 d-flex flex-column justify-content-between">
+                <div class="d-flex justify-content-between">
+                    <div clss="font-lg text-info">{{$user->username}}</div>
+                    <div class="text-muted">
+                        <span class="fa fa-map-marker"></span>
+                        <span>{{$city->name}} ({{$city->country}})</span>
                     </div>
                 </div>
-                <div>{{$user->presentation}}</div>
-                <div class="tags">
+                <div style="word-break: break-all">{{$user->presentation}}</div>
+                <h5>
                     @foreach($occupations as $role)
-                        <aside class='diamond text-center text-capitalize'>{{$role->name}}</aside>
+                        <div class='badge badge-pill badge-info text-capitalize'>{{$role->name}}</div>
                     @endforeach
-                </div>
+                </h5>
             </div>
-            <div class="flex-cols">
+            <div class="col-lg-2 col-md-3 col-xs-12 d-flex flex-column justify-content-between text-right">
                 <div>
-                    <div class="btn-squash-lg btn-text-info text-uppercase"
+                    <div class="btn btn-md btn-block btn-outline-info text-uppercase"
                          ng-click="changeLocation('/person/reports/{{$user->id}}')" >
                         {{trans("layout.LABELS.reports")}}
                     </div>
-                    <!--
-                    <div class="btn-squash-lg btn-text-info margin-top-sm text-uppercase" ng-click="changeLocation('/person/questions/{{$user->id}}')">
-                        {{trans("layout.LABELS.questions")}}
-                    </div>
-                    -->
-                    <div class="btn-squash-lg margin-top-sm text-uppercase" ng-class="{'btn-text-primary': selectedTab != 2, 'btn-text-danger': selectedTab==2 }" ng-click="selectTab(2)">
+                    <div class="btn btn-md btn-block mt-3 text-uppercase" ng-class="{'btn-outline-secondary': selectedTab != 2, 'btn-primary': selectedTab==2 }" ng-click="selectTab(2)">
                         {{trans("layout.LABELS.sns")}}
                     </div>
                 </div>
                 @if($admin)
-                    <a class="btn-squash-lg btn-text-important text-uppercase" ng-click="changeLocation('/account')" >
+                    <a class="btn btn-md btn-block btn-outline-primary text-uppercase" ng-click="changeLocation('/account')" >
                         {{trans("layout.LABELS.preparations")}}
                     </a>
                 @else
-                    <div class="btn-squash-lg text-uppercase" ng-class="{'btn-text-important':selectedTab != 3, 'btn-default':selectedTab == 3}" ng-click="selectTab(3)">
+                    <div class="btn btn-md btn-block btn-outline-danger text-uppercase"  data-toggle="modal" data-target="#invitationModal">
                         {{trans("layout.LABELS.invite")}}
                     </div>
+                    @include('templates.invitation')
                 @endif
             </div>
         </div>
     </div>
-    <div class="panel margin-top-md">
-        @if(!$admin)
-            <div ng-if="selectedTab == 3" class="container">
-                @include('templates.invitation')
-            </div>
-        @endif
-        <div id="projects" class="container content slide-down" ng-show="selectedTab == 0">
-            <div class="h3">
-                <div>
-                    <span class=" text-uppercase">{{trans("layout.MENU.see")}}</span>
-                    <span class="link active" ng-click="openCatalogue()" translate="user.Project.<%filterChosen.name%>"></span>
+    <div class="panel container-fluid bg-light pb-5">
+        <div id="projects" class="py-3" ng-show="selectedTab == 0">
+            <h4 class="d-flex justify-content-center">
+                <div class="text-uppercase">
+                    <span>{{trans("layout.MENU.see")}}</span>
+                    <span class="btn-link text-danger mr-1"  data-toggle="modal" data-target="#recomFilterModal" translate="user.Project.<%filterChosen.name%>"></span>
+                    <span>
                     @if($admin)
                         {{trans("layout.LABELS.me")}}
                     @else
-                        <span translate="user.{{$user->sex}}"></span>
+                        {{trans('layout.LABELS.'.strtolower($user->sex))}}
                     @endif
+                    </span>
                 </div>
-                <div class="dropdown text-important" id="catalogues">
-                    <div class="dropdown-toggle" type="button" id="dropdownPerson"
-                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <div class="dropdown bg-light" >
+                    <a class="text-danger dropdown-toggle px-2" id="cataloguesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span id="catalogue_name">{{$catalogues['creator']}}</span>
-                        <span class="caret"></span>
-                    </div>
-                    <ul class="dropdown-menu">
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="cataloguesMenuButton">
                         @foreach($catalogues as $key=>$catalogue)
-                            <li id="catalogue_{{$key}}" data-bind="catalogues">
-                                <a class="btn"  ng-click="chooseCatalogue('{{$key}}','{{$catalogue}}')">
-                                    <span>{{$catalogue}}</span>
-                                </a>
-                            </li>
+                            <div id="catalog_{{$key}}" class="dropdown-item" ng-click="chooseCatalogue('{{$key}}')">
+                                <span>{{$catalogue}}</span>
+                            </div>
                         @endforeach
-                    </ul>
-                </div>
-                <div>
-                    <span class="text-uppercase">{{trans("layout.MENU.order")}}</span>
-                    <span class="link active" ng-click="openOrder()"
-                          translate="user.Project.<%orderChosen.name%>"></span>
-                </div>
-            </div>
-
-            <br>
-            <div class="row" ng-if="(projects|filter:{active:filterChosen.id}).length == 0">
-                @include('templates.empty')
-            </div>
-            <div class="row">
-                <div ng-repeat="p in projects|filter:{active:filterChosen.id}|orderBy :orderChosen.id:true|limitTo:pagination.perPage:(pagination.currentPage - 1)*pagination.perPage"
-                     class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    @include('templates.project')
-                </div>
-            </div>
-            <div class="text-center" ng-show="pagination.show">
-                <ul uib-pagination
-                    max-size="5"
-                    rotate = true
-                    items-per-page = 'pagination.perPage'
-                    boundary-links="true"
-                    total-items="pagination.total"
-                    ng-model="pagination.currentPage"
-                    class="pagination-sm"
-                    previous-text="&lsaquo;"
-                    next-text="&rsaquo;"
-                    first-text="&laquo;"
-                    last-text="&raquo;"></ul>
-            </div>
-        </div>
-        <div class="container content slide-up" ng-show="selectedTab == 1">
-            <div class="pull-right">
-                <div class="btn btn-lg text-important" ng-click="selectTab(0)"><span class="fa fa-times fa-6x"></span></div>
-            </div>
-            <br>
-            <uib-tabset ng-if="selectedTab == 1">
-                <uib-tab index="$index + 1" ng-repeat="tab in relationTabs" select="selectTopTab($index)">
-                    <uib-tab-heading>
-                        <span translate="user.Views.<%tab%>"></span>
-                        <sup id="sup_<%tab%>"></sup>
-                    </uib-tab-heading>
-                    <div ng-if="relations.length == 0">
-                        @include('templates.empty');
                     </div>
-                    <div class="row">
-                        <div ng-repeat="i in relations" id="relation_content_<%i.id%>"
-                             class="col-md-6 col-xs-12 col-sm-6 flex-left" style="padding-bottom: 30px">
-                            <div class="relation-image">
-                                <img class="img-circle" ng-class="{'friend':i.love}" src="{{ URL::asset('/context/avatars')}}/<%i.id%>.jpg"/>
+                </div>
+                <div class="text-uppercase">
+                    <span >{{trans("layout.MENU.order")}}</span>
+                    <span class="btn-link text-danger"  data-toggle="modal" data-target="#orderFilterModal">
+                        <span translate="user.Project.<%orderChosen.name%>"></span>
+                    </span>
+                </div>
+            </h4>
+            <div class="container projects pb-3">
+                <div  ng-if="(projects|filter:{active:filterChosen.id}).length == 0">
+                    @include('templates.empty')
+                </div>
+                <div class="row">
+                    <div ng-repeat="p in projects|filter:{active:filterChosen.id}|orderBy :orderChosen.id:true|limitTo:pagination.perPage:(pagination.currentPage - 1)*pagination.perPage" class="col-md-4 col-sm-6 col-xs-12 py-3">
+                        <div class="card">
+                            @include('templates.project')
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="container pt-2" ng-show="pagination.show">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    <li class="page-item" ng-repeat="i in pagination.pages" ng-class="{'active':i==pagination.currentPage}" ng-click="pageChanged(i)">
+                        <a class="page-link" href="#" ng-bind="i"></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="container" ng-show="selectedTab == 1">
+            <div class="pull-right">
+                <div class="btn btn-lg text-danger" ng-click="selectTab(0)"><span class="fa fa-times fa-6x"></span></div>
+            </div>
+            <br>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" ng-repeat="tab in relationTabs">
+                    <a class="nav-link" id="<%tab%>-tab" data-toggle="tab" ng-class="{'bg-white':selectedTopTab ==  relationTabs[$index]}" ng-click="selectTopTab($index)">
+                        <span translate="user.Views.<%tab%>"></span><sup class="text-danger" id="sup_<%tab%>"></sup>
+                    </a>
+                </li>
+            </ul>
+            <div ng-if="relations.length == 0">
+                @include('templates.empty');
+            </div>
+            <div class="content bg-white">
+                <div class="row py-5">
+                    <div ng-repeat="i in relations" id="relation_content_<%i.id%>"
+                         class="py-3 col-md-6 col-xs-12 col-sm-6">
+                        <div class="d-flex">
+                            <div class="text-center ml-3">
+                                <img class="rounded-circle img-fluid" ng-class="{'friend':i.love}" style="width: 100px" src="/storage/avatars/<%i.id%>.jpg"/>
                                 <div class="relation-circle my<%i.relation%>" id="relation_<%i.id%>">
                                     <div ng-click="changeRelation(i.id, i.username, '{{$admin ? 1 : 0}}')">
                                         <div class="ifollow">
@@ -184,37 +203,43 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="padding-left-lg flex-cols">
-                                <div class="flex-rows">
-                                    <a class="text-primary" href="/profile/<%i.id%>" ng-bind="i.username"></a>
-                                    <div class="text-default small padding-right-md">
-                                        <span class="glyphicon"><?php echo file_get_contents(public_path("/images/icons/location.svg")); ?></span>
+                            <div class="px-5 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between">
+                                    <a class="text-pink" href="/profile/<%i.id%>" ng-bind="i.username"></a>
+                                    <div class="text-muted small">
+                                        <span class="fa fa-map-marker"></span>
                                         <span ng-bind="i.city_name">&nbsp;(<span ng-bind="i.sortname"></span>)</span>
                                     </div>
                                 </div>
-                                <div>
+                                <div class="pb-3">
                                     <span ng-bind="i.presentation|limitTo:64"></span>
                                     <attr ng-if="i.presentation.length > 64" title="<%i.presentation%>">...</attr>
                                 </div>
                             </div>
                         </div>
+                        <hr/>
                     </div>
-                    <div class="text-center" ng-show="rpagination.show">
-                        <ul uib-pagination ng-change="relationPageChanged()"
-                            max-size="5"
-                            rotate = true
-                            items-per-page = 'rpagination.perPage'
-                            boundary-links="true"
-                            total-items="rpagination.total"
-                            ng-model="rpagination.currentPage"
-                            class="pagination-sm"
-                            previous-text="&lsaquo;"
-                            next-text="&rsaquo;"
-                            first-text="&laquo;"
-                            last-text="&raquo;"></ul>
-                    </div>
-                </uib-tab>
-            </uib-tabset>
+                </div>
+            </div>
+            <nav class="container pt-2" ng-show="rpagination.show">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    <li class="page-item" ng-repeat="i in rpagination.pages" ng-class="{'active':i == rpagination.currentPage}" ng-click="relationPageChanged(i)">
+                        <a class="page-link" href="#" ng-bind="i"></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
         <div class="container content slide-up"  ng-show="selectedTab == 2">
             <div class="pull-right">
@@ -224,11 +249,11 @@
             <div ng-if="!sns.length">
                 @include('templates.empty')
             </div>
-            <div ng-repeat="t in snsMenu" class="margin-bottom-md" ng-if="(sns | filter:{type:t}:true).length > 0">
+            <div ng-repeat="t in snsMenu" class="py-5" ng-if="(sns | filter:{type:t}:true).length > 0">
                 <label translate="personal.SNS.<%t%>" ></label>
                 <hr>
-                <div class="flex-left">
-                    <div ng-repeat="s in sns | filter:{type:t}:true" class="text-center padding-left-lg">
+                <div class="d-flex">
+                    <div ng-repeat="s in sns | filter:{type:t}:true" class="text-center px-4">
                         <a href="<%sns.url%>" target="_blank">
                             <img class="btn-sq-sm" ng-src="{{URL::asset('images/sns')}}/<%s.id%>.png" />
                         </a>

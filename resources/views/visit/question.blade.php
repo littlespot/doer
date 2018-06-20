@@ -102,13 +102,13 @@
                         <div class="col-md-1 flex-cols text-center">
                             <div class="margin-top-sm">
                                 <a class="text-center " href="/profile/profile/<%a.user_id%>">
-                                    <img class="center img-circle img-responsive" src="/context/avatars/<%a.user_id%>.small.jpg" />
+                                    <img class="center img-circle img-fluid" src="/storage/avatars/<%a.user_id%>.small.jpg" />
                                 </a>
                                 <div ng-if="a.mine" class="text-info">
                                     <span class="fa" ng-class="{'fa-star-o' :!a.supports_cnt, 'fa-star': a.supports_cnt}"></span>
                                 </div>
                                 <div ng-if ="!a.mine" class="text-warning" id="support_<%a.id%>" ng-disabled="a.supporting"
-                                     ng-click="supportAnswer(a, '{{Auth::id()}}')">
+                                     ng-click="supportAnswer(a, '{{auth()->id()}}')">
                                    <span ng-class="{'fa-star-o' :!a.mysupport, 'fa-star': a.mysupport}"
                                          class="btn btn-sm fa" ></span>
                                 </div>
@@ -124,9 +124,9 @@
                                 <div class="hidden-bar flex-rows" ng-class="{'br': !$last}">
                                     <div>
                                         <a ng-if="a.username" class="title" href="/profile/<%a.user_id%>" ng-bind="a.username"></a>
-                                        <a ng-if="!a.username" class="title" href="/profile/{{Auth::id()}}">{{Auth::user()->username}}</a>
+                                        <a ng-if="!a.username" class="title" href="/profile/{{auth()->id()}}">{{Auth::user()->username}}</a>
                                     </div>
-                                    <div class="btn" ng-if="a.mine" ng-click="deleteAnswer(a,'{{Auth::id()}}')">
+                                    <div class="btn" ng-if="a.mine" ng-click="deleteAnswer(a,'{{auth()->id()}}')">
                                         <span class="text-danger fa fa-trash"></span>
                                     </div>
                                 </div>
@@ -165,11 +165,11 @@
                     <a class="text-warning" href="/project/{{$question->project_id}}" target="_blank">{{$question->title}}</a>
                 </h5>
                 <div>
-                    <img ng-src="/context/projects/{{$question->project_id}}.thumb.jpg" width="100%"/>
+                    <img ng-src="/storage/projects/{{$question->project_id}}.thumb.jpg" width="100%"/>
                 </div>
                 <div class="text-right">
                     <a class="inner" href="/profile/{{$question->planner_id}}">
-                        <img class="img-circle img-responsive" src="/context/avatars/{{$question->planner_id}}.small.jpg" />
+                        <img class="img-circle img-fluid" src="/storage/avatars/{{$question->planner_id}}.small.jpg" />
                     </a>
                     <a id="user" class="inner" href="/profile/{{$question->planner_id}}">
                         {{$question->planner_name}}

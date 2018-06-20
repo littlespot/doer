@@ -1,112 +1,167 @@
 @extends('layouts.zoomov')
 
 @section('content')
-    <style>
-        button{
-            background: transparent;
-        }
-    </style>
-    <script type="text/ng-template" id="confirm.html">
-        <div class="modal-body" id="modal-body">
-            <h3 translate="project.MESSAGES.<%confirm%>"></h3>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-default" type="button" ng-click="$close(false)">{{trans("project.BUTTONS.cancel")}}</button>
-            <button class="btn btn-danger" type="button" ng-click="$close(true)">{{trans("project.BUTTONS.confirm")}}</button>
-        </div>
-    </script>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
-                <h4>{{trans('personal.LABELS.contact')}}</h4>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.title')}}</label>
-                    <div class="col-sm-7 col-xs-12">{{$contact->last_name}} {{$contact->first_name}}</div>
+    <div ng-controller="filmCtrl" ng-init="loaded()">
+        <div class="container my-5">
+            <div class="row pt-5">
+                <div class="col-lg-2"></div>
+                <div class="col-lg-8 col-md-12">
+                    @include('film.templates.creation_'.app()->getLocale())
                 </div>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.address')}}</label>
-                    <div class="col-sm-7 col-xs-12">{{$contact->address}}</div>
-                </div>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.code')}}</label>
-                    <div class="col-sm-7 col-xs-12">{{$contact->zip}}</div>
-                </div>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.city')}}</label>
-                    <div class="col-sm-7 col-xs-12">{{$contact->city}}</div>
-                </div>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.country')}}</label>
-                    <div class="col-sm-7 col-xs-12">{{$contact->country}}</div>
-                </div>
-                <div class="row">
-                    <label class="col-sm-5 col-xs-12">{{trans('personal.LABELS.tel')}}</label>
-                    <div class="col-sm-7 col-xs-12">{!! is_null($contact->tel) ? $contact->mobile : $contact->tel.'<br>'.$contact->mobile !!}</div>
-                </div>
+                <div class="col-lg-2"></div>
             </div>
-            <div class="col-lg-10 col-md-9 col-sm-8 col-xs-6">
-                <form class="form">
-                    <div class="form-group row">
-                        <label for="title_original" class="col-md-2 col-sm-3 col-xs-4 col-form-label text-right">{{trans('film.label.title_original')}} <sup>*</sup></label>
-                        <div class="col-md-8 col-sm-8 col-xs-8">
-                            <input class="form-text" type="text" value="Artisanal kale" id="title_original" name="title_original">
-                        </div>
-                        <div class="col-md-2 col-sm-1"></div>
+        </div>
+        <div class="bg-white py-5">
+            <form class="container" name="filmForm" action="/archives" method="POST">
+                {{csrf_field()}}
+                <div class="form-group row">
+                    <div class="col-4 ">
                     </div>
-                    <div class="form-group row">
-                        <label for="title_latin" class="col-md-2 col-sm-3 col-xs-4 col-form-label text-right">{{trans('film.label.title_latin')}}</label>
-                        <div class="col-md-8 col-sm-8 col-xs-8">
-                            <input class="form-text" type="text" value="Artisanal kale" id="title_latin" name="latin">
-                        </div>
-                        <div class="col-md-2 col-sm-1"></div>
+                    <div class="col-2 radio-inline">
+                        <input type="radio" name="screenplay" value="0" {{old('screenplay')?'':'checked'}}>
+                        <label>{{trans('film.header.movie')}}</label>
                     </div>
-                    <div class="form-group row">
-                        <label for="title_international" class="col-md-2 col-sm-3 col-xs-4 col-form-label text-right">{{trans('film.label.title_inter')}}</label>
-                        <div class="col-md-8 col-sm-8 col-xs-8">
-                            <input class="form-text" type="text" value="Artisanal kale" id="title_international" name="international">
+                    <div class="col-2 radio-inline">
+                        <input type="radio" name="screenplay" value="1" {{old('screenplay')?'checked':''}}>
+                        <label>{{trans('film.header.screenplay')}}</label>
+                    </div>
+                    <div class="col-4 ">
+                    </div>
+                </div>
+                <br/>
+                <div class="form-group row">
+                    <div class="col-lg-2 col-md-push-0"></div>
+                    <label for="title_original" class="col-lg-2 col-md-4 label-justified required">{{trans('film.label.title_original')}}</label>
+                    <div class="col-lg-6 col-md-8 input input--isao">
+                        <input class="input__field input__field--isao" type="text" id="title_original" name="title"
+                               value="{{old('title')}}"
+                               ng-maxlength="80"
+                               required>
+                        <label class="input__label input__label--isao" for="title_original"
+                               ng-class="{'isao_error':filmForm.title_original.$error}"
+                               data-error="{{trans('film.error.require_title')}}"
+                               data-content="{{trans('film.placeholder.title_original')}}">
+                            <span class="input__label-content input__label-content--isao">{{trans('film.placeholder.title_original')}}</span>
+                        </label>
+                    </div>
+                    <div class="col-lg-2 col-md-push-0"></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-2 col-md-push-0"></div>
+                    <label for="title_latin" class="col-lg-2 col-md-4 label-justified">{{trans('film.label.title_latin')}}</label>
+                    <div class="col-lg-6 col-md-8 input input--isao">
+                        <input class="input__field input__field--isao" type="text" id="title_latin" name="title_latin"
+                               value="{{old('title_latin')}}"
+                               ng-maxlength="80">
+                        <label class="input__label input__label--isao" for="title_latin"
+                               ng-class="{'isao_error':filmForm.title_latin.$error}"
+                               data-error="{{trans('film.error.maxlength_title', ['cnt'=>80])}}"
+                               data-content="{{trans('film.placeholder.title_latin')}}">
+                            <span class="input__label-content input__label-content--isao">{{trans('film.placeholder.title_latin')}}</span>
+                        </label>
+                    </div>
+                    <div class="col-lg-2 col-md-push-0"></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-2 col-md-push-0"></div>
+                    <label for="title_inter" class="col-lg-2 col-md-4 label-justified">{{trans('film.label.title_inter')}}<sup> </sup></label>
+                    <div class="col-lg-6 col-md-8 input input--isao">
+                        <input class="input__field input__field--isao" type="text" id="title_inter" name="title_inter"
+                               value="{{old('title_inter')}}"
+                               ng-maxlength="80">
+                        <label class="input__label input__label--isao" for="title_inter"
+                               ng-class="{'isao_error':filmForm.title_inter.$error}"
+                               data-error="{{trans('film.error.maxlength_title', ['cnt'=>80])}}"
+                               data-content="{{trans('film.placeholder.title_inter')}}">
+                            <span class="input__label-content input__label-content--isao">{{trans('film.placeholder.title_inter')}}</span>
+                        </label>
+                    </div>
+                    <div class="col-lg-2 col-md-push-0"></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-2 col-md-push-0"></div>
+                    <div class="col-lg-6 col-md-8 checkbox-inline checkbox-primary">
+                        <input name="agreement" type="checkbox" ng-model="agreed" required/>
+                        <span class="pl-3 text-danger">{{trans('film.declaration.copyright')}}<sup>*</sup></span>
+                    </div>
+                    <div class="col-lg-2 col-md-push-0"></div>
+                </div>
+                <div class="mt-5 py-5">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <h5 class="col-lg-8 col-md-8">{{trans('film.header.user_contact')}}</h5>
+                        <div class="col-lg-2 col-md-4"><a class="btn btn-link" href="/personal?anchor=contact" target="_blank">{{trans('personal.BUTTONS.change_contact')}}>></a></div>
+                    </div>
+                    @if($contact)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label for="title_international" class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.name')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            <span class="text-uppercase">{{$contact->last_name}}</span><span class="pl-1">{{$contact->first_name}}</span>
                         </div>
-                        <div class="col-md-2 col-sm-1"></div>
+                        <div class="col-lg-2 col-md-push-0"></div>
                     </div>
 
-                    <button class="btn btn-primary btn-block">{{trans('film.buttons.add')}}</button>
-                </form>
-                <hr>
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        @if(is_null($films) || $films->count() == 0)
-                            <div>{{trans('film.progress.form_completed', ['cnt'=>0])}}</div>
-                            <div>{{trans('film.progress.form_tocomplete', ['cnt'=>0])}}</div>
-                        @elseif($films->count() == 1)
-                            @if($films[0]->completed  ==0)
-                                <div>{{trans('film.progress.form_completed', ['cnt'=> $films[0]->cnt ])}}</div>
-                                <div>{{trans('film.progress.form_tocomplete', ['cnt'=>0])}}</div>
-                            @else
-                                <div>{{trans('film.progress.form_completed', ['cnt'=> 0])}}</div>
-                                <div>{{trans('film.progress.form_tocomplete', ['cnt'=> $films[0]->cnt])}}</div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.email')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            {{auth()->user()->email}}
+                        </div>
+                        <div class="col-lg-2 col-md-push-0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.mobile')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            @if($contact->mobile_code && $contact->mobile_code)
+                            <span>{{$contact->mobile_code}}</span><span class="pl-1">{{$contact->mobile_number}}</span>
                             @endif
-                        @else
-                        <div>{{trans('film.progress.form_completed', ['cnt'=>$films[0]->cnt])}}</div>
-                        <div>{{trans('film.progress.form_tocomplete', ['cnt'=>$films[1]->cnt])}}</div>
-                        @endif
-                            <br>
-                            <div>{{trans('film.progress.copy_uploaded', ['cnt'=>$copies])}}</div>
-                            <div>{{trans('film.progress.copy_toupload', ['cnt'=>$copies])}}</div>
+                        </div>
+                        <div class="col-lg-2 col-md-push-0"></div>
                     </div>
-                    <div class="col-md-6 col-xs-12">
-                        <div>{{trans('film.progress.submission_tofinish', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.submission_forward', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.submission_confirmed', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.film_selected', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.film_unselected', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.film_another', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.film_award', ['cnt'=>0])}}</div>
-                        <div>{{trans('film.progress.submission_canceled', ['cnt'=>0])}}</div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.fix')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            @if($contact->fix_code && $contact->fix_number)
+                            <span>{{$contact->fix_code}}</span><span class="pl-1">{{$contact->fix_number}}</span>
+                            @endif
+                        </div>
+                        <div class="col-lg-2 col-md-push-0"></div>
                     </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.city')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            <span>{{$contact->city}}</span><span class="pl-1">({{$contact->country}})</span>
+                        </div>
+                        <div class="col-lg-2 col-md-push-0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-push-0"></div>
+                        <label class="col-lg-2 col-md-4 label-justified">{{trans('personal.LABELS.address')}}</label>
+                        <div class="col-lg-6 col-md-8">
+                            <span>{{$contact->address}}</span><span class="pl-1">({{$contact->postal}})</span>
+                        </div>
+                        <div class="col-lg-2 col-md-push-0"></div>
+                    </div>
+                    @else
+                        <div class="row">
+                            <div class="col-lg-2 col-md-push-0"></div>
+                            <div class="col-lg-8 col-md-10">
+                               <div class="alert alert-danger">{{trans('film.alert.entry_contact')}}</div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
-            </div>
+                <div class="text-right">
+                    <button class="btn btn-primary" ng-disabled="filmForm.$invalid">{{trans('layout.BUTTONS.continue')}}</button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
 @section('script')
-
+    <script src="/js/controllers/film/general.js"></script>
 @endsection

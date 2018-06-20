@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/css/angular-timeline.css" />
 <link rel="stylesheet" href="/css/angular-timeline-bootstrap.css" />
 <link rel="stylesheet" href="/css/angular-timeline-animations.css" />
 <link rel="stylesheet" href="/css/timeline.css">
@@ -26,8 +27,8 @@
         @endif
         @if($project->active)
         <div>
-            <a href="/report/{{$project->id}}" class="btn btn-text-info">
-                <span translate="report.add"></span>
+            <a href="/report/{{$project->id}}" class="btn btn-outline-primary">
+                {{trans('project.BUTTONS.add_report')}}
             </a>
         </div>
             @endif
@@ -36,9 +37,9 @@
 <div class="timeline" ng-if="events">
     <div ng-repeat="mevent in events" id="timeline-<%$index%>">
         <div class="timeline-header" ng-click="slideUp($index)">
-            <div>
-                <div class="text-success" translate="month.<%mevent.month | split:'-':1%>"></div>
-                <div><%mevent.month | split:'-':0%></div>
+            <div class="card text-center">
+                <h4 class="text-success" translate="month.<%mevent.month | split:'-':1%>"></h4>
+                <div class="text-muted"><%mevent.month | split:'-':0%></div>
             </div>
         </div>
         <div ng-repeat="devent in mevent.events">
@@ -58,14 +59,14 @@
                                 <span ng-bind="event.created_date"></span>&nbsp;<span ng-bind="event.created_time"></span>
                                 <span class="text-chocolate fa" ng-class="{'fa-jpy':event.type=='m' || event.type=='b', 'fa-bookmark':event.type=='s'}"></span>
                             </div>
-                            <div  ng-bind-html="event.title"></div>
+                            <div  ng-bind="event.title"></div>
                         </div>
-                        <div class="timeline-conent" ng-bind-html="event.content"></div>
+                        <div class="timeline-conent" ng-bind="event.content"></div>
                         <div ng-if="event.type=='m'" class="text-info"><span ng-bind="event.username"></span></div>
                         <ul class="list-unstyled">
                             <li ng-repeat="c in event.changements" ng-class="{'text-through':c.deleted}">
                                 <div><label ng-bind="c.title"></label></div>
-                                <div ng-bind-html="c.content"></div>
+                                <div ng-bind="c.content"></div>
                             </li>
                         </ul>
                         <div class="loader-content" ng-if="event.deleting"><div class="loader"></div> </div>
@@ -74,13 +75,13 @@
                         <div class="timeline-title">
                             <div><span ng-bind="mevent.month"></span>-<span ng-bind="devent.day"></span></div>
                             <div ng-repeat="p in event.events">
-                                <img src="/context/avatars/<%p.user_id%>.small.jpg" />
+                                <img src="/storage/avatars/<%p.user_id%>.small.jpg" />
                                 <a class="title" href="/profile/<%p.user_id%>" ng-bind="p.username" target="_blank"></a>
                                 <span translate="event.team-add"></span>
                                 <span ng-repeat="r in p.roles"><label ng-bind="r"></label><span ng-if="!$last">,&nbsp;</span></span>
                             </div>
                         </div>
-                        <div class="timeline-conent" ng-bind-html="event.content"></div>
+                        <div class="timeline-conent" ng-bind="event.content"></div>
                     </div>
                     <div ng-if="event.type == 'r'" class="letter">
                         <div ng-repeat="report in event.events">
@@ -92,7 +93,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <img src="/context/avatars/<%report.user_id%>.small.jpg" />
+                                    <img src="/storage/avatars/<%report.user_id%>.small.jpg" />
                                     <a class="link active" href="/profile/<%report.user_id%>" target="_blank" ng-bind="report.username"></a>
                                     <div class="tags">
                                         &nbsp;<aside ng-repeat="role in report.roles" class="diamond text-center"><span ng-bind="role"></span></aside>
@@ -101,7 +102,7 @@
                                 <small class="text-muted" ng-bind="report.created_at | limitTo:16"></small>
                             </div>
                             <div class="timeline-conent">
-                                <div ng-bind-html="report.synopsis"></div>
+                                <div ng-bind="report.synopsis"></div>
                             </div>
                             <div class="flex-rows">
                                 <div class="timeline-tags">
@@ -125,10 +126,10 @@
         </div>
 
     </div>
-    <div class="timeline-footer flex-horizontal">
-        <div>
+    <div class="d-flex justify-content-center">
+        <div class="bg-danger text-white text-center py-3 px-5" style="z-index: 7">
             <div>{{str_limit($project->start_at, 10, "")}}</div>
-            <div translate="event.start"></div>
+            <div class="pt-1" translate="event.start"></div>
         </div>
     </div>
 </div>

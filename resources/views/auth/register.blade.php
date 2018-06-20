@@ -13,27 +13,26 @@
     </div>
 @endsection
 @section('content')
-    <div class="col-lg-offset-4 col-lg-4 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xs-12"
-         ng-controller="registerCtrl" ng-init="init('{{App::getLocale()}}')">
-        <form id="usrform" name="usrform" action="{{ route('register') }}" method="post" novalidate class="fixed-form grey">
+    <div>
+        <form id="usrform" name="usrform" action="{{ route('register') }}" method="post" novalidate class="bg-white py-3 px-4">
             {{ csrf_field() }}
             <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                <input type="text" class="form-text" ng-disabled="usrform.email.$pending.unique"
+                <input type="text" class="form-control" ng-disabled="usrform.email.$pending.unique" ng-init="username = '{{old("username")}}'"
                        name="name" placeholder="{{trans('auth.register_username')}}"
                        ng-model="username" ng-minlength="2" ng-maxlength="16"
                        required autofocus/>
                 @if ($errors && $errors->has('name'))
                     <div class="text-danger small" role="alert">{{ $errors->first('name') }}</div>
                 @else
-                <div class="text-danger small" ng-show="usrform.name.$touched || usrform.$submitted" role="alert">
-                    <span ng-show="usrform.name.$error.required">{{trans('auth.error_username_required')}}</span>
-                    <span ng-show="usrform.name.$error.minlength">{{trans('auth.error_username_minlength')}}</span>
-                    <span ng-show="usrform.name.$error.maxlength">{{trans('auth.error_username_maxlength')}}</span>
-                </div>
+                    <div class="text-danger small" ng-show="usrform.name.$touched || usrform.$submitted" role="alert">
+                        <span ng-show="usrform.name.$error.required">{{trans('auth.error_username_required')}}</span>
+                        <span ng-show="usrform.name.$error.minlength">{{trans('auth.error_username_minlength')}}</span>
+                        <span ng-show="usrform.name.$error.maxlength">{{trans('auth.error_username_maxlength')}}</span>
+                    </div>
                 @endif
             </div>
             <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                <input type="email" class="form-text"
+                <input type="email" class="form-control" ng-init="email = '{{old("email")}}'"
                        name="email" placeholder="{{trans('auth.register_email')}}"
                        ng-model="email" ng-model-options="{ updateOn: 'blur' }"
                        ng-disabled="usrform.email.$pending.unique"
@@ -50,21 +49,21 @@
                 @endif
             </div>
             <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                <input id="password" type="password" class="form-text" name="password" ng-disabled="usrform.email.$pending.unique"
+                <input id="password" type="password" class="form-control" name="password" ng-disabled="usrform.email.$pending.unique"
                        placeholder="{{trans('passwords.new_password')}}" ng-model="password" ng-minlength="6" ng-maxlength="16" ng-pattern="regex" required>
                 @if ($errors->has('password'))
                     <div class="text-danger samll">{{ $errors->first('password') }}</div>
                 @else
                     <div class="<%(usrform.password.$touched || usrform.$submitted) ? 'text-danger' : 'text-info'%> small" role="alert">
-                        <span ng-hide="(usrform.password.$touched || usrform.$submitted) && !usrform.password.$error.pattern && !usrform.password.$error.required">{{trans('auth.error_password_regex')}}</span>
+                        <span ng-hide="(usrform.password.$touched || usrform.$submitted) && !usrform.password.$error.pattern && !usrform.password.$error.required">{!!trans('auth.error_password_regex')  !!}</span>
                         <span ng-hide="(usrform.password.$touched || usrform.$submitted) && !usrform.password.$error.minlength && !usrform.password.$error.maxlength && !usrform.password.$error.required">
                             {{trans('auth.error_password_length')}}
                         </span>
                     </div>
                 @endif
             </div>
-            <div class="form-group" ng-show="usrform.password.$valid">
-                <input id="password-confirm" type="password" class="form-text" ng-disabled="usrform.email.$pending.unique"
+            <div class="form-group" >
+                <input id="password-confirm" type="password" class="form-control" ng-readonly="usrform.email.$pending.unique ||usrform.email.$error.unique"
                        name="password_confirmation" placeholder="{{trans('passwords.password_confirmation')}}" ng-model="password_confirmation" pw-check="password" required />
 
                 <div class="text-danger small" role="alert" ng-show="usrform.password_confirmation.$touched || usrform.$submitted">
@@ -73,24 +72,25 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class=" checkbox">
-                    <input type="checkbox" id="remember" name="remember" />
-                    <label for="remember"></label><span>{!! trans('auth.register_condition') !!}</span>
+                <div class="checkbox-primary checkbox-inline">
+                    <input type="checkbox" id="agreement" name="agreement" ng-required ng-model="agreement"/>
+                    <label for="agreement"></label><span class="{{$errors->has('agreement') ? 'text-danger':''}}"  ng-class="{'text-danger':usrform.$submitted && usrform.remember.$error.required}">{!! trans('auth.register_condition') !!}</span>
                 </div>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary btn-inverse btn-block" ng-disabled="usrform.$invalid"
-                     type="submit">
+                        type="submit">
                     {{trans('auth.register_submit')}}
                 </button>
             </div>
         </form>
         <br>
         <div class="text-center">
-            <p><a class="small text-default" href="{{ route('login') }}" translate="login.Signin" ></a></p>
-            <p><a class="small text-important" href="" translate="login.Help"></a> </p>
+            <p><a class="small text-default" href="{{ route('login') }}">{{trans('auth.another')}}</a></p>
+            <p><a class="small text-important" href="/contracts" >{{trans('auth.help')}}</a> </p>
         </div>
     </div>
+
 @endsection
 @section('script')
     <script src="/js/controllers/auth/register.js"></script>
@@ -113,6 +113,7 @@
 
             var margin = $(window).height() - $('.header').height() - 330 * xScale;
             $('#content').height(margin);
+            $('#main').css('top', - $("#layers").height() - 80)
         }
 
         $(document).ready(function () {

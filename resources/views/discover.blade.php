@@ -1,80 +1,61 @@
 @extends('layouts.zoomov')
 
 @section('content')
-    <div class="content padding-top-md" ng-controller="projectCtrl" ng-init="init('{{$filter}}')">
-        <link href="/css/projects.css" rel="stylesheet" />
-        <link href="/css/gallery.css" rel="stylesheet" />
-        <div class="jumbotron container" >
+    <link href="/css/projects.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/tag.css" type="text/css">
+    <div class="pt-3" ng-controller="projectCtrl" ng-init="init('{{$filter}}')">
+        <div class="jumbotron container bg-white" >
             <div class="row" style="height: 100%">
                 <div class="col-md-5 col-xs-12" style="height: 100%; display: table-cell" >
-                    <div class="font-lg text-primary" translate="PANEL.header" style="position: relative; top:-10px"></div>
+                    <h5 class="font-lg text-primary" translate="PANEL.header" style="position: relative; top:-10px"></h5>
                     <div class="text-default font-l" style="position: relative; bottom: -15px;">
                         <table cellspacing="5px">
                             <tr>
                                 <td class="text-right"><span translate="PANEL.div1"></span></td>
                                 <td>
-                                    <div class="dropdown text-info" id="order">
-                                        <div class="dropdown-toggle" type="button" id="dropdownOrder"
-                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            <span translate="user.Project.<%filter.order%>"></span>
-                                            <span class="caret"></span>
+                                    <div class="btn-group dropright" id="order">
+                                        <button type="button" class="btn dropdown-toggle bg-transparent" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  id="orderDropdown">
+                                            <span class="text-info" translate="user.Project.<%filter.order%>"></span>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="orderDropdown">
+                                            <a class="dropdown-item" ng-repeat="o in orderoptions" ng-if="o != filter.order" ng-click="setOrder(o)" translate="user.Project.<%o%>"></a>
                                         </div>
-                                        <ul class="dropdown-menu">
-                                            <li ng-repeat="o in orderoptions" ng-if="o != filter.order">
-                                                <a class="btn" ng-click="setOrder(o)" translate="user.Project.<%o%>"></a>
-                                            </li>
-                                        </ul>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-right"><span translate="PANEL.div2"></span></td>
                                 <td>
-                                    <div class="dropdown text-success">
-                                        <div class="dropdown-toggle" type="button" id="dropdownPerson"
+                                    <div class="btn-group dropright">
+                                        <button type="button" class="btn dropdown-toggle bg-transparent" id="dropdownPerson"
                                              data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            <span id="person_name" translate="user.!!"></span>
-                                            <span class="caret"></span>
+                                            <span class="text-danger" translate="user.!!" id="person_name"></span>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownPerson">
+                                            <a class="dropdown-item" ng-show="filter.person > 0" id="person_0" ng-click="setPersonFilter(0)" translate="user.!!"></a>
+                                        @foreach($occupations as $person)
+                                            <a class="dropdown-item" id="person_{{$person->id}}" ng-show="'{{$person->id}}' != filter.person" ng-click="setPersonFilter('{{$person->id}}')"
+                                               translate="occupation.{{$person->name}}"></a>
+                                        @endforeach
                                         </div>
-                                        <ul class="dropdown-menu">
-                                            <li  ng-show="filter.person > 0" >
-                                                <a id="person_0" ng-click="setPersonFilter(0)" class="btn text-important">
-                                                    <span translate="user.!!"></span>
-                                                </a>
-                                            </li>
-                                            @foreach($occupations as $person)
-                                                <li ng-show="'{{$person->id}}' != filter.person">
-                                                    <a class="btn" id="person_{{$person->id}}" ng-click="setPersonFilter('{{$person->id}}')">
-                                                        <span translate="occupation.{{$person->name}}"></span>
-                                                    </a>
-                                                </li>
-                                            @endforeach
-                                        </ul>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-right"><span translate="PANEL.div3"></span></td>
                                 <td>
-                                    <div class="dropdown text-chocolate" id="location">
-                                        <div class="dropdown-toggle" type="button" id="dropdownLocation" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                            <span id="city_name" translate="location.!!"></span>
-                                            <span class="caret"></span>
-                                        </div>
-                                        <ul class="dropdown-menu">
-                                            <li ng-show="filter.city > 0" >
-                                                <a class="btn text-important" id="city_0" ng-click="setLocationFilter(0)">
-                                                    <span translate="location.!!"></span>
-                                                </a>
-                                            </li>
+                                    <div class="btn-group dropright" id="location">
+                                        <button class="btn dropdown-toggle bg-transparent" type="button" id="dropdownLocation" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="text-success" id="city_name" translate="location.!!"></span>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownLocation">
+                                            <a class="dropdown-item" ng-show="filter.city > 0" id="city_0" ng-click="setLocationFilter(0)" translate="location.!!"></a>
                                             @foreach($locations as $city)
-                                                <li ng-show="'{{$city->id}}'!= filter.city">
-                                                    <a class="btn" id="city_{{$city->id}}" ng-click="setLocationFilter('{{$city->id}}')">
-                                                        {{$city->name}}&nbsp;({{$city->sortname}})
-                                                    </a>
-                                                </li>
+                                                <a class="dropdown-item" id="city_{{$city->id}}" ng-show="'{{$city->id}}'!= filter.city" ng-click="setLocationFilter('{{$city->id}}')">
+                                                    {{$city->name}}&nbsp;({{$city->country}})
+                                                </a>
                                             @endforeach
-                                        </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -94,7 +75,7 @@
                         </div>
                         @endfor
                     </div>
-                    <div class="row margin-top-md">
+                    <div class="row pt-3">
                         <div class="col-sm-3 col-xs-6">
                             <div class="category-link" ng-class="{active:filter.genre == 0}" ng-click="setGenre(0)">
                                 <span translate="genre.All"></span>
@@ -113,38 +94,46 @@
             </div>
             <br/>
         </div>
-        <div id="projects" style="display:block;">
-            <div class="panel">
-                <div class="container">
-                    <div ng-if="projects.length == 0">
-                        @include('templates.empty')
-                    </div>
-                    <br/>
-                    <div ng-if="projects.length > 0" class="row">
-                        <div ng-repeat="p in projects"
-                             class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <div id="projects" class="container-fluid bg-light  py-3">
+            <div class="container projects">
+                <div ng-if="projects.length == 0">
+                    @include('templates.empty')
+                </div>
+                <br/>
+                <div class="row">
+                    <div ng-repeat="p in projects" class="col-md-4 col-sm-6 col-xs-12 py-3">
+                        <div class="card">
                             @include('templates.project')
                         </div>
                     </div>
                 </div>
-                <div class="text-center" ng-show="pagination.show">
-                    <ul uib-pagination ng-change="pageChanged()"
-                        max-size="5"
-                        rotate = true
-                        items-per-page = 'pagination.perPage'
-                        boundary-links="true"
-                        total-items="pagination.total"
-                        ng-model="pagination.currentPage"
-                        class="pagination-sm"
-                        previous-text="&lsaquo;"
-                        next-text="&rsaquo;"
-                        first-text="&laquo;"
-                        last-text="&raquo;"></ul>
-                </div>
             </div>
+            <nav class="container pt-2" ng-show="pagination.show">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    <li class="page-item" ng-repeat="i in pagination.pages" ng-class="{'active':i==pagination.currentPage}" ng-click="pageChanged(i)">
+                        <a class="page-link" href="#" ng-bind="i"></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 @endsection
 @section('script')
+    @if(auth()->check())
     <script src="/js/controllers/project/list.js"></script>
+    @else
+        <script src="/js/controllers/project/visit.js"></script>
+    @endif
 @endsection

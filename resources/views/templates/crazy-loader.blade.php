@@ -1,6 +1,30 @@
-<div id="crazyloader" class="modal" style="display: block;background-color: #0f151d;opacity: .9;filter: Alpha(Opacity=90); ">
+<div id="crazyloader" >
     <style>
-
+        .crazyloader{
+            position: fixed;
+           /* background-color: #0f151d;opacity: .9;filter: Alpha(Opacity=90);*/
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-flow: row nowrap;
+            -ms-flex-flow: row nowrap;
+            flex-flow: row nowrap;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+            background: none repeat scroll 0 0 #ffffff;
+        }
         #crazy .original
         {
             position: absolute;
@@ -68,7 +92,7 @@
             100% { transform: translateX(0%) translateY(0%) rotate(0deg); }
         }
     </style>
-    <div id="crazy" class="modal-dialog">
+    <div id="crazy" class="crazyloader">
         <div class="top">
             <div class="square">
                 <div class="square">

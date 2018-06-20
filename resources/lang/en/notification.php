@@ -38,7 +38,12 @@ return [
         'delete_script' => ':user remove script :script from project :title',
         'delete_author' => ':user drop your name from script :script of project :title'
     ],
-    'errors'=> [
-        "projects" => "To invite a zoomover, you must have at least one project on line."
+    'ERRORS'=> [
+        "projects" => "To invite a zoomover, you must have at least one project on line.",
+        'require_reminder_subject' => 'Reminder must have subject (4-40 characters)',
+        'require_reminder_project' => 'Choose a project to remind',
+        'require_team' => 'Project ":title" has no other member to set reminder for',
+        'require_message_subject' => 'Message must have a subject',
+        'require_message_body' => 'Message must have content',
     ]
 ];

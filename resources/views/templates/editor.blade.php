@@ -5,7 +5,11 @@
 
 <style>
     #editor {overflow:scroll; max-height:800px}
-
+    #editor a,
+    #editor-content a {
+        text-decoration: underline;
+        color: #293a4f;
+    }
 </style>
 <script src="/bower_components/jquery/jquery.hotkeys.js"></script>
 <script src="/google-code-prettify/prettify.js"></script>
@@ -19,28 +23,31 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div id="picture_wrapper">
-                                <img src="" id="picture_cropper" class="img-responsive">
+                                <img src="" id="picture_cropper" class="img-fluid">
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <ul class="list-inline" id="img_size_selection">
-                                <li image-width="original">
+                            <ul class="" id="img_size_selection">
+                                <li class="list-inline-item" image-width="original">
                                     <label><input type="radio" name="image_width" value="">{{trans('layout.EDITOR.image_original')}}(<span></span>)</label>
                                 </li>
-                                <li image-width="max">
+                                <li class="list-inline-item" image-width="max">
                                     <label><input type="radio" value="2016" name="image_width">{{trans('layout.EDITOR.image_max', ['value'=>2016])}}(<span>2016</span>)</label>
                                 </li>
-                                <li image-width="medium">
+                                <li class="list-inline-item" image-width="medium">
                                     <label><input type="radio" value="800" name="image_width">{{trans('layout.EDITOR.image_medium', ['value'=>800])}}(<span>800</span>)</label>
                                 </li>
-                                <li image-width="min">
+                                <li class="list-inline-item" image-width="min">
                                     <label><input type="radio" value="400" name="image_width">{{trans('layout.EDITOR.image_min')}}(<span>{{trans('layout.EDITOR.image_width', ['value'=>400])}}</span>)</label>
                                 </li>
                             </ul>
-                            <a class="btn btn-default" href="#" data-dismiss="modal" id="closeMondal">
-                                <span class="fa fa-undo"></span>
-                            </a>
-                            <a href="javascript:void(0)" class="btn btn-info" data-edit="insertimage" title="{{trans('layout.BUTTONS.submit')}}"><i class="fa fa-check"></i></a>
+                            <hr/>
+                            <div class="text-right">
+                                <a class="btn btn-default" href="#" data-dismiss="modal" id="closeMondal">
+                                    <span class="fa fa-undo"></span>
+                                </a>
+                                <a href="javascript:void(0)" class="btn btn-info" data-edit="insertimage" title="{{trans('layout.BUTTONS.submit')}}"><i class="fa fa-check"></i></a>
+                            </div>
                         </div>
                     </div>
                     <input type="hidden" value="{{$picture}}" name="picture_dst" id="picture_dst" />
@@ -85,15 +92,24 @@
             <a class="btn" data-edit="justifyright" title="{{trans('layout.EDITOR.right')}} (Ctrl/Cmd+R)"><i class="icon-align-right"></i></a>
             <a class="btn" data-edit="justifyfull" title="{{trans('layout.EDITOR.justify')}} (Ctrl/Cmd+J)"><i class="icon-align-justify"></i></a>
         </div>
+        <!--
         <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown" title="{{trans('layout.EDITOR.hyperlink')}}"><i class="icon-link"></i></a>
-            <div class="dropdown-menu input-append">
-                <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
-                <button class="btn" type="button">{{trans('layout.EDITOR.add')}}</button>
+            <a class="btn dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" title="{{trans('layout.EDITOR.hyperlink')}}"><i class="icon-link"></i></a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <div class="input-group" style="width: 380px" >
+                    <span class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">http://</span>
+                        </span>
+                    <input class="form-control mr-3" placeholder="URL" type="text" data-edit="createLink" name="hyperLink"/>
+                    <span class="input-group-append">
+                        <span class="btn btn-outline-secondary">{{trans('layout.EDITOR.add')}}</span>
+                    </span>
+                </div>
             </div>
             <a class="btn" data-edit="unlink" title="{{trans('layout.EDITOR.remove')}}"><i class="icon-cut"></i></a>
 
         </div>
+        -->
         @if($picture)
             <div class="btn-group">
                 <a class="btn" title="{{trans('layout.EDITOR.picture')}}" id="pictureBtn"><i class="icon-picture"></i></a>

@@ -1,36 +1,55 @@
 @extends('layouts.zoomov')
 
 @section('content')
-    <div ng-controller="homeCtrl" class="content" ng-init="init('{{$pictures}}', '{{$ratio}}')">
-        <link href="/css/home.css" rel="stylesheet" />
-        <link href="/css/gallery.css" rel="stylesheet" />
-        <div class="overlay ng-hide" ng-show="overlay" ng-click="overlay=false;">
-            <div>
-                <div class="category">
-                    <div ng-click="setFilter(0)">
-                        <span class="link" ng-class="{active:filterChosen.id == '!!'}" >{{trans("layout.MENU.all")}}</span>
+    <link rel="stylesheet" href="/css/tag.css" type="text/css">
+    <link rel="stylesheet" href="/css/projects.css" type="text/css">
+    <div ng-controller="homeCtrl" ng-init="init('{{$pictures}}', '{{$height}}')">
+        <div class="modal fade bd-example-modal-lg" id="recomFilterModal" tabindex="-1" role="dialog" aria-labelledby="recomFilterModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content bg-transparent border-0">
+                    <div class="modal-body text-center">
+                        <h5 ng-click="setFilter(0, 0)" class="p-3" data-dismiss="modal" aria-label="Close">
+                            <span class="text-white" ng-class="{'text-danger':filters[0].id == '!!'}" >{{trans("layout.MENU.all")}}</span>
+                        </h5>
+                        @foreach($categories as $category)
+                            <h5 ng-click="setFilter(0, '{{$category->id}}', '{{$category->name}}')" class="p-3 btn-link text-white" ng-class="{'text-danger':filters[0].id == '{{$category->id}}'}"
+                                data-dismiss="modal" aria-label="Close">
+                                <span>{{$category->name}}</span>
+                            </h5>
+                        @endforeach
                     </div>
-                    @foreach($categories as $category)
-                        <div ng-click="setFilter('{{$category->id}}', '{{$category->name}}')">
-                            <span class="link" ng-class="{active:filterChosen.id == '{{$category->id}}'}" >{{$category->name}}</span>
-                        </div>
-                    @endforeach
                 </div>
             </div>
         </div>
-        <div style="display: block;margin-top: 40px;position: relative">
-            <div class="zooCarousel"  uib-carousel active="true" interval="myInterval" no-wrap="false">
-                <div uib-slide ng-repeat="slide in slides track by slide.id" index="$index">
-                    <img ng-src="/context/carousel/<%slide.image%>" style="height:<%slide.height%>px">
+        <div class="modal fade bd-example-modal-lg" id="latestFilterModal" tabindex="-1" role="dialog" aria-labelledby="latestFilterModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content bg-transparent border-0">
+                    <div class="modal-body text-center">
+                        <h5 ng-click="setFilter(1, 0)" class="p-3" data-dismiss="modal" aria-label="Close">
+                            <span class="text-white" ng-class="{'text-danger':filters[1].id == '!!'}" >{{trans("layout.MENU.all")}}</span>
+                        </h5>
+                        @foreach($categories as $category)
+                            <h5 ng-click="setFilter(1, '{{$category->id}}', '{{$category->name}}')" class="p-3 btn-link text-white" ng-class="{'text-danger':filters[1].id == '{{$category->id}}'}"
+                                data-dismiss="modal" aria-label="Close">
+                                <span>{{$category->name}}</span>
+                            </h5>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-            <div class="carousel-header">
-                <div class="container ">
-                    <div class="header-slogan">
-                        <div>
-                            {!! trans("layout.HOME.header", ["username"=>Auth::user()->username, "userid"=>Auth::id()])!!}
-                        </div>
-                        <div>
+        </div>
+
+        <div id="zooCarousel" class="jumbotron bg-transparent" style="position: relative">
+            <div id="homeBanner" class="carousel slide" data-ride="carousel" >
+                <ol class="carousel-indicators">
+                    <li ng-repeat="slide in slides" data-target="#homeBanner" data-slide-to="<%$index%>" ng-class="{'active':$index === 0}"></li>
+                </ol>
+                <div class="carousel-inner container">
+                    <div class="d-flex flex-column justify-content-start" style="position: absolute; top:0; height: 100%; left:50px; width: 100%;z-index: 999">
+                        <h3 style="line-height: 2.5rem" class="mt-3">
+                            {!! trans("layout.HOME.header", ["username"=>auth()->user()->username, "userid"=>auth()->id()])!!}
+                        </h3>
+                        <h4 style="line-height: 2.5rem">
                             @if(is_null($counts) || sizeof($counts) == 0)
                                 <span class="text-info">{!! trans("layout.HOME.start")!!}</span>
                             @else
@@ -56,73 +75,84 @@
                                     @endif
                                 @endif
                             @endif
+                        </h4>
+                        <h4 style="line-height: 2.5rem">{!! trans("layout.HOME.slogan")!!}</h4>
+                        <div class="mt-3">
+                            <a href="/profile/{{auth()->id()}}" class="btn btn-lg btn-primary">
+                                {{trans("layout.HOME.manage")}}
+                            </a>
+                            <br/>
+                            <a href="/admin/preparations" class="mt-3 btn btn-lg btn-outline-primary">
+                                {{trans("layout.HOME.create")}}
+                            </a>
                         </div>
-                        <div>{!! trans("layout.HOME.slogan")!!}</div>
                     </div>
-                    <br/>
-                    <div class="form-group">
-                        <a href="/profile/{{Auth::id()}}" class="btn btn-primary">
-                            {{trans("layout.HOME.manage")}}
-                        </a>
-                    </div>
-                    <div class="form-group">
-                        <a href="/preparations" class="btn btn-default">
-                            {{trans("layout.HOME.create")}}
-                        </a>
+                    <div class="carousel-item" ng-repeat="slide in slides track by slide.id" ng-class="{'active':$index === 0}">
+                        <img class="d-block" ng-src="/storage/<%slide.image%>">
                     </div>
                 </div>
-
+                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
             </div>
         </div>
-        <div id="projects" style="display:block;margin-top:10px">
-            <div class="panel">
-                <div class="container">
-                    <div class="h3">
-                        {{trans("layout.TITLES.best")}}
-                        <span class="link active" ng-click="openCatalogue(0)">
-                            <span ng-if="filters[0].id == '!!'">
-                                {{trans("layout.MENU.all")}}
-                            </span>
-                            <span ng-if="filters[0].id != '!!'" name="genre_<%filters[0].id%>" ng-bind="filters[0].name"></span>
+        <div id="projects" class="pt-3 container-fluid bg-light">
+            <div class="container">
+                <h3 class="text-center">
+                    {{trans("layout.TITLES.best")}}
+                    <span class="btn-link text-danger"  data-toggle="modal" data-target="#recomFilterModal">
+                        <span ng-if="filters[0].id == '!!'">
+                            {{trans("layout.MENU.all")}}
                         </span>
-                    </div>
-                    <div ng-if="(recommendations| filter:{genre_id:filters[0].id}).length == 0">
-                        @include('templates.empty')
-                    </div>
-                    <br/>
-                    <div class="row">
-                        <div ng-repeat="p in recommendations| filter:{genre_id:filters[0].id} |limitTo:3"
-                             class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            @include('templates.project')
-                        </div>
-                    </div>
-                    <br/>
-                    <div class="h3">
-                        {{trans("layout.TITLES.latest")}}
-                        <span class="link active" ng-click="openCatalogue(1)">
-                            <span ng-if="filters[1].id == '!!'">
-                                 {{trans("layout.MENU.all")}}
-                            </span>
-                            <span name="genre_<%filters[1].id%>"  ng-if="filters[1].id != '!!'" ng-bind="filters[1].name"></span>
-                        </span>
-                    </div>
-                    <div ng-if="(latest| filter:{genre_id:filters[1].id}).length == 0">
-                        @include('templates.empty')
-                    </div>
-                    <br/>
-                    <div class="row" id="last_projects">
-                        <div ng-repeat= "p in latest| filter:{genre_id:filters[1].id} | orderBy:'updated_at' : true |limitTo:3"
-                             class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <span ng-if="filters[0].id != '!!'" name="genre_<%filters[0].id%>" ng-bind="filters[0].name"></span>
+                    </span>
+                </h3>
+                <div ng-if="(recommendations| filter:{genre_id:filters[0].id}).length == 0">
+                    @include('templates.empty')
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="p in recommendations| filter:{genre_id:filters[0].id} | limitTo:3" >
+                        <div class="card">
                             @include('templates.project')
                         </div>
                     </div>
                 </div>
-                <div class="row" style="text-align: center">
-                    <a class="btn btn-default" href="/discover">
+                <hr/>
+                <h3 class="text-center">
+                    {{trans("layout.TITLES.latest")}}
+                    <span class="btn-link text-danger" data-toggle="modal" data-target="#latestFilterModal">
+                        <span ng-if="filters[1].id == '!!'">
+                             {{trans("layout.MENU.all")}}
+                        </span>
+                        <span name="genre_<%filters[1].id%>"  ng-if="filters[1].id != '!!'" ng-bind="filters[1].name"></span>
+                    </span>
+                </h3>
+                <div ng-if="(latest| filter:{genre_id:filters[1].id}).length == 0">
+                    @include('templates.empty')
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 col-xs-12"  ng-repeat="p in (latest| filter:{genre_id:filters[1].id} | orderBy:'updated_at' : true | limitTo:3)">
+                        <div class="card">
+                            @include('templates.project')
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="text-center p-3">
+                    <a class="btn btn-outline-primary" href="/discover">
                         {{trans("layout.HOME.all")}}
                     </a>
                 </div>
             </div>
+
         </div>
         <div style="width: 100%;height: 100%">
             <img src="/images/footer.png" style="width: 100%;height: 100%">

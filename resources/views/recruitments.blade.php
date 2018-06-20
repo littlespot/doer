@@ -5,13 +5,14 @@
             position: relative;
         }
         .recruit-block .overlay{
-            display: none;
-            position: absolute;
-            top: 0;
-            left:0;
+            display: block;
+            background: #333;
+            color:#fff;
+            width: 100%;
+            height: 100%;
         }
         .recruit-block:hover .overlay{
-            display: block;
+
         }
 
         .apply-form{

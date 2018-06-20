@@ -137,7 +137,7 @@ return [
         "member_name"=> "Them member's real name or pseudonym.",
         "member_site"=> "Optional. Team member's blog, personal web, sns page, etc",
         "recruitment_role" => "Choose an position to post",
-        "recruitment_description" =>"Your request and reward for this position (15 to 400 characters)",
+        "recruitment_description" =>"Your request and reward for this position (under 400 characters)",
         "budget"=>"Find a reason to spend",
         "tags"=>"Input tags of question, splitting by comma",
         "question_subject"=>"A fine terse subject",

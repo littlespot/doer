@@ -104,11 +104,11 @@
                     <a href="/project/{{$project_id}}" target="_blank">{{$project_title}}</a>
                 </h5>
                 <div>
-                    <img class="img-responsive" src="/context/projects/{{$project_id}}.thumb.jpg" />
+                    <img class="img-fluid" src="/storage/projects/{{$project_id}}.thumb.jpg" />
                 </div>
                 <div class="blockquote-reverse margin-top-sm">
                     <a class="inner" href="/profile/{{$planner_id}}">
-                        <img class="img-circle img-responsive" src="/context/avatars/{{$planner_id}}.small.jpg" />
+                        <img class="img-circle img-fluid" src="/storage/avatars/{{$planner_id}}.small.jpg" />
                     </a>
                     <a id="user" class="inner" href="/profile/{{$planner_id}}">
                         {{$planner_name}}

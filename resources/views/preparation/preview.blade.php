@@ -2,52 +2,60 @@
 
 @section('content')
 
-<link rel="stylesheet" href="/css/project.css" />
-<link rel="stylesheet" href="/css/project-detail.css" />
-<link rel="stylesheet" href="/css/message.css" />
-<style>
-    .tab-menu-item{
-        width: 160px;
-    }
-</style>
+<link rel="stylesheet" href="/css/tag.css" />
+<div id="project-status" class="mt-5 pt-5 fixed-right btn-group-vertical">
+    <div class='btn text-primary d-flex flex-column border border-secondary'
+         disabled data-toggle="tooltip" title="{{trans('layout.TIP.views')}}">
+        <div class="fa fa-eye"></div>
+        <div></div>
+    </div>
+    <div class='btn btn-outline-success d-flex flex-column border-secondary' disabled data-toggle="tooltip" title="{{trans('layout.TIP.followers')}}">
+        <div class='fa fa-bookmark-o'></div>
+        <div></div>
+    </div>
+    <div id="lovers_cnt" class='btn btn-outline-danger d-flex flex-column border-secondary' disabled data-toggle="tooltip" >
+        <div class='fa fa-heart-o'></div>
+        <div></div>
+    </div>
+</div>
 <div class="container" ng-init="loaded()">
-    <div class="affix fixed-top fixed-right padding-top-md">
-        <div class='btn btn-text-info btn-sq-sm flex-vertical'>
-            <div class='fa fa-bullseye fa-2x'></div>
-        </div>
-        <div class='btn btn-text-success btn-sq-sm flex-vertical' disabled>
-            <div class='fa fa-bookmark-o fa-2x'></div>
-        </div>
-        <div id="lovers_cnt" class='btn btn-text-danger btn-sq-sm flex-vertical' disabled>
-            <div class='fa fa-heart-o fa-2x'></div>
-        </div>
-    </div>
     @include('templates.synopsis')
-    <div class="tab-menu-bar">
-        <div class="tab-menu-item active">
-           {{trans('layout.LABELS.information')}}
-        </div>
-        <div class="tab-menu-item disabled">
-            <span class="text-muted"> {{trans('project.CREATION.team')}}</span>
-        </div>
-        <div class="tab-menu-item disabled">
-            <span class="text-muted"> {{trans('project.LABELS.events')}}</span>
-        </div>
-        <div class="tab-menu-item disabled">
-            <span class="text-muted"> {{trans('layout.LABELS.comments')}}</span>
-        </div>
-        <!--
-        <div class="tab-menu-item true">
-            <span class="text-muted"> {{trans('layout.LABELS.questions')}}</span>
-        </div>
-        -->
-        <div class="tab-menu-share">
-
-        </div>
-    </div>
-    <div style="position: relative">
-        <div class="row content">
-            <div class="col-xs-7">
+    <ul class="row nav nav-pills nav-fill">
+        <li class="nav-item border">
+            <a class="nav-link"  ng-class="{'active':selectedTab == 0}"
+               id="pills-info-tab" data-index="0"
+               data-toggle="pill" href="#pills-info"
+               role="tab" aria-controls="pills-info"
+               aria-selected="true">{{trans('layout.LABELS.information')}}</a>
+        </li>
+        <li class="nav-item border">
+            <a class="nav-link"  ng-class="{'active':selectedTab == 1}"
+               id="pills-team-tab" data-index="1"
+               data-toggle="pill" href="#pills-team"
+               role="tab" aria-controls="pills-team"
+               aria-selected="true">
+                {{trans('project.CREATION.team')}}
+            </a>
+        </li>
+        <li class="nav-item border">
+            <a class="nav-link"  ng-class="{'active':selectedTab == 2}"
+               id="pills-event-tab" data-index="2"
+               data-toggle="pill" href="#pills-event"
+               role="tab" aria-controls="pills-event"
+               aria-selected="true">
+                {{trans('project.LABELS.events')}}
+            </a>
+        </li>
+        <li class="nav-item border">
+            <a class="nav-link disabled" >{{trans('layout.LABELS.comments')}}</a>
+        </li>
+        <li class="nav-item border">
+            <a class="nav-link disabled" ><span class="fa fa-share-alt"></span></a>
+        </li>
+    </ul>
+    <div class="my-5">
+        <div class="row">
+            <div class="col-9">
                 @if(sizeof($project->scripts) > 0)
                     <div class="table-responsive">
                         <h4>{{trans("project.LABELS.script")}}</h4>
@@ -130,23 +138,14 @@
                     {!! $project->description !!}
                 </div>
             </div>
-            <div class="col-xs-offset-1 col-xs-4">
+            <div class="col-3">
                 @if(sizeof($project->recruit)>0)
                     @include('templates.recruitments')
                 @endif
-                <div class="pubs">
-                    <?php
-                    $handle = opendir(public_path('/context/pubs'));
-                    while (false !== ($file = readdir($handle))) {
-                        list($filesname,$kzm)=explode(".",$file);
-                        if(strcasecmp($kzm,"gif")==0 or strcasecmp($kzm, "jpg")==0 or strcasecmp($kzm, "png")==0)
-                        {
-                            if (!is_dir('./'.$file)) {
-                                echo "<div><img src=\"/context/pubs/$file\"></div>";
-                            }
-                        }
-                    }
-                    ?>
+                <div class="pt-3">
+                    @foreach(Storage::disk('public')->files('pubs') as $file)
+                        <div><img src="/storage/{{$file}}" class="img-fluid"></div>
+                    @endforeach
                 </div>
             </div>
         </div>

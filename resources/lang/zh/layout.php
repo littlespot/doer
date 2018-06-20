@@ -7,7 +7,10 @@
  */
 
 return [
-    "SLOGAN"=>"梦想开始的地方",
+    "SLOGANS"=> [
+        "home" => "梦想开始的地方",
+        "welcome" => "一站报投全球电影节"
+    ],
     "TITLES"=>[
         "best"=>"最佳",
         "latest"=>"最近",
@@ -15,18 +18,38 @@ return [
         "videos"=>"VIDEOS"
     ],
     'ALERTS' =>[
-        'compulsive' => '带 (<span class="text-important">*</span>) 号的为必填栏。',
+        'compulsive' => '带 (<span class="text-danger">*</span>) 号的为必填栏。',
+        'checkToSelect' => '选择好后点击旁边的 确认 才能添加',
+        'plusToSelect' => '选择好后点击旁边的 加号 才能添加',
+        'plusToInput' => '填写好后点击旁边的 加号 才能添加',
+    ],
+    'LANGS' =>[
+        'ZH' => '中',
+        'EN' => '英',
+        'FR' => '法'
     ],
     "MENU"=>[
         "discover"=>"发现",
         "creation"=>"创建",
         "videos"=>"视频",
+        'projects'=>'项目',
+        'project_list' =>'浏览项目',
+        'my_projects' => '我的项目',
+        'favorites' => '我关注的',
+        'project_favorite' => '我关注的项目',
+        'project_creation' => '创建项目',
+        'festivals' => "电影节",
+        'festival_list' =>'浏览电影节',
+        'festival_inscription' => '我的报名表',
+        'festival_favorite' => '我关注的电影节',
+        'films' => '我的作品',
+        'film_creation' => '创建作品',
         "person"=>"帐户管理",
         "profile"=>"个人主页",
-        "preparations"=>"未提交项目",
+        "preparations"=>"未上线的项目",
         "untitled"=>"未命名",
         "signout"=>"登出账户",
-        "search"=>"搜寻项目标题或创建者",
+        "search"=>"项目标题或创建者",
         "all" => "全部",
         "see" => "浏览",
         "order" => "排序方式",
@@ -40,7 +63,20 @@ return [
         "complete" => "完成",
         "cancel" => "放弃",
         "save_return" => "保存并返回项目主页",
-        "submit" =>"确认"
+        "submit" =>"确认",
+        "edit" => "编辑",
+        'delete' => '删除',
+        "modify" => "修改",
+        "previous" => '上一步',
+        'back' => '返回',
+        'next' => '下一步',
+        'browse' => '选择文件',
+        'upload' => '点击上传',
+        'festivals' => '浏览全球电影节',
+        'welcome' => '返回欢迎页',
+        'discover_projects' => '发现新项目',
+        'discover_festivals' => '报名电影节',
+        'delete_all' => '全部删除'
     ],
     "LABELS"=>[
         "relations" => "所有关系",
@@ -52,6 +88,10 @@ return [
         "preparations" => "未上线的",
         "invite" => "邀请",
         "me" => "我",
+        "s" => '伊',
+        "m" => '他',
+        "f" => '她',
+        "o" => '伊',
         'zh' => "中文",
         'en' => "英文",
         'yes' => '是',
@@ -60,6 +100,10 @@ return [
         'without' => '无',
         'year' => '年',
         'month' => '月',
+        'day' => '日',
+        'others' => '其他',
+        'zero' => '零',
+        'you' => '您'
     ],
   "HOME"=>[
         "traveler" => "游客只能使用<b>体验版</b>!<br>您必须注册成为用户才能正常使用ZOOMOV",
@@ -123,7 +167,7 @@ return [
         "number"=>"序列号",
         "reduce"=>"减少缩进",
         "indent"=>"增加缩进",
-        "Left"=>"向左对齐",
+        "left"=>"向左对齐",
         "center"=>"剧中对齐",
         "right"=>"向右对齐",
         "justify"=>"两边对齐",
@@ -141,7 +185,7 @@ return [
     "FOOTER"=>[
         "zoomov"=>"ZOOMOV是什么？",
         "home"=>"主页",
-        "discover"=>"发现",
+        "discover"=>"发现项目",
         "create"=>"创建",
         "profile"=>"人个页面",
         "search"=>"搜索",
@@ -161,7 +205,7 @@ return [
         "join"=>"加入我们",
         "verification"=>"商业认证",
         "activities"=>"活动",
-        "festival"=>"节日",
+        "festival"=>"投报电影节",
         "languages"=>"语言",
         "newsletter"=>"收取新闻",
         "weibo"=>"微博",
