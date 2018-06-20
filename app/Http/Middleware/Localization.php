@@ -20,25 +20,19 @@ class Localization
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::check()){
-            App::setLocale(Auth::user()->locale);
-        }
-        else{
-            $locale = session('locale');
+        $locale = session('locale');
 
-            if(is_null($locale)){
-                $locale = substr($request->server('HTTP_ACCEPT_LANGUAGE'), 0, 2);
+        if(is_null($locale)){
+            $locale = substr($request->server('HTTP_ACCEPT_LANGUAGE'), 0, 2);
 
-                if ($locale != 'zh' && $locale != 'en') {
-                    $locale = config('app.fallback_locale');
-                }
-
-                session(['locale'=>$locale]);
+            if ($locale != 'zh' && $locale != 'en') {
+                $locale = config('app.fallback_locale');
             }
 
-            App::setLocale($locale);
+            session(['locale'=>$locale]);
         }
 
+        App::setLocale($locale);
         return $next($request);
     }
 }

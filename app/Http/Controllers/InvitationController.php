@@ -33,7 +33,7 @@ class InvitationController extends Controller
             ->join('users', $user, '=', 'users.id')
             ->join('projects', 'project_id', '=', 'projects.id')
             ->leftJoin('occupations', 'occupation_id', '=', 'occupations.id')
-            ->selectRaw('invitations.id, project_id, projects.title, quit, occupation_id, occupations.name_'.Auth::user()->locale.' as name, '.$user
+            ->selectRaw('invitations.id, project_id, projects.title, quit, occupation_id, occupations.name_'.app()->getLocale().' as name, '.$user
                 .' as user_id, username, accepted, checked, invitations.created_at')
             ->orderBy('invitations.created_at', 'desc')
             ->paginate(20);
@@ -62,7 +62,7 @@ class InvitationController extends Controller
 
     public function update($id, Request $request){
         $invitation = Invitation::find($id);
-        if($invitation->receiver_id != Auth::id() || !is_null($invitation->accepted)) {
+        if($invitation->receiver_id != auth()->id() || !is_null($invitation->accepted)) {
             return Response('NOT ALLOWED', 200);
         }
         try{
@@ -74,7 +74,7 @@ class InvitationController extends Controller
                     if (is_null($team)) {
                         $team = ProjectTeam::create([
                             "project_id" => $invitation->project_id,
-                            "user_id" => Auth::id(),
+                            "user_id" => auth()->id(),
                             "id" => $this->uuid('t')
                         ]);
                     }
@@ -160,7 +160,10 @@ class InvitationController extends Controller
             }
         }
         else{
-            $this->invite($request->project_id, $request->message, $request->receiver_id, $request->occupation_id, 0);
+            $result = $this->invite($request->project_id, $request->message, $request->receiver_id, $request->occupation_id, 0);
+            if($result){
+                return $result->id;
+            }
         }
     }
 
@@ -229,7 +232,7 @@ class InvitationController extends Controller
             "project_id" => $project_id,
             "message" => $message,
             "receiver_id" => $receiver_id,
-            "sender_id" => Auth::id(),
+            "sender_id" => auth()->id(),
             "quit" => $quit,
             "occupation_id" => $occupation_id
         ]);
@@ -245,5 +248,7 @@ class InvitationController extends Controller
             "user_id" => $invitation->sender_id,
             "placeholder_id" => config('constants.messageplaceholder.outbox')
         ]);
+
+        return $invitation;
     }
 }

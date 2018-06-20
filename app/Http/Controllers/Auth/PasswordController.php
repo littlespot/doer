@@ -47,13 +47,13 @@ class PasswordController extends Controller
         $user = User::where("password", $key)->first();
 
         if (is_null($user)) {
-            return View('auth.activation', ['message' => Lang::get('auth.unactivated'), 'title'=>trans('auth.failed'), 'email'=>'contact@zoomov.com']);
+            return View('auth.activation', ['message' => trans('auth.unactivated'), 'title'=>trans('auth.failed'), 'email'=>'contact@zoomov.com', 'user'=>null]);
         }
 
         Session::set('locale', $user->locale);
 
         if (strtotime('-30 day', time()) > strtotime($user->updated_at)) {
-            return View('auth.activation', ['message' => Lang::get('auth.late'), 'title'=>trans('auth.failed'), 'email'=>'contact@zoomov.com']);
+            return View('auth.activation', ['message' => trans('auth.late'), 'title'=>trans('auth.failed'), 'email'=>'contact@zoomov.com', 'user'=>$user]);
         }
 
         return view('auth.passwords.reset', ['token'=>$request->session()->token(), 'user'=>$user->id, 'username'=>$user->name]);
@@ -61,7 +61,7 @@ class PasswordController extends Controller
 
     public function getReset(Request $request)
     {
-        return view('auth.passwords.reset', ['token'=>$request->session()->token()]);
+        return view('auth.passwords.reset', ['token'=>$request->session()->token(), 'user'=>null]);
     }
 
     public function firstReset(Request $request){
@@ -70,22 +70,12 @@ class PasswordController extends Controller
 
         $user->password = bcrypt($request->password);
 
-        if($user->professional){
-            $user->active = 1;
-            $user->save();
+        $user->active = 0;
+        $user->save();
 
-            Auth::guard($this->getGuard())->login($user);
+        Auth::guard($this->getGuard())->login($user);
 
-            return redirect('/');
-        }
-        else{
-            $user->active = 0;
-            $user->save();
-
-            Auth::guard($this->getGuard())->login($user);
-
-            return redirect('/personal');
-        }
+        return redirect('/personal');
     }
 
     protected function getResetValidationRules()

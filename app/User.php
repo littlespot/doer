@@ -2,6 +2,7 @@
 
 namespace Zoomov;
 use Auth;
+use DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zoomov\Helpers\CustomPassword;
@@ -17,8 +18,8 @@ class User extends Authenticatable
      */
     public $incrementing = false;
 
-    protected $fillable = ['id', 'username', 'email', 'password', 'presentation', 'city_id', 'address',
-        'locale', 'phone', 'mobile', 'created_at','username'];
+    protected $fillable = ['id', 'username', 'email', 'password', 'presentation', 'city_id', 'address', 'birthday', 'active','sex', 'preference',
+        'locale', 'phone', 'mobile', 'created_at', 'updated_at', 'username', 'usernamed_at'];
 
     protected $guarded = [
         'password', 'remember_token', 'email', 'usernamed_at', 'created_at', 'updated_at'
@@ -125,5 +126,21 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomPassword($token));
+    }
+
+    public function getContact()
+    {
+        $contact = DB::table('user_contacts')->where('user_id', $this->id)->first();
+        $this->contact = $contact;
+        return $contact;
+        //return $contact && !$contact->first_name && !$contact->last_name && !$contact->city_id && (!$contact->fix_number || !$contact->mobile_number) && !$contact->address;
+    }
+
+    public function getFilms($conditon=null, $order='updated_at', $direction='desc'){
+        $film = Film::where('user_id', $this->id);
+        if($conditon){
+            $film = $film->where($conditon);
+        }
+        return $film->orderBy($order,$direction)->get();
     }
 }

@@ -31,9 +31,9 @@ class Kernel extends HttpKernel
             \Zoomov\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
+             \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Zoomov\Http\Middleware\VerifyCsrfToken::class,
+            //\Zoomov\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Zoomov\Http\Middleware\Localization::class,
         ],
@@ -65,7 +65,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
         'traveler' => \Zoomov\Http\Middleware\Traveler::class,
-        'professional' => \Zoomov\Http\Middleware\Professional::class,
-        'admin' => \Zoomov\Http\Middleware\Administration::class,
+       // 'admin' => \Zoomov\Http\Middleware\Administration::class,
     ];
 }

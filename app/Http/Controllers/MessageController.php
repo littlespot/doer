@@ -12,9 +12,10 @@ use Zoomov\MessagePlaceholder;
 
 class MessageController extends Controller
 {
+
     public function index(Request $request)
     {
-        $id = Auth::id();
+        $id = auth()->id();
         $box = $request->input('box', 'in');
 
         if ($box == 'in') {
@@ -22,17 +23,17 @@ class MessageController extends Controller
                     ->groupBy('parent_id')
                     ->selectRaw('max(message_id) as message_id')
                     ->pluck('message_id');
-            return MessagePlaceholder::whereRaw("user_id='".$id."' and placeholder_id=".config('constants.messageplaceholder.inbox')." and parent_id is  null")
+            return MessagePlaceholder::where(["user_id" =>$id,"placeholder_id"=>config('constants.messageplaceholder.inbox'),"parent_id"=>null])
                 ->orWhereIn('message_id', $parents)
                 ->join('messages','message_id','messages.id')
                 ->join("users", "sender_id", "=", "users.id")
-                ->selectRaw("messages.id, parent_id, messages.subject, sender_id, username, messages.created_at, checked")
+                ->selectRaw("messages.id, parent_id, messages.subject, sender_id, username, messages.created_at, checked, replied")
                 ->orderBy('messages.created_at', 'desc')
                 ->paginate(20);
         }
         else {
             return Message::with('receivers')->
-                join(DB::raw("(select message_id from message_placeholders where user_id='".$id."' and placeholder_id = '".
+                join(DB::raw("(select message_id, parent_id from message_placeholders where user_id='".$id."' and placeholder_id = '".
                     config('constants.messageplaceholder.' . $box . 'box')."') pl"), function ($join) {
                     $join->on('pl.message_id', '=', 'messages.id');
                 })
@@ -46,32 +47,32 @@ class MessageController extends Controller
        $message = Message::select('body as letter')
             ->find($id);
 
-        if($request->input('checked', 0) == 0){
-            $place = MessagePlaceholder::where('message_id', $id)
-                ->where('placeholder_id', config('constants.messageplaceholder.inbox'))
-                ->where('user_id', Auth::id())
-                ->first();
+        $place = MessagePlaceholder::where('message_id', $id)
+            ->where('placeholder_id', config('constants.messageplaceholder.inbox'))
+            ->where('user_id', auth()->id())
+            ->first();
 
+        if($place && !$place->checked){
             $place->checked = 1;
             $place->save();
         }
 
         $parent = $request->input('parent', 0);
         if($parent > 0){
-           $replies = MessagePlaceholder::whereRaw("(parent_id =".$parent." or message_id=".$parent.") and user_id='".Auth::id()."' and message_id <>".$id)
+           $replies = MessagePlaceholder::whereRaw("(parent_id =".$parent." or message_id=".$parent.") and user_id='".auth()->id()."' and message_id <>".$id)
                ->join('messages', 'messages.id', '=', 'message_id')
                ->join('users', 'messages.sender_id', '=', 'users.id')
-               ->selectRaw("body, message_placeholders.created_at, sender_id = '".Auth::id()."' as sender, sender_id as user_id, username")
+               ->selectRaw("body, message_placeholders.created_at, sender_id = '".auth()->id()."' as sender, sender_id as user_id, username")
                ->orderBy('message_placeholders.created_at')
                ->get();
 
            return \Response::json(array("letter"=>$message->letter, "replies"=>$replies));
        }
        else{
-           $replies = MessagePlaceholder::whereRaw("parent_id =".$id." and user_id='".Auth::id()."' and message_id <>".$id)
+           $replies = MessagePlaceholder::whereRaw("parent_id =".$id." and user_id='".auth()->id()."' and message_id <>".$id)
                ->join('messages', 'messages.id', '=', 'message_id')
                ->join('users', 'messages.sender_id', '=', 'users.id')
-               ->selectRaw("body, message_placeholders.created_at, sender_id = '".Auth::id()."' as sender, sender_id as user_id, username")
+               ->selectRaw("body, message_placeholders.created_at, sender_id = '".auth()->id()."' as sender, sender_id as user_id, username")
                ->orderBy('message_placeholders.created_at')
                ->get();
 
@@ -107,32 +108,34 @@ class MessageController extends Controller
     {
         $validator = $this->validator($request->all());
 
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                $request, $validator
-            );
-        }
-
         $message = Message::create([
             "subject" => $request->subject,
-            "sender_id" => Auth::id(),
+            "sender_id" => auth()->id(),
             "body" => $request->body
         ]);
 
+        $parent_id = $request->input('parent_id', null);
         MessagePlaceholder::create([
-            "parent_id" => is_null($request->parent_id) ? null : $request->parent_id,
+            "parent_id" => $parent_id,
             "placeholder_id" => config('constants.messageplaceholder.inbox'),
             "user_id" => $request->receiver_id,
             "message_id" => $message->id,
         ]);
 
         MessagePlaceholder::create([
-            "parent_id" => is_null($request->parent_id) ? null : $request->parent_id,
+            "parent_id" => $parent_id,
             "placeholder_id" => config('constants.messageplaceholder.outbox'),
-            "user_id" =>  Auth::id(),
+            "user_id" =>  auth()->id(),
             "message_id" => $message->id,
             "checked" => 1
         ]);
+        if($parent_id){
+            MessagePlaceholder::where(['message_id'=>$parent_id, 'placeholder_id'=>config('constants.messageplaceholder.outbox')])
+                ->update(['replied'=>1]);
+
+            MessagePlaceholder::where(['message_id'=>$parent_id, 'placeholder_id'=>config('constants.messageplaceholder.inbox'), 'user_id'=>auth()->id()])
+                ->update(['replied'=>1]);
+        }
     }
 
     public function update($id, Request $request)
@@ -157,19 +160,34 @@ class MessageController extends Controller
 
     public function destroy($id, Request $request)
     {
-        $parent = $request->input('parent', 0);
-        if($parent > 0){
-            DB::table("message_placeholder")
-                ->whereRaw("(parent_id = ".$parent." or message_id =".$parent.") and user_id='".Auth::id()."'")->delete();
+        if($request->input('parent', 0)){
+            $message = MessagePlaceholder::where('message_id', $id)
+                ->where('user_id', auth()->id())
+                ->where('placeholder_id', config('constants.messageplaceholder.'.$request->input('box', 'in').'box'))
+                ->first();
+            if($message){
+                $message->update(['placeholder_id', config('constants.messageplaceholder.trash')]);
+                $parent = $message->parent_id;
+                while($parent){
+                    $message = MessagePlaceholder::where('message_id', $message->parent_id)
+                        ->where('user_id', auth()->id())
+                        ->first();
+                    if($message){
+                        DB::table("message_placeholders")->where('message_id', $message->parent_id)
+                            ->where('user_id', auth()->id())
+                            ->update(['placeholder_id' => config('constants.messageplaceholder.trash')]);
+                    }
+                }
+            }
         }
         else{
             MessagePlaceholder::where('message_id', $id)
-                ->where('user_id', Auth::User()->id)
+                ->where('user_id', auth()->id())
                 ->where('placeholder_id', config('constants.messageplaceholder.'.$request->input('box', 'in').'box'))
-                ->delete();
+                ->update(['placeholder_id' => config('constants.messageplaceholder.trash')]);
         }
 
-        return Response('OK', 200);
+        return $this->index($request);
     }
 
     protected function validator(array $data)

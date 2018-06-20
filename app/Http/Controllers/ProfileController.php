@@ -4,6 +4,7 @@ namespace Zoomov\Http\Controllers;
 use Auth;
 use Config;
 use DB;
+
 use Session;
 use Zoomov\Application;
 use Zoomov\ApplicationPlaceholder;
@@ -12,8 +13,6 @@ use Zoomov\Invitation;
 use Zoomov\InvitationPlaceholder;
 use Zoomov\MessagePlaceholder;
 use Zoomov\Notification;
-use Zoomov\ProjectFollower;
-use Zoomov\ProjectLover;
 use Zoomov\Reminder;
 use Zoomov\ReminderPlaceholder;
 use Zoomov\SnsUser;
@@ -21,15 +20,29 @@ use Zoomov\User;
 use Zoomov\Project;
 use Zoomov\Relation;
 use Zoomov\UserOccupation;
+use Illuminate\Http\Request;
 
 class ProfileController extends VisitController
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Project::where('user_id', Auth::id())
-            ->where('active', 1)
-            ->select('title', 'projects.id')
+        $user = auth()->user();
+        $fans = Relation::where('idol_id', $user->id)->get();
+        $idols = Relation::where('fan_id', $user->id)->get();
+        $friends = Relation::where('idol_id', $user->id)->where('love', 1)->count();
+        $city = City::join('departments', 'department_id', '=', 'departments.id')
+            ->join('countries', 'country_id', '=', 'countries.id')
+            ->select('cities.name_'.app()->getLocale().' as name', 'countries.name_'.app()->getLocale().' as country');
+
+        $occupations = UserOccupation::where('user_id', $user->id)
+            ->join('occupations', 'user_occupations.occupation_id', '=', 'occupations.id')
+            ->select('occupations.name_'.app()->getLocale().' as name')
             ->get();
+
+        $catalogues = trans('personal.PROJECTS');
+
+        return view('profile', ['user'=>$user,'admin'=>1,  'city'=>$city->find($user->city_id), 'fans_cnt'=>$fans->count(), 'friends_cnt'=>$friends,
+            'catalogues'=>$catalogues, 'idols_cnt'=>$idols->count(), 'relation'=>'Self', 'admin'=>true, 'occupations'=>$occupations, 'anchor'=>$request->input('anchor', 'creator')]);
     }
 
     public function messages(){
@@ -37,34 +50,33 @@ class ProfileController extends VisitController
         $outbox = config('constants.messageplaceholder.outbox');
 
         $app = Invitation::where('accepted', null)
-            ->join(DB::raw("(select invitation_id from invitation_placeholders where user_id = '".Auth::id()."'
+            ->join(DB::raw("(select invitation_id from invitation_placeholders where user_id = '".auth()->id()."'
                and placeholder_id=".$inbox.") place"), function ($join) {
                 $join->on('invitations.id', '=', 'place.invitation_id');
             })
             ->count();
 
         $rem = MessagePlaceholder::where('checked', 0)
-            ->where('user_id', Auth::id())
+            ->where('user_id', auth()->id())
             ->where('placeholder_id',config('constants.messageplaceholder.inbox'))
             ->count();
 
-        $counterApp = InvitationPlaceholder::where('user_id', Auth::id())
+        $counterApp = InvitationPlaceholder::where('user_id', auth()->id())
             ->whereRaw("placeholder_id in (".$inbox.",".$outbox.")")
             ->selectRaw('placeholder_id = '.$outbox.' as outbox, count(id) as cnt')
             ->groupBy("placeholder_id")
             ->orderBy('outbox')
             ->get();
 
-        $counterRem = MessagePlaceholder::where('user_id', Auth::id())
+        $counterRem = MessagePlaceholder::where('user_id', auth()->id())
             ->whereRaw("placeholder_id in (".$inbox.",".$outbox.")")
             ->selectRaw('placeholder_id = '.$outbox.' as outbox, count(id) as cnt')
             ->groupBy("placeholder_id")
             ->orderBy('outbox')
             ->get();
 
-        $roles = Project::whereRaw("active = 1 and user_id = '".Auth::id()."'")
-            ->selectRaw("id, title")
-            ->get();
+        $roles = Project::where(['active' => 1, 'user_id' =>auth()->id()])
+            ->get(['id', 'title']);
 
         return view('messages', ["invitations_cnt" => $app, "messages_cnt"=>$rem, "roles"=>$roles, "invitations"=>$counterApp, "messages"=>$counterRem]);
     }
@@ -73,43 +85,46 @@ class ProfileController extends VisitController
         $inbox = config('constants.messageplaceholder.inbox');
         $outbox = config('constants.messageplaceholder.outbox');
 
-        DB::table('notification_receivers')->where('notification_receivers.user_id', Auth::id())
+        DB::table('notification_receivers')->where('notification_receivers.user_id', auth()->id())
             ->where('checked', false)
             ->update(['checked'=>true]);
 
         $notifications = Notification::join('notification_receivers', 'notification_id', '=', 'notifications.id')
-            ->where('notification_receivers.user_id', Auth::id())
+            ->where('notification_receivers.user_id', auth()->id())
             ->select('notification_receivers.id','title','body','created_at', 'checked')
             ->orderBy('created_at','desc')
             ->get();
 
         $app = Application::where('accepted', null)
-            ->join(DB::raw("(select application_id from application_placeholders where user_id = '".Auth::id()."'
+            ->join(DB::raw("(select application_id from application_placeholders where user_id = '".auth()->id()."'
                and placeholder_id=".$inbox.") place"), function ($join) {
                 $join->on('applications.id', '=', 'place.application_id');
             })
             ->count();
 
-        $unchecked = ApplicationPlaceholder::where('checked', 0)
-            ->where('placeholder_id', $outbox)
-            ->where('user_id',  Auth::id())
+        $appNoAnswer = Application::where('accepted', null)
+            ->join(DB::raw("(select application_id from application_placeholders where user_id = '".auth()->id()."'
+               and placeholder_id=".$outbox.") place"), function ($join) {
+                $join->on('applications.id', '=', 'place.application_id');
+            })
             ->count();
 
-        $rem = ReminderPlaceholder::where('checked', 0)
-               ->where('user_id', Auth::id())
-                ->where('placeholder_id',config('constants.messageplaceholder.inbox'))->count();
+        $counterApp = ApplicationPlaceholder::where('user_id', auth()->id())
+            ->whereRaw("placeholder_id in (".$inbox.",".$outbox.")")
+            ->selectRaw('placeholder_id = '.$outbox.' as outbox, count(id) as cnt')
+            ->groupBy("placeholder_id")
+            ->orderBy('outbox')
+            ->get();
 
-        $unread = Reminder::where('sender_id', Auth::id())
-            ->whereRaw("exists (select 1 from reminder_placeholders where checked = 0 and placeholder_id = ".config('constants.messageplaceholder.inbox').
+        $reminderUnchecked = ReminderPlaceholder::where('checked', 0)
+            ->where('user_id', auth()->id())
+            ->where('placeholder_id',$inbox)
+            ->count();
+
+        $reminderUnread = Reminder::where('sender_id', auth()->id())
+            ->whereRaw("exists (select 1 from reminder_placeholders where checked = 0 and placeholder_id = ".$inbox.
                 " and reminder_id = reminders.id)")
             ->count();
-
-        $counterApp = ApplicationPlaceholder::where('user_id', Auth::id())
-                ->whereRaw("placeholder_id in (".$inbox.",".$outbox.")")
-                ->selectRaw('placeholder_id = '.$outbox.' as outbox, count(id) as cnt')
-                ->groupBy("placeholder_id")
-                ->orderBy('outbox')
-                ->get();
 
         $counterRem = ReminderPlaceholder::where('user_id', Auth::id())
             ->whereRaw("placeholder_id in (".$inbox.",".$outbox.")")
@@ -118,17 +133,18 @@ class ProfileController extends VisitController
             ->orderBy('outbox')
             ->get();
 
-        $roles = Project::whereRaw("active = 1 and exists (select 1 from project_teams where user_id = '".Auth::id()."' and project_teams.project_id = projects.id)")
-            ->selectRaw("id, title, user_id, user_id = '".Auth::id()."' as admin")
+        $roles = Project::whereRaw("active = 1 and exists (select 1 from project_teams where user_id = '".auth()->id()."' and project_teams.project_id = projects.id)")
+            ->selectRaw("id, title, user_id, user_id = '".auth()->id()."' as admin")
             ->get();
 
-        return view('notifications', ["notifications"=>$notifications,"applications_cnt" => $app, "reminders_cnt"=>$rem, "unchecked"=>$unchecked, "unread"=>$unread, "roles"=>$roles, "applications"=>$counterApp, "reminders"=>$counterRem]);
+        return view('notifications', ["notifications"=>$notifications,"applications_cnt" => $app, "appNoAnswer"=>$appNoAnswer,
+            "reminderUnchecked"=>$reminderUnchecked, "reminderUnread"=>$reminderUnread, "roles"=>$roles, "applications"=>$counterApp, "reminders"=>$counterRem]);
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
-        if($id == 'me') {
-            $id = Auth::id();
+        if($id == auth()->id()){
+            return $this->index($request);
         }
 
         $fans = Relation::where('idol_id', $id)->get();
@@ -136,27 +152,20 @@ class ProfileController extends VisitController
         $friends = Relation::where('idol_id', $id)->where('love', 1)->count();
         $city = City::join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
-            ->select('cities.name_'.Auth::user()->locale.' as name', 'countries.sortname');
+            ->select('cities.name_'.app()->getLocale().' as name', 'countries.name_'.app()->getLocale().' as country');
 
         $occupations = UserOccupation::where('user_id', $id)
             ->join('occupations', 'user_occupations.occupation_id', '=', 'occupations.id')
-            ->select('occupations.name_'.Auth::user()->locale.' as name')
+            ->select('occupations.name_'.app()->getLocale().' as name')
             ->get();
-
-        if(Auth::id() == $id){
-            $user = Auth::user();
-            $catalogues = trans('personal.PROJECTS');
-            return view('profile', ['user'=>$user,'admin'=>1,  'city'=>$city->find($user->city_id), 'fans_cnt'=>$fans->count(), 'friends_cnt'=>$friends,
-                'catalogues'=>$catalogues, 'idols_cnt'=>$idols->count(), 'relation'=>'Self', 'admin'=>true, 'occupations'=>$occupations]);
-        }
 
         $user = User::find($id);
 
         $relation = 'Stranger';
 
-        $myFan = $idols->where('idol_id', Auth::id())->first();
+        $myFan = $idols->where('idol_id', auth()->id())->first();
         if(is_null($myFan)){
-            $myIdol = $fans->where('fan_id', Auth::id())->first();
+            $myIdol = $fans->where('fan_id', auth()->id())->first();
 
             if(!is_null($myIdol)) {
                 if($myIdol->love){
@@ -173,7 +182,7 @@ class ProfileController extends VisitController
         $catalogues = ['creator'=>trans('personal.PROJECTS.creator'), 'participator'=>trans('personal.PROJECTS.participator')];
 
         return view('profile', ['user'=>$user, 'admin'=>0, 'city'=>$city->find($user->city_id), 'friends_cnt'=>$friends, 'fans_cnt'=>$fans->count(), 'idols_cnt'=>$idols->count(),
-            'catalogues'=>$catalogues, 'relation'=>$relation, 'admin'=>false, 'occupations'=>$occupations]);
+            'catalogues'=>$catalogues, 'relation'=>$relation, 'admin'=>false, 'occupations'=>$occupations, 'anchor'=>'creator']);
     }
 
     public function sns($id){
@@ -185,7 +194,7 @@ class ProfileController extends VisitController
 
     public function update($id)
     {
-        $user = Auth::user();
+        $user = aut()->user();
         $user->locale = $id;
         session('locale', $id);
         $user->save();
@@ -228,7 +237,7 @@ class ProfileController extends VisitController
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
             ->select('projects.id', 'title', 'synopsis', 'projects.active', 'genre_id','duration',
-                'genres.name_'.Auth::user()->locale.' as genre_name', 'projects.city_id', 'cities.name_'.Auth::user()->locale.' as city_name',
+                'genres.name_'.app()->getLocale().' as genre_name', 'projects.city_id', 'cities.name_'.app()->getLocale().' as city_name',
                 'cities.department_id', 'departments.country_id',
                 'countries.sortname as sortname',
                 'user_id', 'username', DB::raw('DATE_FORMAT(projects.updated_at, "%Y-%m-%d %h:%i:%s") as updated_at'), 'start_at', 'finish_at',
@@ -237,11 +246,9 @@ class ProfileController extends VisitController
             ->get();
     }
 
-
-
-    public function destroy($id){
+    public function removeNotification($id){
         DB::table('notification_receivers')->where('id', $id)
-            ->where('user_id', Auth::id())
+            ->where('user_id', auth()->id())
             ->delete();
     }
 }

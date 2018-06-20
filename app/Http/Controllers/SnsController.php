@@ -16,7 +16,7 @@ class SnsController extends Controller
             $join->on('sns.id', '=', 'sns_users.sns_id')
                 ->where('sns_users.user_id', '=', Auth::id());
             })
-            ->select('sns.id', 'sns.type', 'sns.url', 'sns.name'.(Auth::user()->locale == 'zh' ? '_zh' : '').' as name', 'sns_users.id as sns_id', 'sns_users.sns_name')
+            ->select('sns.id', 'sns.type', 'sns.url', 'sns.name'.(app()->getLocale() == 'zh' ? '_zh' : '').' as name', 'sns_users.id as sns_id', 'sns_users.sns_name')
             ->get()
             ->groupBy('type')
             ->toArray();
@@ -27,7 +27,7 @@ class SnsController extends Controller
                 $join->on('sns.id', '=', 'sns_users.sns_id')
                     ->where('sns_users.user_id', '=', $id);
             })
-            ->select('sns.id', 'sns.type', 'sns.url', 'sns.name'.(Auth::user()->locale == 'zh' ? '_zh' : '').' as name', 'sns_users.id as sns_id', 'sns_users.sns_name')
+            ->select('sns.id', 'sns.type', 'sns.url', 'sns.name'.(app()->getLocale() == 'zh' ? '_zh' : '').' as name', 'sns_users.id as sns_id', 'sns_users.sns_name')
             ->orderBy('sns.id')
             ->get();
     }
@@ -35,7 +35,7 @@ class SnsController extends Controller
     public function store(Request $request){
         $sns = new SnsUser;
         $sns->sns_id = $request->id;
-        $sns->user_id = Auth::id();
+        $sns->user_id = auth()->id();
         $sns->sns_name = $request->sns_name;
         $sns->created_at = gmdate("Y-m-d H:i:s", time());
         $sns->save();
@@ -47,7 +47,7 @@ class SnsController extends Controller
         if(is_null($sns)){
             $this->store($request);
         }
-        else if($sns->user_id == Auth::id() && $sns->sns_name != $request->sns_name){
+        else if($sns->user_id == auth()->id() && $sns->sns_name != $request->sns_name){
             $sns->sns_name = $request->sns_name;
             $sns->updated_at = gmdate("Y-m-d H:i:s", time());
             $sns->save();

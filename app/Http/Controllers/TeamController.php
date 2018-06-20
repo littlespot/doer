@@ -33,7 +33,7 @@ class TeamController extends EventRelatedController
         }
 
         return ProjectTeam::where('project_id', $id)
-            ->leftJoin(DB::raw("(select users.id, username, concat(cities.name_" . Auth::user()->locale . ", '(', sortname, ')') as location 
+            ->leftJoin(DB::raw("(select users.id, username, concat(cities.name_" . app()->getLocale() . ", '(', sortname, ')') as location 
                 from users inner join cities on city_id = cities.id inner join departments on department_id = departments.id inner join countries on country_id =countries.id) users"), function ($join) {
                 $join->on('project_teams.user_id', '=', 'users.id');
             })
@@ -109,8 +109,8 @@ class TeamController extends EventRelatedController
                 $user = Outsiderauthor::select('id', 'name')->find($team->outsider_id);
             }
 
-            $removedRoles = Occupation::whereIn('id', $toRemove)->selectRaw("concat('<deleted>', 'name_".Auth::user()->locale."', '</deleted>') as role")->pluck('role')->all();
-            $addedRoles = Occupation::whereIn('id', $toAdd)->selectRaw("concat('<added>', 'name_".Auth::user()->locale."', '</added>') as role")->pluck('role')->all();
+            $removedRoles = Occupation::whereIn('id', $toRemove)->selectRaw("concat('<deleted>', 'name_".app()->getLocale()."', '</deleted>') as role")->pluck('role')->all();
+            $addedRoles = Occupation::whereIn('id', $toAdd)->selectRaw("concat('<added>', 'name_".app()->getLocale()."', '</added>') as role")->pluck('role')->all();
 
             Event::create([
                 'project_id' => $team->project_id,
@@ -152,7 +152,7 @@ class TeamController extends EventRelatedController
                 'name' => $request->username,
                 'link' => $request->link,
                 'email' => $request->location,
-                'user_id' => Auth::id()
+                'user_id' => auth()->id()
             ]);
 
             $team = ProjectTeam::create([
@@ -252,7 +252,7 @@ class TeamController extends EventRelatedController
 
         $occupations = ProjectTeamOccupation::where('project_team_id', $team->id)
             ->join('occupations', 'occupations.id', '=', 'project_team_occupations.occupation_id')
-            ->pluck('occupations.name_'.Auth::user()->locale)
+            ->pluck('occupations.name_'.app()->getLocale())
             ->all();
 
         if(!is_null($project->active)){

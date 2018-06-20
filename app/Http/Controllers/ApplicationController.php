@@ -20,14 +20,14 @@ class ApplicationController extends Controller
         $user = $box == 'in' ? 'sender_id' : 'receiver_id';
 
         return Application::join(DB::raw("(select id, application_id, created_at, checked  from application_placeholders where user_id = '"
-            .Auth::User()->id."' and placeholder_id=".config('constants.messageplaceholder.'.$box.'box').") place"), function ($join) {
+            .auth()->id()."' and placeholder_id=".config('constants.messageplaceholder.'.$box.'box').") place"), function ($join) {
                 $join->on('applications.id', '=', 'place.application_id');
             })
             ->join('project_recruitments','project_recruitment_id','=','project_recruitments.id')
             ->join('projects', 'project_recruitments.project_id', '=', 'projects.id')
             ->join('occupations', 'project_recruitments.occupation_id', '=', 'occupations.id')
             ->join('users', $user, '=', 'users.id')
-            ->selectRaw('applications.id, projects.id as project_id, projects.title, occupations.name, place.id as place_id, place.checked, place.created_at, 
+            ->selectRaw('applications.id, projects.id as project_id, projects.title, occupations.name_'.app()->getLocale().' as name, place.id as place_id, place.checked, place.created_at, 
                 applications.'.$user.', accepted, username')
             ->orderBy('created_at','desc')
             ->paginate(20);
@@ -59,7 +59,7 @@ class ApplicationController extends Controller
     public function update($id, Request $request){
         try {
             $application = Application::find($id);
-            if(is_null($application) || $application->receiver_id != Auth::User()->id || !is_null($application->accepted)){
+            if(is_null($application) || $application->receiver_id != auth()->id() || !is_null($application->accepted)){
                 return null;
             }
 
@@ -113,7 +113,7 @@ class ApplicationController extends Controller
         try {
             $application = Application::create([
                 "motivation" => $request->motivation,
-                "sender_id" => Auth::User()->id,
+                "sender_id" => auth()->id(),
                 "receiver_id" => $request->receiver_id,
                 "project_recruitment_id" => $request->recruit_id
             ]);

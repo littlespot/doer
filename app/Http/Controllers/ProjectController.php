@@ -20,10 +20,10 @@ use Zoomov\Project;
 use Zoomov\ProjectLanguage;
 use Zoomov\ProjectLover;
 use Zoomov\ProjectTeam;
-use Zoomov\ProjectRecruitment;
+//use Zoomov\ProjectRecruitment;
 
 use Zoomov\ProjectView;
-use Zoomov\Question;
+//use Zoomov\Question;
 use Zoomov\Report;
 use Zoomov\ProjectFollower;
 use Zoomov\Script;
@@ -39,6 +39,7 @@ class ProjectController extends VisitController
      *
      * @return Response
      */
+
     public function index(Request $request)
     {
         $cities = City::whereExists(function ($query) {
@@ -49,11 +50,31 @@ class ProjectController extends VisitController
         })
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
-            ->select('cities.id', DB::raw('cities.name_'.Lang::locale().' as name'), 'countries.sortname')
-            ->orderByRaw('convert(cities.name_'.Lang::locale().' using gb2312)')
+            ->select('cities.id', DB::raw('cities.name_'.app()->getLocale().' as name'), 'countries.name_'.app()->getLocale().' as country')
+            ->orderByRaw('convert(cities.name_'.app()->getLocale().' using gb2312)')
             ->get();
 
-        $genres = Genre::where('film', '<', 2)->select('id', DB::raw('name_'.Lang::locale().' as name'), 'sequence as order')->orderBy('sequence')->get();
+        $genres = Genre::where('film', '<', 2)->select('id', DB::raw('name_'.app()->getLocale().' as name'), 'sequence as order')->orderBy('sequence')->get();
+
+        $filter = '{"genre":'.$request->input('genre', 0).', "city":'.$request->input('city', 0).', "person":'.$request->input('person', 0).'}';
+        return view('discover', ["locations"=>$cities, "genres"=>$genres, 'occupations'=>Occupation::all(), "filter"=>$filter]);
+    }
+
+    public function discover(Request $request)
+    {
+        $cities = City::whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('projects')
+                ->where('projects.active', '>', '0')
+                ->whereRaw('projects.city_id = cities.id');
+        })
+            ->join('departments', 'department_id', '=', 'departments.id')
+            ->join('countries', 'country_id', '=', 'countries.id')
+            ->select('cities.id', DB::raw('cities.name_'.app()->getLocale().' as name'), 'countries.name_'.app()->getLocale().' as country')
+            ->orderByRaw('convert(cities.name_'.app()->getLocale().' using gb2312)')
+            ->get();
+
+        $genres = Genre::where('film', '<', 2)->select('id', DB::raw('name_'.app()->getLocale().' as name'), 'sequence as order')->orderBy('sequence')->get();
 
         $filter = '{"genre":'.$request->input('genre', 0).', "city":'.$request->input('city', 0).', "person":'.$request->input('person', 0).'}';
         return view('discover', ["locations"=>$cities, "genres"=>$genres, 'occupations'=>Occupation::all(), "filter"=>$filter]);
@@ -93,9 +114,9 @@ class ProjectController extends VisitController
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
             ->with('scripts', 'budget', 'sponsor', 'lang', 'recruit')
-            ->selectRaw( "projects.id, title, synopsis, projects.genre_id, projects.user_id, projects.city_id, username, duration, countries.sortname,
-                        genres.name_". Auth::user()->locale ." as genre_name, cities.name_". Auth::user()->locale ." as city_name, projects.updated_at, start_at, finish_at, projects.active,
-                        projects.user_id = '".Auth::id()."' as admin, description, FLOOR((unix_timestamp(finish_at) - unix_timestamp(now()))/60/60/24) as daterest,
+            ->selectRaw( "projects.id, title, synopsis, projects.genre_id, projects.user_id, projects.city_id, username, duration, countries.name_".app()->getLocale()." as country,
+                        genres.name_". app()->getLocale() ." as genre_name, cities.name_". app()->getLocale() ." as city_name, projects.updated_at, start_at, finish_at, projects.active,
+                        projects.user_id = '".auth()->id()."' as admin, description, FLOOR((unix_timestamp(finish_at) - unix_timestamp(now()))/60/60/24) as daterest,
                         datediff(finish_at, projects.created_at) as datediff")
             ->find($id);
 
@@ -105,12 +126,12 @@ class ProjectController extends VisitController
             $views = ProjectView::where('project_id', $id)->get();
             $followers = ProjectFollower::where('project_id', $id)->select('user_id')->pluck('user_id')->toArray();
             $lovers = ProjectLover::where('project_id', $id)->select('user_id')->pluck('user_id')->toArray();
-            $questions_cnt = Question::where('project_id', $id)->count();
-            $comments_cnt = ProjectComment::where('project_id', $id)->count();
+            //$questions_cnt = Question::where('project_id', $id)->count();
+            $comments_cnt = ProjectComment::where('project_id', $id)->where('deleted', 0)->count();
 
-            $myFollower = $project->admin || in_array(Auth::id(), $followers);
+            $myFollower = $project->admin || in_array(auth()->id(), $followers);
 
-            $myLover = in_array(Auth::id(), $lovers);
+            $myLover = in_array(auth()->id(), $lovers);
 
             $views_cnt = $views->sum('count');
 
@@ -119,7 +140,7 @@ class ProjectController extends VisitController
                 if (is_null($view)) {
                     ProjectView::create([
                         "project_id" => $project->id,
-                        "user_id" => Auth::id()
+                        "user_id" => auth()->id()
                     ]);
                 } else {
                     $view->count += 1;
@@ -127,9 +148,9 @@ class ProjectController extends VisitController
                 }
             }
 
-            return view('visit.project', ['project' => $project, 'role'=> ProjectTeam::where('user_id', Auth::id())->where('project_id', $project->id)->exists(),
+            return view('visit.project', ['project' => $project, 'role'=> ProjectTeam::where('user_id', auth()->id())->where('project_id', $project->id)->exists(),
                 'tab' => $request->input('tab', 0), 'myfollow' => $myFollower, 'mylove' => $myLover, 'views_cnt' => $views_cnt,
-                'followers_cnt' => count($followers), 'lovers_cnt' => count($lovers), 'genres_cnt' => $genres_cnt, 'questions_cnt' => $questions_cnt, 'comments_cnt' => $comments_cnt]);
+                'followers_cnt' => count($followers), 'lovers_cnt' => count($lovers), 'genres_cnt' => $genres_cnt, 'comments_cnt' => $comments_cnt]);
         }
         else if(!$project->admin && !$project->role){
             return view('errors.501');
@@ -137,93 +158,6 @@ class ProjectController extends VisitController
         else{
             return view('visit.project', ['project' => $project, 'tab' => $request->input('tab', 0), 'myfollow' => true, 'mylove' => true, 'views_cnt' => 0,
                 'followers_cnt' => 0, 'lovers_cnt' => 0, 'genres_cnt' => $genres_cnt, 'questions_cnt' => 0, 'comments_cnt' => 0]);
-        }
-    }
-
-    public function edit($id, Request $request)
-    {
-        $project = null;
-        if($request->has('step')){
-            $step = $request->input('step');
-        }
-        else{
-            $project = Project::select('id', 'active', 'title', 'description', 'user_id')->find($id);
-
-            $this->validEdit($project);
-
-            if(strlen($project->description) < 200){
-                $step = 1;
-            }
-            else{
-                $step = 2;
-            }
-        }
-
-        switch ($step) {
-            case 0:
-                $project = Project::join('genres', 'projects.genre_id', '=', 'genres.id')
-                    ->join('cities', 'projects.city_id', '=', 'cities.id')
-                    ->join('departments', 'department_id', '=', 'departments.id')
-                    ->join('countries', 'country_id', '=', 'countries.id')
-                    ->selectRaw("projects.id, title, synopsis, duration, projects.user_id, countries.name_" . Lang::locale() . " as country,
-                        departments.name_" . Lang::locale() . " as department, date(finish_at) as finish_at, 
-                        projects.active, genres.name_" . Lang::locale() . " as genre_name, user_id,
-                        cities.name_" . Lang::locale() . " as city, char_length(description) as count")
-                    ->find($id);
-
-                $this->validEdit($project);
-                $languages = Language::leftJoin(DB::raw("(select 1 as chosen, language_id from project_languages where project_id='".$id."') pl"), function ($join) {
-                        $join->on('language_id', '=', 'languages.id');
-                    })
-                    ->selectRaw("languages.id, pl.language_id, name_" . Lang::locale() . " as name, rank, IFNULL(chosen, 0) as chosen")
-                    ->orderBy('rank')
-                    ->get();
-
-                return view('project.basic', ["project" => $project, "step"=>$step,
-                    "langs" => $languages->where('chosen', 1)->values(),
-                    "languages" => $languages]);
-            case 1:
-                if(is_null($project)){
-                    $project = Project::select('id', 'active',  'title', 'description', 'user_id')->find($id);
-                }
-                $this->validEdit($project);
-                return view('project.description', ["step"=>$step, "project" => $project]);
-            case 2:
-                return $this->container($id, $project);
-            case 3:
-                if(is_null($project)){
-                    $project = Project::select('id', 'active',  'title', 'user_id')->find($id);
-                }
-
-                $this->validEdit($project);
-
-                $authors = Outsiderauthor::where('user_id', Auth::id())
-                    ->selectRaw("outsiderauthors.id, outsiderauthors.name as username, email as location, outsiderauthors.link, 1 as outsider")
-                    ->orderBy('username')
-                    ->get();
-
-                $occupations = Occupation::where('name', '<>', 'Planner')
-                    ->selectRaw("id, name_".Lang::locale()." as name")
-                    ->get();
-                return view('project.team', ["step"=>$step, "users"=>$authors, "occupations"=>$occupations, "project" => $project]);
-
-            case 4:
-                if(is_null($project)){
-                    $project = Project::select('id', 'active',  'title', 'user_id')->find($id);
-                }
-                $this->validEdit($project);
-                $occupations = Occupation::where('name', '<>', 'Planner')
-                    ->selectRaw("id, name_".Lang::locale()." as name")
-                    ->orderBy('name')
-                    ->get();
-                $recruitment = ProjectRecruitment::where('project_id', $id)->join('occupations','occupation_id', '=', 'occupations.id')
-                    ->leftJoin(DB::raw("(select 1 as applied, project_recruitment_id from applications where sender_id = '".Auth::id()."' group by project_recruitment_id) application"),function ($join){
-                        $join->on('application.project_recruitment_id', '=', 'project_recruitments.id');
-                    })
-                    ->selectRaw("project_recruitments.id,project_recruitments.quantity,project_recruitments.description, occupation_id, 
-                        occupations.name_" . Lang::locale() . " as name, IFNULL(application.applied, 0) as application")
-                    ->get();
-                return view('project.recruitment', ["step"=>$step, "recruitment"=>$recruitment, "occupations"=>$occupations,"project" => $project]);
         }
     }
 
@@ -253,10 +187,10 @@ class ProjectController extends VisitController
             ->leftJoin(DB::raw("(select count(id) as cnt, report_id from report_lovers group by report_id) lovers"), function ($join) {
                 $join->on('lovers.report_id', '=', 'reports.id');
             })
-            ->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".Auth::id()."') mylove"), function ($join) {
+            ->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".auth()->id()."') mylove"), function ($join) {
                 $join->on('mylove.report_id', '=', 'reports.id');
             })
-            ->selectRaw("reports.id, reports.user_id, username, reports.title, reports.synopsis, reports.created_at, reports.user_id = '".Auth::id()."' as mine, 
+            ->selectRaw("reports.id, reports.user_id, username, reports.title, reports.synopsis, reports.created_at, reports.user_id = '".auth()->id()."' as mine, 
                 IFNULL(comments.cnt,0) as comments_cnt, IFNULL(lovers.cnt, 0) as lovers_cnt, IFNULL(mylove.id, 0) as mylove")
             ->where('project_id', $id);
 
@@ -268,8 +202,9 @@ class ProjectController extends VisitController
             ->paginate(12);
     }
 
+
     public function followers($id){
-        $user_id = Auth::id();
+        $user_id = auth()->id();
         $follower = ProjectFollower::where('project_id', $id)->where('user_id', $user_id)->first();
         try {
             if ($follower) {
@@ -289,7 +224,7 @@ class ProjectController extends VisitController
     }
 
     public function lovers($id){
-        $user_id = Auth::id();
+        $user_id = auth()->id();
         $lover = ProjectLover::where('project_id', $id)->where('user_id', $user_id)->first();
         try {
             if ($lover) {
@@ -388,14 +323,14 @@ class ProjectController extends VisitController
                 DB::table("project_languages")->where('project_id', $project->id)->delete();
             }
 
-            return $request->input('returnFlag', 0) ? redirect('/project/'.$project->id) : redirect('/admin/projects/'.$project->id.'?step=1');
+            return $request->input('returnFlag', 0) ? redirect('/project/'.$project->id) : redirect('/admin/preparations/'.$project->id.'?step=1');
         }
         else{
             $this->validate($request, ['editor'=>'required|min:200']);
 
             $project->description = $_POST['editor'];
             $project->save();
-            return redirect()->guest('/admin/projects/'.$project->id.'?step=2');
+            return redirect()->guest('/admin/preparations/'.$project->id.'?step=2');
         }
     }
 
@@ -424,46 +359,15 @@ class ProjectController extends VisitController
     }
 
     private function validEdit($project){
-        if ($project->user_id != Auth::id()) {
+        if ($project->user_id != auth()->id()) {
             throw new \Illuminate\Auth\Access\AuthorizationException(trans('messages.error'));
         }
 
-        if($project->active != 1){
+        if($project->active === 0){
             throw new \Illuminate\Auth\Access\AuthorizationException(trans('messages.error'));
         }
     }
 
-    private function supression($id){
-        DB::table('project_recruitments')->where('project_id', $id)->detlete();
-
-
-        DB::table('sponsors')->where('project_id', $id)->delete();
-
-        DB::table('budgets')->where('project_id', $id)->delete();
-
-        $team = Script::where('project_id', $id)->get();
-
-        foreach ($team as $member) {
-            DB::table('script_authors')->where('script_id', $member->id)->delete();
-            $member->delete();
-        }
-
-        DB::table('events')->where('project_id', $id)->delete();
-
-        $path = public_path() . '/context/projects/' . $id;
-
-        if (file_exists($path . '.jpg')) {
-            unlink($path . '.jpg');
-        }
-
-        if (file_exists($path . '.thumb.jpg')) {
-            unlink($path . '.thumb.jpg');
-        }
-
-        if (file_exists($path . '.small.jpg')) {
-            unlink($path . '.small.jpg');
-        }
-    }
 
     private function container($id, $project=null){
         if(is_null($project)){
@@ -471,16 +375,16 @@ class ProjectController extends VisitController
         }
 
         $this->validEdit($project);
-        $userid = Auth::id();
+        $userid = auth()->id();
 
       /*  $users = ProjectTeam::where('project_id', $id)
             ->join('users', 'project_teams.user_id', '=', 'users.id')
             ->selectRaw("users.id, username, email as location, concat('/profile/',users.id) as link, 0 as outsider");*/
 
-        $types  = BudgetType::select('id', 'name_'.Lang::locale().' as name')->get();
+        $types  = BudgetType::select('id', 'name_'.app()->getLocale().' as name')->get();
         $budgets = Budget::where('project_id', $id)
             ->join('budget_types', 'budget_type_id', '=', 'budget_types.id')
-            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.Lang::locale().' as name')
+            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.app()->getLocale().' as name')
             ->get();
 
         $sponsors = Sponsor::where('project_id', $id)
@@ -501,7 +405,7 @@ class ProjectController extends VisitController
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
             ->selectRaw("users.id, username, IFNULL(teams.love, 0) AS love, 
-                concat(cities.name_".Auth::user()->locale.", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider")
+                concat(cities.name_".app()->getLocale().", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider")
             ->orderBy('love', 'desc')
             ->orderByRaw('convert(username using gb2312)')
             ->get();
@@ -530,6 +434,6 @@ class ProjectController extends VisitController
             $projects = $projects->where('projects.city_id', $city);
         }
 
-        return $projects->orderBy('projects.'.$order)->paginate(9);
+        return $projects->where('finish_at', '>', now())->orderBy('projects.'.$order)->paginate(9);
     }
 }

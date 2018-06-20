@@ -4,8 +4,8 @@ namespace Zoomov;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FilmFestivalReward extends Model
+class FilmakerContact extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['film_festival_id', 'reward'];
+    protected $fillable = ['filmaker_id', 'contact_id'];
 }

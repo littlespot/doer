@@ -9,6 +9,6 @@ use Zoomov\Genre;
 class GenreController extends Controller
 {
     public function index(){
-        return Genre::where('film', '<', 2)->select('id', DB::raw('name_'.Auth::user()->locale.' as name'), 'sequence as order')->orderBy('sequence')->get();
+        return Genre::where('film', '<', 2)->select('id', DB::raw('name_'.app()->getLocale().' as name'), 'sequence as order')->orderBy('sequence')->get();
     }
 }

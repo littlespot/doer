@@ -14,6 +14,24 @@ class Controller extends BaseController
     protected $planner = 20;
     protected $writer = 9;
 
+    protected function checkChinese($string)
+    {
+        $result = -1;
+        for ($i = 0; $i < strlen($string); $i++){
+            $number=ord($string[$i]);
+            if($number>127)  {
+                $result = 1;
+
+            }
+            else if($result > 0){
+                $result = 0;
+
+            }
+        }
+
+        return $result;
+    }
+
     protected function uuid($prefix = '', $len=16, $salt = 'zoomov') {
 
         $hex = md5($salt. uniqid(mt_rand(), true));

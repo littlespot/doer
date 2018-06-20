@@ -4,7 +4,8 @@ namespace Zoomov\Http\Controllers\Auth;
 
 use Zoomov\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
-use Illuminate\Support\Facades\Cookie;
+use Illuminate\Http\Request;
+use Zoomov\User;
 
 class ForgotPasswordController extends Controller
 {
@@ -31,9 +32,10 @@ class ForgotPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    public function showLinkRequestForm()
+    public function showLinkRequestForm(Request $request)
     {
-        $user = Cookie::get('zoomover');
+        $this->validate($request, ['id'=>'required']);
+        $user = User::find($request['id']);
         return view('auth.passwords.email', ['email'=>is_null($user) ? null : $user->email]);
     }
 }

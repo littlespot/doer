@@ -18,7 +18,7 @@ class ReminderController extends Controller
         $box = config('constants.messageplaceholder.'.$param.'box');
 
         $reminders = Reminder::join(DB::raw("(select reminder_id, id, checked, created_at
-               from reminder_placeholders where user_id = '".Auth::User()->id."'
+               from reminder_placeholders where user_id = '".auth()->id()."'
                and placeholder_id=".$box.") place"), function ($join) {
             $join->on('reminders.id', '=', 'place.reminder_id');
         })
@@ -42,37 +42,23 @@ class ReminderController extends Controller
 
     public function show($id, Request $request)
     {
-        if($request->input('checked', 0) == 0){
-            $place = ReminderPlaceholder::where('reminder_id', $id)
-                ->where('placeholder_id', config('constants.messageplaceholder.inbox'))
-                ->where('user_id', Auth::id())
-                ->first();
+        ReminderPlaceholder::where(['reminder_id'=>$id, 'placeholder_id'=>config('constants.messageplaceholder.inbox'), 'user_id'=>auth()->id()])
+            ->update(['checked' => 1]);
 
-            $place->checked = 1;
-            $place->save();
+        $counter = ReminderPlaceholder::where('reminder_id', $id)
+            ->where(['reminder_id'=>$id, 'placeholder_id'=>config('constants.messageplaceholder.inbox'), 'checked'=>0])
+            ->exists();
 
-            $counter = ReminderPlaceholder::where('reminder_id', $id)
-                ->where('placeholder_id', config('constants.messageplaceholder.inbox'))
-                ->where('checked', 0)
-                ->exists();
-
-            if(!$counter){
-                $place = ReminderPlaceholder::where('reminder_id', $id)
-                    ->where('placeholder_id', config('constants.messageplaceholder.outbox'))
-                    ->first();
-
-                $place->checked = 1;
-                $place->save();
-            }
+        if(!$counter){
+            DB::table("reminder_placeholders")->where(['reminder_id'=>$id, 'placeholder_id'=>config('constants.messageplaceholder.outbox')])
+                ->update(['checked' => 1]);
         }
-
-        return Reminder::select('id','body as letter')->find($id);
     }
 
     public function update($id){
         $place = ReminderPlaceholder::find($id);
 
-        if($place->user_id != Auth::id() || $place->place_id != config('constants.messageplaceholder.inbox')){
+        if($place->user_id != auth()->id() || $place->place_id != config('constants.messageplaceholder.inbox')){
             return null;
         }
 
@@ -81,38 +67,33 @@ class ReminderController extends Controller
     }
 
     public function store(Request $request){
-        $validator = Validator::make($request->all(), [
+        $this->validate($request,[
             'subject' => 'required|min:4|max:40',
-            'body' => 'required|min:10|max:800',
-            'project_id' => 'required'
+            'project' => 'required'
         ]);
 
-        if ($validator->fails()) {
-            return new JsonResponse($validator->errors()->getMessages(), 422);
-        }
+        $team = ProjectTeam::where('project_id',  $request['project']['id'])->whereNotNull('user_id')->pluck('user_id')->toArray();
 
-        $team = ProjectTeam::where('project_id', $request->project_id)->select('user_id')->get();
-
-        if(is_null($team) || is_null($team->where('user_id', Auth::id())->first())){
-            return null;
+        if(is_null($team) || !in_array(auth()->id(), $team)){
+            return Response(trans('notification.ERRORS.require_authorization', ['title'=>$request['project']['title']]), 200);
         }
 
         if(sizeof($team) == 1){
-            return Response('No team to reminder', 200);
+            return Response(trans('notification.ERRORS.require_team',  ['title'=>$request['project']['title']]), 200);
         }
 
         $message = Reminder::create([
-            "project_id" => $request->project_id,
+            "project_id" => $request['project']['id'],
             "subject" => $request->subject,
-            "body" => $request->body,
-            "sender_id" => Auth::id()
+    /*        "body" => $request->body,*/
+            "sender_id" => auth()->id()
         ]);
 
         foreach ($team as $member){
             ReminderPlaceholder::create([
                 "reminder_id" => $message->id,
-                "placeholder_id" => config('constants.messageplaceholder.'.($member->user_id == Auth::id() ? 'out' :'in').'box'),
-                "user_id" => $member->user_id
+                "placeholder_id" => config('constants.messageplaceholder.'.($member == auth()->id() ? 'out' :'in').'box'),
+                "user_id" => $member
             ]);
         }
 
@@ -120,23 +101,26 @@ class ReminderController extends Controller
     }
 
     public function destroy($id){
-        $place = ReminderPlaceholder::find($id);
+        $place = ReminderPlaceholder::where(['reminder_id'=>$id, 'user_id'=>auth()->id()])->first();
 
-        if($place->user_id != Auth::id()){
-            return Response('NOT ALLOWED', 501);
-        }
-
-        if($place->place_id == config('constants.messageplaceholder.outbox')){
-            $reminder = Reminder::find($place->reminder_id);
-            if($reminder->sender_id == Auth::id()){
+        if($place){
+            $reminder = Reminder::find($id);
+            if($place->placeholder_id == config('constants.messageplaceholder.outbox') && $reminder->sender_id == auth()->id()){
                 $place->delete();
+                if(DB::table('reminder_placeholders')->where('reminder_id', $id)->exists()){
+                    DB::table('reminder_placeholders')->where(['reminder_id'=>$id, 'placeholder_id'=>config('constants.messageplaceholder.inbox')])
+                        ->update(['checked'=>2]);
+                }
+                else{
+                    $reminder->delete();
+                }
             }
-            else{
-                return Response('NOT ALLOWED', 501);
+            else if($place->placeholder_id == config('constants.messageplaceholder.inbox') && $place->checked){
+                $place->delete();
+                if(!DB::table('reminder_placeholders')->where('reminder_id',$id)->exists()){
+                    $reminder->delete();
+                }
             }
-        }
-        else{
-            $place->delete();
         }
     }
 }

@@ -17,8 +17,10 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::guard($guard)->check() && !Auth::user()->active) {
-            return redirect('personal');
+        if (Auth::guard($guard)->check()) {
+            if(!auth()->user()->active){
+                return redirect('/personal');
+            }
         }
 
         return $next($request);

@@ -18,6 +18,6 @@ class Budget extends Model
 
     public function getTypeAttribute()
     {
-        return BudgetType::where('id', $this->budget_type_id)->select('name_'.Auth::user()->locale.' as name')->first();
+        return BudgetType::where('id', $this->budget_type_id)->select('name_'.app()->getLocale().' as name')->first();
     }
 }

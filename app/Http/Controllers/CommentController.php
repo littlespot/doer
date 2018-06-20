@@ -21,11 +21,11 @@ class CommentController extends Controller
                 'parent.id', '=', 'project_comments.parent_id')
             ->leftJoin(DB::raw("(select count(id) as cnt, project_comment_id from project_comment_supports group by project_comment_id) supports"),
                 'supports.project_comment_id', '=', 'project_comments.id')
-            ->leftJoin(DB::raw("(select id as supported, project_comment_id from project_comment_supports where user_id ='". Auth::id()."') mysupport"),
+            ->leftJoin(DB::raw("(select id as supported, project_comment_id from project_comment_supports where user_id ='". auth()->id()."') mysupport"),
                 'mysupport.project_comment_id', '=', 'project_comments.id')
             ->selectRaw("project_comments.id, project_comments.user_id, users.username,  project_comments.message, project_comments.created_at, 
                 parent_id,  FLOOR((unix_timestamp(now()) - unix_timestamp(project_comments.created_at))/60/60/24) <1  as newest,   
-                (CASE WHEN project_comments.user_id = '".Auth::id()."' THEN 1 ELSE 0 END) as mine,
+                (CASE WHEN project_comments.user_id = '".auth()->id()."' THEN 1 ELSE 0 END) as mine,
                 IFNULL(supports.cnt, 0) as supports_cnt, IFNULL(mysupport.supported, 0) as supported")
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -63,7 +63,7 @@ class CommentController extends Controller
             $newMessage = ProjectComment::create([
                 "message" => $request->message,
                 "parent_id" => $request->parent_id,
-                "user_id" => Auth::id(),
+                "user_id" => auth()->id(),
                 "project_id" => $request->related_id
             ]);
             $newMessage->created_at = date('Y-m-d H:i', time());

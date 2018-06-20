@@ -14,7 +14,7 @@ class EventRelatedController extends Controller
     {
         $project = Project::select('id', 'user_id', 'title', 'active')->find($id);
 
-        if($project->user_id != Auth::id() || $project->active > 1){
+        if($project->user_id != auth()->id() || (!is_null($project->active) && $project->active > 1)){
             return null;
         }
 

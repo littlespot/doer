@@ -4,42 +4,72 @@ namespace Zoomov\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use Auth;
 use DB;
-use Lang;
+use Storage;
+use Zoomov\Festival;
 use Zoomov\Genre;
 use Zoomov\Project;
 use Zoomov\User;
 
 class HomeController extends VisitController
 {
+    public function show(){
+        return auth()->check() ? $this->display() : $this->welcome();
+    }
+
+    public function welcome(){
+        $festivals = Festival::get(['name_'.app()->getLocale().' as title', 'id'])->take(12);
+        $projects =  Project::where('projects.active', 1)
+            ->join('recommendations', 'recommendations.project_id', '=', 'projects.id')
+            ->join('users', 'users.id', '=', 'projects.user_id')
+            ->join('genres', 'genre_id', '=', 'genres.id')
+            ->join('cities', 'projects.city_id', '=', 'cities.id')
+            ->join('departments', 'department_id', '=', 'departments.id')
+            ->join('countries', 'country_id', '=', 'countries.id')
+            ->leftJoin(DB::raw("(select sum(count) as cnt, project_id from project_views group by project_id) view"), 'projects.id', '=', 'view.project_id')
+            ->leftJoin(DB::raw("(select count(id) as cnt, project_id from project_followers group by project_id) follower"), 'projects.id', '=', 'follower.project_id')
+            ->leftJoin(DB::raw("(select count(id) as cnt, project_id from project_lovers group by project_id) lovers"), 'projects.id', '=', 'lovers.project_id')
+            ->leftJoin(DB::raw("(select count(id) as cnt, project_id from (select id, project_id from project_comments where deleted = 0) comments group by project_id) comment"),
+                'projects.id', '=', 'comment.project_id')
+            ->selectRaw("projects.id, title, synopsis, projects.genre_id, genres.name_".app()->getLocale()." as genre_name, projects.user_id, projects.city_id, cities.name_".app()->getLocale()." as city_name, username, duration, 
+                countries.name_".app()->getLocale()." as country, IFNULL(view.cnt, 0) as views_cnt, IFNULL(follower.cnt, 0) as followers_cnt, 
+                IFNULL(comment.cnt, 0) as comments_cnt, IFNULL(lovers.cnt, 0) as lovers_cnt,  projects.updated_at, start_at, finish_at, projects.active,
+                FLOOR((unix_timestamp(finish_at) - unix_timestamp(now()))/60/60/24) as daterest,
+                datediff(projects.finish_at, projects.created_at) as datediff")
+            ->orderBy('views_cnt', 'desc')
+            ->orderBy('projects.updated_at', 'desc')
+            ->get();
+        return view('welcome', ['festivals'=>$festivals, 'projects'=>$projects]);
+    }
+
     public function display(){
         $minRatio = 0;
+        $maxHeight = 0;
         $pictures = "";
-        $handle = opendir(public_path('/context/carousel'));
-        while (false !== ($file = readdir($handle))) {
-            list($filesname,$kzm)=explode(".",$file);
-            if(strcasecmp($kzm,"gif")==0 or strcasecmp($kzm, "jpg")==0 or strcasecmp($kzm, "png")==0)
-            {
-                if (!is_dir('./'.$file)) {
-                    list($width, $height) = getimagesize(public_path('/context/carousel/').$file);
-                    $ratio = round($height/$width,3);
-                    if($minRatio >  $ratio){
-                        $minRatio = $ratio;
-                    }
-                }
+        $files = Storage::disk('public')->files('/pub/home');
+        foreach ($files as $file){
+            if (!is_dir('./'.$file)) {
+                list($width, $height) = getimagesize(storage_path('app/public/').$file);
 
-                $pictures .= $file.',';
+                $ratio = round($height/$width,3);
+                if($height > $maxHeight){
+                    $maxHeight = $height;
+                }
+                if($minRatio >  $ratio){
+                    $minRatio = $ratio;
+                }
             }
+
+            $pictures .= $file.',';
         }
 
-        $counts = Project::where('user_id', Auth::id())
+        $counts = Project::where('user_id', auth()->id())
             ->groupBy('active')
             ->selectRaw('count(id) as cnt, IFNULL(active, -1) as active')
             ->orderBy('active')
             ->get();
 
-        return view('home', ["counts"=>$counts, "pictures" => $pictures, "ratio" => $minRatio, "categories" => Genre::select('id', 'name_'.Lang::locale().' as name')->get()]);
+        return view('home', ["counts"=>$counts, "pictures" => $pictures, 'height'=>$maxHeight, "ratio" => $minRatio, "categories" => Genre::select('id', 'name_'.app()->getLocale().' as name')->get()]);
     }
 
     public function index(){
@@ -55,8 +85,8 @@ class HomeController extends VisitController
             ->leftJoin(DB::raw("(select count(id) as cnt, project_id from project_lovers group by project_id) lovers"), 'projects.id', '=', 'lovers.project_id')
             ->leftJoin(DB::raw("(select count(id) as cnt, project_id from (select id, project_id from project_comments where deleted = 0) comments group by project_id) comment"),
                 'projects.id', '=', 'comment.project_id')
-            ->leftJoin(DB::raw("(select 1 as follow, project_id from project_followers where user_id = '".Auth::id()."' group by project_id) myfollow"), 'projects.id', '=', 'myfollow.project_id')
-            ->leftJoin(DB::raw("(select 1 as love, project_id from project_lovers where user_id = '".Auth::id()."' group by project_id) mylove"), 'projects.id', '=', 'mylove.project_id');
+            ->leftJoin(DB::raw("(select 1 as follow, project_id from project_followers where user_id = '".auth()->id()."' group by project_id) myfollow"), 'projects.id', '=', 'myfollow.project_id')
+            ->leftJoin(DB::raw("(select 1 as love, project_id from project_lovers where user_id = '".auth()->id()."' group by project_id) mylove"), 'projects.id', '=', 'mylove.project_id');
         $recommends = $this->selection($projects)
             ->orderBy('projects.updated_at')
             ->orderBy('views_cnt', 'desc')
@@ -68,12 +98,12 @@ class HomeController extends VisitController
                  LEFT JOIN (select count(id) as cnt, project_id from project_followers group by project_id) follower ON projects.id = follower.project_id 
                  LEFT JOIN (select count(id) as cnt, project_id from (select id, project_id from project_comments where deleted = 0) comments group by project_id) comment ON projects.id = comment.project_id 
                  LEFT JOIN (select count(id) as cnt, project_id from project_lovers  group by project_id) lovers ON projects.id = lovers.project_id 
-                 LEFT JOIN (select 1 as follow, project_id from project_followers where user_id = '".Auth::id()."' group by project_id) myfollow ON projects.id = myfollow.project_id 
-                 LEFT JOIN (select 1 as love, project_id from project_lovers where user_id = '".Auth::id()."' group by project_id) mylove ON projects.id = mylove.project_id";
+                 LEFT JOIN (select 1 as follow, project_id from project_followers where user_id = '".auth()->id()."' group by project_id) myfollow ON projects.id = myfollow.project_id 
+                 LEFT JOIN (select 1 as love, project_id from project_lovers where user_id = '".auth()->id()."' group by project_id) mylove ON projects.id = mylove.project_id";
         $query = "(SELECT id, genre_id, updated_at FROM projects p ORDER BY genre_id, updated_at desc) z";
         $query = " (SELECT @genre:= 0) s, (SELECT @rank:= 0) x,".$query;
         $query = " (SELECT id, @rank:=CASE WHEN @genre <> genre_id THEN 1 ELSE @rank + 1 END AS rn, @genre:=genre_id AS clset FROM".$query .") w ";
-        $rank = DB::select("SELECT ".$this->params.", genres.name_". Auth::user()->locale." as genre_name, cities.name_". Auth::user()->locale .
+        $rank = DB::select("SELECT ".$this->params.", genres.name_". app()->getLocale()." as genre_name, cities.name_". app()->getLocale() .
             " as city_name FROM projects inner join users on projects.user_id = users.id inner join genres on projects.genre_id = genres.id 
             inner join cities on projects.city_id = cities.id inner join departments on cities.department_id = departments.id 
             inner join countries on departments.country_id = countries.id ".$left." WHERE projects.active = 1 AND projects.id IN (SELECT id FROM".$query.

@@ -12,6 +12,8 @@ use Storage;
 use Zoomov\Budget;
 use Zoomov\BudgetType;
 use Zoomov\Country;
+use Zoomov\Department;
+use Zoomov\City;
 use Zoomov\Event;
 use Zoomov\Genre;
 use Zoomov\Guest;
@@ -31,15 +33,15 @@ use Zoomov\User;
 
 class PreparationController extends Controller
 {
-    public function create(Request $request)
+    public function index(Request $request)
     {
-        $countries = Country::select('id', 'sortname', 'name_' . Auth::user()->locale . ' as name')->orderByRaw('convert(name_' . Auth::user()->locale .' using gbk) ASC')->get();
+        $countries = Country::where('region', '<>', 1)->select('id', 'sortname', 'name_' . app()->getLocale(). ' as name')->orderBy('rank')->orderByRaw('convert(name_' . app()->getLocale() .' using gbk) ASC')->get();
 
-        $languages = Language::selectRaw("id, rank, name_" . Auth::user()->locale . " as name, false as chosen")
+        $languages = Language::selectRaw("id, rank, name_" . app()->getLocale() . " as name, false as chosen")
             ->orderBy('rank')
             ->get();
 
-        $genres = Genre::select('id', 'name_' . Auth::user()->locale . ' as name')->get();
+        $genres = Genre::select('id', 'name_' . app()->getLocale() . ' as name')->get();
 
         return view('user.creation', ["step" => 0, "countries" => $countries, "languages" => $languages, "genres" => $genres]);
     }
@@ -55,28 +57,28 @@ class PreparationController extends Controller
         }
     }
 
-    public function index(Request $request)
-    {
-        $countries = Country::select('id', 'sortname', 'name_'.Auth::user()->locale.' as name')->orderByRaw('convert(name_' . Auth::user()->locale .' using gbk) ASC')->get();
-
-        $languages = Language::selectRaw("id, name_".Auth::user()->locale." as name, false as chosen")->get();
-
-        $genres = Genre::select('id', 'name_'.Auth::user()->locale.' as name')->get();
-
-
-        return view('user.preparation', ["id"=>$request->input("id", $request->session()->get('viewed_preparation',0)), "countries"=>$countries, "languages"=>$languages, "genres"=>$genres]);
-    }
-
     public function show($id, Request $request)
     {
-        $project = null;
+        $project = Project::leftJoin('genres', 'genre_id', '=', 'genres.id')
+            ->leftJoin('cities', 'projects.city_id', '=', 'cities.id')
+            ->leftJoin('departments', 'department_id', '=', 'departments.id')
+            ->leftJoin('countries', 'country_id', '=', 'countries.id')
+            ->selectRaw('projects.id, title, synopsis, duration, active, user_id,  char_length(description) as count, genres.name_'.app()->getLocale().' as genre_name,
+                        genre_id, projects.city_id, cities.name_'.app()->getLocale().' as city_name, countries.name_'.app()->getLocale().' as country, cities.department_id, departments.country_id, finish_at,
+                        FLOOR((unix_timestamp(finish_at) - unix_timestamp(now()))/60/60/24) as daterest, datediff(finish_at, projects.created_at) as datediff,
+                        description')
+            ->with('lang')
+            ->find($id);
+
+        $this->validEdit($project);
+        if($project->active === 1){
+            $project->genres_cnt = Project::where(['genre_id'=>$project->genre_id, 'active'=>1])->count();
+        }
+
         if($request->has('step')){
             $step = $request->input('step', 0);
         }
         else{
-            $project = Project::select('id', 'active', 'title', 'description', 'user_id')->find($id);
-
-            $this->validEdit($project);
 
             if(strlen($project->description) < 200){
                 $step = 1;
@@ -86,33 +88,21 @@ class PreparationController extends Controller
             }
         }
 
+
         switch ($step) {
             case 0:
-                $project = Project::leftJoin('genres', 'genre_id', '=', 'genres.id')
-                    ->leftJoin('cities', 'projects.city_id', '=', 'cities.id')
-                    ->leftJoin('departments', 'department_id', '=', 'departments.id')
-                    ->leftJoin('countries', 'country_id', '=', 'countries.id')
-                    ->selectRaw('projects.id, title, synopsis, duration, active, user_id,  char_length(description) as count,
-                        genre_id, projects.city_id, cities.department_id, departments.country_id, finish_at')
-                    ->with('lang')
-                    ->find($id);
-
-                $this->validEdit($project);
-                $countries = Country::select('id', 'sortname', 'name_' . Auth::user()->locale . ' as name')->orderByRaw('convert(name_' . Auth::user()->locale .' using gbk) ASC')->get();
+                $countries = Country::where('region', '<>', 1)->select('id', 'sortname', 'name_' . app()->getLocale() . ' as name')->orderByRaw('convert(name_' . app()->getLocale() .' using gbk) ASC')->get();
 
                 $languages = Language::leftJoin(DB::raw("(select 1 as chosen, language_id from project_languages where project_id ='".$id."') pl"), function ($join) {
                         $join->on('languages.id', '=', 'language_id');
                     })
-                    ->selectRaw("id, name_" . Auth::user()->locale . " as name, rank, IFNULL(pl.chosen, 0) as chosen")
+                    ->selectRaw("id, name_" . app()->getLocale() . " as name, rank, IFNULL(pl.chosen, 0) as chosen")
                     ->orderBy('rank')->get();
 
-                $genres = Genre::select('id', 'name_' . Auth::user()->locale . ' as name')->get();
+                $genres = Genre::select('id', 'name_' . app()->getLocale() . ' as name')->get();
+
                 return view('preparation.basic', ["step"=>$step, "project" => $project, "countries" => $countries, "languages" => $languages, "genres" => $genres]);
             case 1:
-                if(is_null($project)){
-                    $project = Project::select('id', 'active',  'title', 'description', 'user_id')->find($id);
-                }
-                $this->validEdit($project);
                 return view('preparation.description', ["step"=>$step, "project" => $project]);
             case 2:
                 return $this->container($id, $project);
@@ -123,13 +113,13 @@ class PreparationController extends Controller
                 }
 
                 $this->validEdit($project);
-                $userid = Auth::id();
+                $userid = auth()->id();
 
                 $users = User::where('active', 1)
                     ->join('cities', 'city_id', '=', 'cities.id')
                     ->join('departments', 'department_id', '=', 'departments.id')
                     ->join('countries', 'country_id', '=', 'countries.id')
-                    ->selectRaw("users.id, username, concat(cities.name_".Auth::user()->locale.", '(', countries.sortname, ')')  as location, 
+                    ->selectRaw("users.id, username, concat(cities.name_".app()->getLocale().", '(', countries.sortname, ')')  as location,
                         CONCAT('/profile/', users.id) as link, 0 as outsider");
 
                 $authors = Outsiderauthor::where('user_id', $userid)
@@ -139,26 +129,22 @@ class PreparationController extends Controller
                     ->get();
 
                 $occupations = Occupation::where('name', '<>', 'Planner')
-                    ->selectRaw("id, name_".Auth::user()->locale." as name")
+                    ->selectRaw("id, name_".app()->getLocale()." as name")
                     ->get();
 
                 return view('preparation.team', ["step"=>$step, "users"=>$authors, "occupations"=>$occupations, "project" => $project]);
 */
             case 3:
-                if(is_null($project)){
-                    $project = Project::select('id', 'active',  'title', 'user_id')->find($id);
-                }
-                $this->validEdit($project);
                 $occupations = Occupation::where('name', '<>', 'Planner')
-                    ->selectRaw("id, name_".Auth::user()->locale." as name")
+                    ->selectRaw("id, name_".app()->getLocale()." as name")
                     ->orderByRaw('convert(name using gb2312)')
                     ->get();
                 $recruitment = ProjectRecruitment::where('project_id', $id)->join('occupations','occupation_id', '=', 'occupations.id')
-                    ->leftJoin(DB::raw("(select 1 as applied, project_recruitment_id from applications where sender_id = '".Auth::id()."' group by project_recruitment_id) application"),function ($join){
+                    ->leftJoin(DB::raw("(select 1 as applied, project_recruitment_id from applications where sender_id = '".auth()->id()."' group by project_recruitment_id) application"),function ($join){
                         $join->on('application.project_recruitment_id', '=', 'project_recruitments.id');
                     })
                     ->selectRaw("project_recruitments.id,project_recruitments.quantity,project_recruitments.description, occupation_id, 
-                        occupations.name_". Auth::user()->locale." as name, IFNULL(application.applied, 0) as application")
+                        occupations.name_". app()->getLocale()." as name, IFNULL(application.applied, 0) as application")
                     ->get();
                 return view('preparation.recruitment', ["step"=>$step, "recruitment"=>$recruitment, "occupations"=>$occupations,"project" => $project]);
         }
@@ -174,9 +160,9 @@ class PreparationController extends Controller
                 $join->on('projects.genre_id', '=', 'genres.genre_id');
             })
             ->with('scripts', 'budget', 'sponsor', 'lang', 'recruit')
-            ->selectRaw('projects.id, title, synopsis, projects.genre_id, projects.user_id, projects.city_id, username, duration, countries.sortname, 
+            ->selectRaw('projects.id, title, synopsis, projects.genre_id, projects.user_id, projects.city_id, username, duration, countries.name_'.app()->getLocale().' as country, 
                projects.updated_at, start_at, finish_at, projects.active, projects.description, IFNULL(genres.cnt, 1) as genres_cnt,
-               genres.name_' . Auth::user()->locale . ' as genre_name, cities.name_' . Auth::user()->locale . ' as city_name,
+               genres.name_' . app()->getLocale() . ' as genre_name, cities.name_' . app()->getLocale() . ' as city_name,
                FLOOR((unix_timestamp(finish_at) - unix_timestamp(now()))/60/60/24) as daterest,
                datediff(finish_at, projects.created_at) as datediff')
             ->find($id);
@@ -189,22 +175,59 @@ class PreparationController extends Controller
                 'followers_cnt' => 0, 'lovers_cnt' => 0, 'genres_cnt' => $genres_cnt, 'questions_cnt' => 0, 'comments_cnt' => 0]);
     }
 
+    public function update($id, Request $request){
+        $project = Project::find($id);
+        if ($project->active === 0 || $project->user_id != auth()->id()) {
+            return Response('NOT authorised', 501);
+        }
+
+        if($request->has('finish_at') && !$request->finish_at){
+            $project->update([
+                'finish_at' => gmdate("Y-m-d", strtotime($request->finish_at))
+            ]);
+        }
+        else if($request->has('language_id')){
+            $lang = ProjectLanguage::where(['project_id'=>$id, 'language_id'=>$request->language_id])->first();
+            if($lang){
+                $lang->delete();
+                return 0;
+            }
+            else{
+               $lang = ProjectLanguage::create(['project_id'=>$id, 'language_id'=>$request->language_id]);
+               return $lang->id;
+            }
+        }
+        else if($request->input('city_id','')){
+            $project->update(['city_id'=>str_replace('number:','',$request->city_id)]);
+        }
+        else{
+            $project->update($request->all());
+        }
+    }
+
     public function description(Request $request){
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-            'editor'=>'required|min:200',
+        $validator =  Validator::make($request->all(), [
+            'id' => 'required'
         ]);
 
         $project = Project::find($request->id);
         $validator->after(function($validator) use ($request, $project)
         {
-            if($project->user_id != Auth::id()){
-                $validator->errors()->add('authorize', trans('project.ERRORS.permission'));
+            if($project->user_id != auth()->id()){
+                $validator->errors()->add('authorize', trans('project.ERRORS.invalid.permission'));
             }
-            if(!is_null($project->active)){
-                $validator->errors()->add('phase', trans('project.ERRORS.phase'));
+            if($project->active === 0){
+                $validator->errors()->add('phase', trans('project.ERRORS.invalid.phase'));
+            }
+            if(strlen(strip_tags($request->editor)) < 200){
+                $validator->errors()->add('description', trans('project.ERRORS.minlength.description', ['cnt'=>200]));
             }
         });
+
+        if($validator->fails()){
+            return back()->withErrors($validator)
+                ->withInput();
+        }
 
         if($request->has('images')){
 
@@ -235,18 +258,21 @@ class PreparationController extends Controller
             return $this->update($id, $request);
         }
         $validator = $this->validator($request->all());
-        $id = Auth::id();
-        $root = 'uploads/projects/'.$id;
-        $path = $root.'.jpg';
+
+        $id = auth()->id();
+
+        $root = 'app/public/uploads/projects/'.$id;
+        $path = storage_path($root.'.jpg');
+
         $validator->after(function($validator) use ($request, $path)
         {
-            if(!file_exists(public_path($path))){
+            if(!file_exists($path)){
                 $validator->errors()->add('poster', trans('project.ERRORS.require.poster'));
             }
         });
 
         if ($validator->fails()) {
-            return back()->withInput()->withErrors('validator');
+           return back()->withInput()->withErrors('validator');
         }
 
         $project = Project::create([
@@ -271,38 +297,43 @@ class PreparationController extends Controller
             }
         }
 
-        $context = str_replace($id, $project->id, str_replace("uploads", "context", $root));
-        rename($path, $context.'.jpg');
+        $dst_path = public_path('/storage/projects/'.$project->id.'.jpg');
+        rename($path, $dst_path);
 
-        if(file_exists($root.config('constants.image.small').'.jpg')){
-            rename($root.config('constants.image.small').'.jpg', $context.config('constants.image.small').'.jpg');
+        $small_path = storage_path($root.config('constants.image.small').'.jpg');
+
+        if(file_exists($small_path))
+        {
+            rename($small_path, public_path('/storage/projects/'.$project->id.config('constants.image.small').'.jpg'));
         }
-        if(file_exists($root.config('constants.image.thumbnail').'.jpg')){
-            rename($root.config('constants.image.thumbnail').'.jpg', $context.config('constants.image.thumbnail').'.jpg');
+
+        $thumbnail_path = storage_path($root.config('constants.image.thumbnail').'.jpg');
+
+        if(file_exists($thumbnail_path)){
+            rename($thumbnail_path,  public_path('/storage/projects/'.$project->id.config('constants.image.thumbnail').'.jpg'));
         }
 
         return redirect('/admin/preparations/'.$project->id.'?step=1');
     }
 
-    public function update($id, Request $request)
+    public function putonline($id, Request $request)
     {
-
         $project = Project::find($id);
 
-        if (!is_null($project->active) || $project->user_id != Auth::id()) {
+        if (!is_null($project->active) || $project->user_id != auth()->id()) {
             return Response('NOT authorised', 501);
         }
-
+        //return $request->all();
         $validator = $this->validator($request->all());
         $validator->after(function($validator) use ($request)
         {
-            if(!file_exists(public_path() . '/context/projects/'.$request->id.'.jpg')){
+            if(!file_exists(public_path() . '/storage/projects/'.$request->id.'.jpg')){
                 $validator->errors()->add('poster', trans('project.ERRORS.require.poster'));
             }
         });
 
         if ($validator->fails()) {
-            return back()->withInput()->withErrors('validator');
+            return back()->withErrors('validator');
         }
 
         $project->title = $request->title;
@@ -372,7 +403,7 @@ class PreparationController extends Controller
             $member->delete();
         }
 
-        $path = public_path() . '/context/projects/' . $project->id;
+        $path = public_path() . '/storage/projects/' . $project->id;
 
         if (file_exists($path . '.jpg')) {
             unlink($path . '.jpg');
@@ -421,8 +452,8 @@ class PreparationController extends Controller
     }
 
     private function creation($project){
-        $id = Auth::id();
-        $username = Auth::user()->username;
+        $id = auth()->id();
+        $username =  auth()->user()->username;
         $budgets = DB::table('budgets')->where('project_id', $project->id)
             ->join('budget_types','budget_type_id', '=', 'budget_types.id')
             ->selectRaw("project_id, 'b' as type, budgets.id as related_id, concat(budget_types.name, '-', quantity) as title, comment as content, '".$id."' as user_id, '".$username."' as username")
@@ -512,7 +543,7 @@ class PreparationController extends Controller
             $team = ProjectTeam::create([
                 'id' => $this->uuid('t'),
                 'project_id' => $project->id,
-                'user_id' => Auth::id()
+                'user_id' => auth()->id()
             ]);
         }
 
@@ -530,7 +561,7 @@ class PreparationController extends Controller
         }
 
         $this->validEdit($project);
-        $userid = Auth::id();
+        $userid = auth()->id();
 
         $users = User::where('active', 1)
             ->leftJoin(DB::raw("(select fan_id, love from relations where relations.idol_id = '".$userid."') friends"), function ($join) {
@@ -540,7 +571,7 @@ class PreparationController extends Controller
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
             ->selectRaw("users.id, username, (CASE users.id WHEN '".$userid."' THEN 2 ELSE IFNULL(love, -1) END) AS love, 
-                concat(cities.name_".Auth::user()->locale.", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider")
+                concat(cities.name_".app()->getLocale().", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider")
             ->orderBy('love', 'desc')
             ->orderByRaw('convert(username using gb2312)')
             ->get();
@@ -550,10 +581,10 @@ class PreparationController extends Controller
             ->orderByRaw('convert(username using gb2312)')
             ->get();
 
-        $types  = BudgetType::select('id', 'name_'.Auth::user()->locale.' as name')->get();
+        $types  = BudgetType::select('id', 'name_'.app()->getLocale().' as name')->get();
         $budgets = Budget::where('project_id', $id)
             ->join('budget_types', 'budget_type_id', '=', 'budget_types.id')
-            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.Auth::user()->locale.' as name')
+            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.app()->getLocale().' as name')
             ->get();
 
         $sponsors = Sponsor::where('project_id', $id)
@@ -571,11 +602,7 @@ class PreparationController extends Controller
     }
 
     private function validEdit($project){
-        if ($project->user_id != Auth::id()) {
-            throw new \Illuminate\Auth\Access\AuthorizationException(trans('messages.error'));
-        }
-
-        if(!is_null($project->active)){
+        if ($project->user_id != auth()->id()) {
             throw new \Illuminate\Auth\Access\AuthorizationException(trans('messages.error'));
         }
     }

@@ -29,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected $redirectTo = '/home';
 
     /**
      * Create a new controller instance.
@@ -41,23 +41,35 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
-        $user = Cookie::get('user');
-        if(!is_null($user)){
-            session(['locale' =>  $user->locale]);
-        }
+        $user = json_decode($request->cookie('zoomover'));
 
+        if($request->has('new')){
+            $user = null;
+            cookie()->forget('zoomover');
+        }
+        elseif(!is_null($user)){
+
+            if($user->locale){
+                app()->setLocale($user->locale);
+            }
+            else{
+                $user->locale = app()->getLocale();
+            }
+
+        }
         return view('auth.login', ['user'=>$user]);
     }
 
     public function login(Request $request)
     {
+
         $this->validate($request, [
             'email' => 'required|string'
         ]);
         if (is_null($request->password)) {
-            $user = User::where('email', $request->email)->select('id','username', 'email', 'locale')->first();
+            $user = User::where('email', $request->email)->select('id','username', 'email', 'locale', 'active')->first();
             if(is_null($user)){
                 $errors = trans('auth.error_user');
                 return back()->withInput()->withErrors(compact('errors'));
@@ -68,6 +80,7 @@ class LoginController extends Controller
                 return view('auth.login', ['user'=>$user]);
             }
         } else {
+
             $this->validateLogin($request);
 
             // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -82,8 +95,12 @@ class LoginController extends Controller
                 return back()->withInput()->withErrors(compact('errors'))->with('status',423);
             }
 
+            if($request->session()->has('imherefor')){
+                $this->redirectTo = '/festivals';
+            }
+
             if ($this->attemptLogin($request)) {
-                return $this->sendLoginResponse($request);
+                return redirect()->intended($this->redirectPath());
             }
 
             // If the login attempt was unsuccessful we will increment the number of attempts

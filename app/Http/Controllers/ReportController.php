@@ -43,12 +43,12 @@ class ReportController extends Controller
             ->leftJoin(DB::raw("(select count(id) as cnt, report_id from report_lovers group by report_id) lovers"), function ($join) {
                 $join->on('lovers.report_id', '=', 'reports.id');
             })
-            ->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".Auth::id()."') mylove"), function ($join) {
+            ->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".auth()->id()."') mylove"), function ($join) {
                 $join->on('mylove.report_id', '=', 'reports.id');
             })
             ->selectRaw("reports.id, reports.title, reports.synopsis, reports.content, reports.updated_at, reports.created_at, project_id, projects.title as project_title,
                 planner_id, planner_name, IFNULL(lovers.cnt,0) as lovers_cnt, IFNULL(mylove.id, 0) as mylove, reports.user_id, users.username,
-                reports.user_id = '".Auth::id()."' as admin, YEAR(reports.created_at) as year, MONTH(reports.created_at) month, DAYOFMONTH(reports.created_at) day")
+                reports.user_id = '".auth()->id()."' as admin, YEAR(reports.created_at) as year, MONTH(reports.created_at) month, DAYOFMONTH(reports.created_at) day")
             ->find($id);
 
         $tags = Tag::join(DB::raw("(select tag_id from report_tags where report_id = '".$id."') reports"), function ($join) {
@@ -68,8 +68,8 @@ class ReportController extends Controller
         $tab = $request->input('tab', 'writes');
 
         $user = User::join('cities', 'city_id', '=', 'cities.id')
-            ->join('departments', 'department_id', '=', 'departments.id')
-            ->join('countries', 'country_id', '=', 'countries.id')
+            ->join('departments', 'cities.department_id', '=', 'departments.id')
+            ->join('countries', 'departments.country_id', '=', 'countries.id')
             ->leftJoin(DB::raw("(select count(id) as cnt, user_id from reports group by user_id) reports"), function ($join) {
                 $join->on('reports.user_id', '=', 'users.id');
             })
@@ -79,16 +79,16 @@ class ReportController extends Controller
             ->leftJoin(DB::raw("(select count(id) as cnt, user_id from report_comments group by user_id) comments"), function ($join) {
                 $join->on('comments.user_id', '=', 'users.id');
             })
-            ->selectRaw("users.id, username, cities.name_".Auth::user()->locale." as city_name, countries.sortname,
+            ->selectRaw("users.id, username, cities.name_".app()->getLocale()." as city_name, countries.name_".app()->getLocale()." as country,
                 IFNULL(reports.cnt, 0) as writes_cnt, IFNULL(lovers.cnt, 0) as lovers_cnt, IFNULL(comments.cnt, 0) as comments_cnt")
             ->find($id);
 
         $occupations = UserOccupation::where('user_id', $id)
             ->join('occupations', 'occupation_id', '=', 'occupations.id')
-            ->select('user_id', 'name')
+            ->select('user_id', 'name_'.app()->getLocale().' as name')
             ->get();
 
-        return view('visit.reports', ["user"=>$user, "occupations"=>$occupations, "admin" => $id == Auth::id(), "tab"=>$tab]);
+        return view('visit.reports', ["user"=>$user, "occupations"=>$occupations, "admin" => $id == auth()->id(), "tab"=>$tab]);
     }
 
     public function writes($id, Request $request){
@@ -96,7 +96,7 @@ class ReportController extends Controller
 
         $params = "reports.id, reports.title, reports.synopsis, reports.updated_at, reports.created_at, project_id, projects.title as project_title,
             IFNULL(lovers.cnt,0) as lovers_cnt, IFNULL(comments.cnt, 0) as comments_cnt, 
-            reports.user_id = '".Auth::id()."' as mine, YEAR(reports.created_at) as year, MONTH(reports.created_at) month, DAYOFMONTH(reports.created_at) day";
+            reports.user_id = '".auth()->id()."' as mine, YEAR(reports.created_at) as year, MONTH(reports.created_at) month, DAYOFMONTH(reports.created_at) day";
 
         $reports = Report::where('reports.user_id', $id)
             ->join('projects','project_id', '=', 'projects.id')
@@ -107,8 +107,8 @@ class ReportController extends Controller
                 $join->on('comments.report_id', '=', 'reports.id');
             });
 
-        if($id != Auth::id()){
-            $reports = $reports->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".Auth::id()."') mylove"), function ($join) {
+        if($id != auth()->id()){
+            $reports = $reports->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".auth()->id()."') mylove"), function ($join) {
                 $join->on('mylove.report_id', '=', 'reports.id');
             });
 
@@ -128,7 +128,7 @@ class ReportController extends Controller
 
         $params = "reports.id, reports.title, reports.synopsis, reports.updated_at, reports.created_at, IFNULL(lovers.cnt,0) as lovers_cnt, IFNULL(comments.cnt, 0) as comments_cnt, 
             project_id, projects.title as project_title, reports.user_id, username, l.created_at as loved_at,
-            reports.user_id = '".Auth::id()."' as mine, YEAR(l.created_at) as year, MONTH(l.created_at) month, DAYOFMONTH(l.created_at) day,
+            reports.user_id = '".auth()->id()."' as mine, YEAR(l.created_at) as year, MONTH(l.created_at) month, DAYOFMONTH(l.created_at) day,
             FLOOR((unix_timestamp(now()) - unix_timestamp(reports.created_at))/60/60/24) <1  as newest";
 
         $reports = Report::join(DB::raw("(select report_id, created_at from report_lovers where user_id='".$id."') l"), function ($join) {
@@ -144,7 +144,7 @@ class ReportController extends Controller
             });
 
         if($id != Auth::id()){
-            $reports = $reports->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".Auth::id()."') mylove"), function ($join) {
+            $reports = $reports->leftJoin(DB::raw("(select id, report_id from report_lovers where user_id = '".auth()->id()."') mylove"), function ($join) {
                 $join->on('mylove.report_id', '=', 'reports.id');
             });
 
@@ -162,7 +162,7 @@ class ReportController extends Controller
     public function comments($id, Request $request){
         $order = $request->input('order', 'created_at');
 
-        $params = "comments.id, comments.report_id, reports.title, reports.updated_at, reports.created_at, reports.user_id, username,
+        $params = "comments.id, comments.report_id, reports.title, reports.updated_at, reports.created_at, project_id, projects.title as project_title, reports.user_id, username,
             comments.message, YEAR(comments.created_at) as year, MONTH(comments.created_at) month, DAYOFMONTH(comments.created_at) day,
             IFNULL(supports.cnt, 0) as supports_cnt,  IFNULL(counters.cnt, 0) as comments_cnt";
 
@@ -170,6 +170,7 @@ class ReportController extends Controller
                 $join->on('comments.report_id', '=', 'reports.id');
             })
             ->join('users', 'reports.user_id', '=', 'users.id')
+            ->join('projects','project_id', '=', 'projects.id')
             ->leftJoin(DB::raw("(select count(id) as cnt, report_comment_id from report_comment_supports group by report_comment_id) supports"), function ($join) {
                 $join->on('report_comment_id', '=', 'comments.id');
             })
@@ -178,7 +179,7 @@ class ReportController extends Controller
             });
 
         if($id != Auth::id()){
-            $comments = $comments->leftJoin(DB::raw("(select id, report_comment_id from report_comment_supports where user_id = '".Auth::id()."') mysupport"), function ($join) {
+            $comments = $comments->leftJoin(DB::raw("(select id, report_comment_id from report_comment_supports where user_id = '".auth()->id()."') mysupport"), function ($join) {
                 $join->on('mysupport.report_comment_id', '=', 'comments.id');
             });
 
@@ -211,7 +212,7 @@ class ReportController extends Controller
             ->select('report_tags.id', 'tag_id', 'tags.label')
             ->get();
         $report->tags = $tags;
-        return $report->user_id == Auth::id() ? view('project.report', $report) : null;
+        return $report->user_id == auth()->id() ? view('project.report', $report) : null;
     }
 
     public function store(Request $request)
@@ -237,7 +238,7 @@ class ReportController extends Controller
 
         Changement::create([
             'event_id' => $report->id,
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'username' => Auth::user()->username,
             'title' => $report->title,
             'content' => $report->synopsis
@@ -246,7 +247,7 @@ class ReportController extends Controller
         foreach ($request->tags as $key=> $value) {
             if($key == 0){
                 $tag = Tag::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => auth()->id(),
                     'label' => $value
                 ]);
 
@@ -274,7 +275,7 @@ class ReportController extends Controller
             return Response('NO AUTHORITY', 501);
         }
 
-        $changement = ["event_id"=>$id, "title" => null, "content" => null, "user_id" => Auth::id(), "username" =>  Auth::user()->username];
+        $changement = ["event_id"=>$id, "title" => null, "content" => null, "user_id" => auth()->id(), "username" =>  Auth::user()->username];
 
         $change = false;
 
@@ -321,7 +322,7 @@ class ReportController extends Controller
         foreach ($request->tags as $key=> $value) {
             if($key == 0){
                 $tag = Tag::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => auth()->id(),
                     'label' => $value
                 ]);
 

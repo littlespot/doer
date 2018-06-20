@@ -15,7 +15,7 @@ class BudgetController extends EventRelatedController
 {
     public function index()
     {
-        $types  = BudgetType::select('id', 'name_'.Auth::user()->locale.' as name')->get();
+        $types  = BudgetType::select('id', 'name_'.app()->getLocale().' as name')->get();
         return \Response::json($types);
     }
 
@@ -27,11 +27,11 @@ class BudgetController extends EventRelatedController
             return Response('NOT AUTHORIZED', 501);
         }
 
-        $types  = BudgetType::select('id', 'name_'.Auth::user()->locale.' as name')->get();
+        $types  = BudgetType::select('id', 'name_'.app()->getLocale().' as name')->get();
 
         $budgets = Budget::where('project_id', $id)
             ->join('budget_types', 'budget_type_id', '=', 'budget_types.id')
-            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.Auth::user()->locale.' as name')
+            ->select('budgets.id', 'quantity', 'comment', 'budget_type_id', 'budget_types.name_'.app()->getLocale().' as name')
             ->get();
 
         $sponsors = Sponsor::where('project_id', $id)
@@ -78,7 +78,7 @@ class BudgetController extends EventRelatedController
 
             if ($changed) {
                 $budget->save();
-                if ($project->active == 1) {
+                if ($project->active === 1) {
                     $changement = $this->getEvent($id, "b");
 
                     if($changed != 4){
@@ -122,10 +122,10 @@ class BudgetController extends EventRelatedController
                 'comment' => $request->comment
             ]);
 
-            if($project->active == 1){
+            if($project->active === 1){
                 Event::create([
                     'project_id' => $request->project_id,
-                    'user_id' => Auth::id(),
+                    'user_id' => auth()->id(),
                     'username' => Auth::user()->username,
                     'title' => BudgetType::find($request->budget_type_id)->name.'=>'.$budget->quantity,
                     'content' => $budget->comment,
@@ -150,7 +150,7 @@ class BudgetController extends EventRelatedController
                 return Response('NOT AUTHORIZED', 501);
             }
 
-            if($project->active == 1){
+            if($project->active === 1){
                $this->afterDelete($id,'b');
             }
 

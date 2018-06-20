@@ -35,7 +35,7 @@ class ReportLoverController extends Controller
         if(!$support){
             ReportLover::create([
                 "report_id" => $id,
-                "user_id" => Auth::id()
+                "user_id" => auth()->id()
             ]);
 
             return \Response::json(array("cnt" => 1, "mylove" => 1));

@@ -20,6 +20,6 @@ class ProjectTeam extends Model
     {
         return $this->hasMany('Zoomov\ProjectTeamOccupation')
             ->join('occupations', 'occupations.id', '=', 'occupation_id')
-            ->selectRaw("occupation_id, name_".Auth::user()->locale." as name, 0 as old, project_team_id");
+            ->selectRaw("occupation_id, name_".app()->getLocale()." as name, 0 as old, project_team_id");
     }
 }

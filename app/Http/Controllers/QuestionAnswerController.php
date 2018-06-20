@@ -21,10 +21,10 @@ class QuestionAnswerController extends Controller
             ->join('users', 'question_answers.user_id', '=', 'users.id')
             ->leftJoin(DB::raw("(select count(id) as cnt, question_answer_id from question_answer_supports group by question_answer_id) supports"),
                 'supports.question_answer_id', '=', 'question_answers.id')
-            ->leftJoin(DB::raw("(select id as mine, question_answer_id from question_answer_supports where user_id = '".Auth::id()."') mysupport"),
+            ->leftJoin(DB::raw("(select id as mine, question_answer_id from question_answer_supports where user_id = '".auth()->id()."') mysupport"),
                 'mysupport.question_answer_id', '=', 'question_answers.id')
             ->selectRaw("question_answers.id, content, question_id, question_answers.user_id, username, question_answers.created_at,
-                IFNULL(supports.cnt,0) as supports_cnt, IFNULL(mysupport.mine,0) as mysupport, question_answers.user_id ='".Auth::id()."' as mine")
+                IFNULL(supports.cnt,0) as supports_cnt, IFNULL(mysupport.mine,0) as mysupport, question_answers.user_id ='".auth()->id()."' as mine")
             ->orderBy('question_answers.updated_at', 'desc')
             ->paginate(10);
     }
@@ -47,7 +47,7 @@ class QuestionAnswerController extends Controller
         if(!$support){
             QuestionAnswerSupport::create([
                 "question_answer_id" => $id,
-                "user_id" => Auth::id()
+                "user_id" => auth()->id()
             ]);
 
            return \Response::json(array("cnt" => 1, "mysupport" => 1));
@@ -63,7 +63,7 @@ class QuestionAnswerController extends Controller
         $this->validate($request, ['editor'=>'required|min:10']);
         $answer = QuestionAnswer::create([
             'question_id' => $request->question_id,
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'content' => $request['editor'],
             'created_at' => gmdate("Y-m-d H:i:s", time()),
             'updated_at' => gmdate("Y-m-d H:i:s", time())

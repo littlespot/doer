@@ -46,7 +46,7 @@ class SponsorController extends EventRelatedController
             if($changed){
                 $sponsor->save();
 
-                if($project->active == 1){
+                if($project->active === 1){
                     $changement = $this->getEvent($id, 'm');
 
                     if($changed != 4){
@@ -90,7 +90,7 @@ class SponsorController extends EventRelatedController
                 "sponsed_at" => date("Y-m-d", strtotime($request->sponsed_at))
             ]);
 
-            if($project->active == 1){
+            if($project->active === 1){
                 Event::create([
                     'project_id' => $sponsor->project_id,
                     'user_id' => $sponsor->user_id,
@@ -122,7 +122,7 @@ class SponsorController extends EventRelatedController
                 return Response('NOT AUTHORIZED', 501);
             }
 
-            if($project->active == 1){
+            if($project->active === 1){
                 $this->afterDelete($id, 'm');
             }
 

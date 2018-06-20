@@ -35,7 +35,7 @@ class RecruitmentController extends EventRelatedController
         }
 
         return ProjectRecruitment::where('project_id', $id)->join('occupations','occupation_id', '=', 'occupations.id')
-            ->leftJoin(DB::raw("(select 1 as applied, project_recruitment_id from applications where sender_id = '".Auth::id()."' group by project_recruitment_id) application"),function ($join){
+            ->leftJoin(DB::raw("(select 1 as applied, project_recruitment_id from applications where sender_id = '".auth()->id()."' group by project_recruitment_id) application"),function ($join){
                 $join->on('application.project_recruitment_id', '=', 'project_recruitments.id');
             })
             ->selectRaw("project_recruitments.id,project_recruitments.quantity,project_recruitments.description, occupation_id, occupations.name, IFNULL(application.applied, 0) as application")
@@ -54,7 +54,7 @@ class RecruitmentController extends EventRelatedController
         $recruit->description = $request->description;
         $recruit->quantity = $request->quantity;
 
-        if(is_null($project->active) ||  $project->active == 0){
+        if(!$project->active){
             $recruit->occupation_id = $request->occupation_id;
         }
 
@@ -99,7 +99,7 @@ class RecruitmentController extends EventRelatedController
                 return Response('NOT AUTHORIZED', 501);
             }
 
-            if($project->active == 1){
+            if($project->active === 1){
                 $applications = Application::where('project_recruitment_id', $recruit->id)->whereNull('accepted')->get();
 
                 foreach ($applications as $application){

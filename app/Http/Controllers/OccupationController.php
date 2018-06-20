@@ -13,7 +13,7 @@ class OccupationController extends Controller
     public function index(Request $request)
     {
         return Occupation::where('name', '<>', 'Planner')
-            ->selectRaw("id, name_".($request->lang ? $request->lang : Auth::user()->locale)." as name, 0 as old")
+            ->selectRaw("id, name_".($request->lang ? $request->lang : app()->getLocale())." as name, 0 as old")
             ->get();
     }
 
@@ -21,7 +21,7 @@ class OccupationController extends Controller
     {
         return UserOccupation::where('user_id', $id)
             ->join('occupations', 'user_occupations.occupation_id', '=', 'occupations.id')
-            ->selectRaw("occupations.id, occupations.name_".Auth::user()->locale)
+            ->selectRaw("occupations.id, occupations.name_".app()->getLocale())
             ->get();
     }
 }

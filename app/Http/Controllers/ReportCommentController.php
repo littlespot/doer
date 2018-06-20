@@ -15,7 +15,7 @@ class ReportCommentController extends Controller
         $order = $request->input('order', 'created_at');
 
         $params = "report_comments.id, report_comments.created_at, report_comments.user_id, username, report_comments.message, report_comments.parent_id, 
-            IFNULL(supports.cnt, 0) as supports_cnt, IFNULL(mysupport.id, 0) as mysupport, report_comments.user_id='".Auth::id()."' as mine";
+            IFNULL(supports.cnt, 0) as supports_cnt, IFNULL(mysupport.id, 0) as mysupport, report_comments.user_id='".auth()->id()."' as mine";
 
         $comments = ReportComment::where('report_id', $id)->where('deleted', 0)
             ->with('parent')
@@ -23,7 +23,7 @@ class ReportCommentController extends Controller
             ->leftJoin(DB::raw("(select count(id) as cnt, report_comment_id from report_comment_supports group by report_comment_id) supports"), function ($join) {
                 $join->on('report_comment_id', '=', 'report_comments.id');
             })
-            ->leftJoin(DB::raw("(select id, report_comment_id from report_comment_supports where user_id = '".Auth::id()."') mysupport"), function ($join) {
+            ->leftJoin(DB::raw("(select id, report_comment_id from report_comment_supports where user_id = '".auth()->id()."') mysupport"), function ($join) {
                 $join->on('mysupport.report_comment_id', '=', 'report_comments.id');
             });
 
@@ -51,7 +51,7 @@ class ReportCommentController extends Controller
         if(!$support){
             ReportCommentSupport::create([
                 "report_comment_id" => $id,
-                "user_id" => Auth::id()
+                "user_id" => auth()->id()
             ]);
 
             return \Response::json(array("cnt" => 1, "mysupport" => 1));

@@ -15,23 +15,25 @@ class PictureController extends Controller
        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image, $result)){
            $extension = $result[2] == 'jpeg' ? '.jpg':'.'.$result[2];
 
-           $parent = $request->input('parent_id', Auth::id());
-           $directory  = '/uploads/'.$request['picture_dst'].'/'.$parent;
+           $parent = $request->input('parent_id', auth()->id());
+           $directory  = $request['picture_dst'].'/'.$parent;
 
-           if(!is_dir(public_path($directory))){
-               Storage::disk('images')->makeDirectory($directory);
+           if(!is_dir(storage_path('app/public/'.$directory))){
+               Storage::disk('public')->makeDirectory($directory);
            }
-
-           $image = new Image($directory, time(), $extension);
+            $filename = time();
+           $image = new Image($directory,$filename, $extension);
            $src_img = $image->getDestination('',$extension);
-
-           if (file_put_contents(public_path($src_img), base64_decode(str_replace($result[1], '', $base64_image))) && $request->input('image_width', '')){
-               list($src_w,$src_h)=getimagesize(public_path($src_img));
+           $dst_img = storage_path('app/public/'.$src_img);
+           file_put_contents($dst_img, base64_decode(str_replace($result[1], '', $base64_image)));
+           $dst_w = $request->input('image_width', 0);
+           if ($dst_w){
+               list($src_w,$src_h)=getimagesize($dst_img);
                $src_scale = $src_h/$src_w;
-               $dst_w = $request->input('image_width');
+
                $dst_h = $src_scale * $dst_w;
                $target = imagecreatetruecolor($dst_w, $dst_h);
-               $source= $this->getSource(public_path($src_img), $image);
+               $source= $this->getSource($dst_img, $image, null);
              /*  $croped=imagecreatetruecolor($w, $h);
                imagecopy($croped, $source, 0, 0, $x, $y, $src_w, $src_h);
 
@@ -40,16 +42,16 @@ class PictureController extends Controller
                $final_w = intval($w * $scale);
                $final_h = intval($h * $scale);*/
                imagecopyresampled($target, $source, 0, 0, 0, 0, $dst_w,$dst_h, $src_w, $src_h);
+               $src_img = $directory.'/'.$filename.'.small.jpg';
+               $target_img = storage_path('app/public/'.$src_img);
 
-               $target_img = $directory.'/'.time().'.jpg';
-
-               imagejpeg($target, public_path($target_img));
+               imagejpeg($target, $target_img);
                imagedestroy($target);
 
-               return $target_img;
+               return '/storage/'.$src_img;
            }
 
-           return $src_img;
+           return '/storage/'.$src_img;
        }else{
            return Response('Please upload image file', 400);
        }
@@ -58,6 +60,7 @@ class PictureController extends Controller
     public function crop(Request $request) {
         $file = $_FILES['picture_file'];
         $image = new Image($request['picture_dst'], $request['picture_name']);
+
         return $this->setFile($file, json_decode(stripslashes($request['picture_data'])), $image);
     }
 
@@ -70,18 +73,19 @@ class PictureController extends Controller
             if ($type) {
                 $extension = image_type_to_extension($type);
 
-                $src =  public_path($image->getDestination(config('constants.image.original'), $extension));
+                $src_original = $image->getDestination(config('constants.image.original'), $extension);
 
+                $src = str_contains($src_original, 'storage') ? storage_path(str_replace('storage', 'app/public', $src_original)) : public_path($src_original);
                 if ($type == IMAGETYPE_GIF || $type == IMAGETYPE_JPEG || $type == IMAGETYPE_PNG) {
-                    if (file_exists($src)) {
-                        unlink($src);
+                    if (Storage::exists($src)) {
+                        Storage::delete($src);
                     }
 
 
                     $result = move_uploaded_file($file['tmp_name'], $src);
 
                     if ($result) {
-                        return $this->save($src, $data, $image);
+                        return $this->save($src, $data, $image, $type);
                     } else {
                         return Response('Failed to save file', 400);
                     }
@@ -96,12 +100,15 @@ class PictureController extends Controller
         }
     }
 
-    private function getSource($src, Image $image){
-        $type = exif_imagetype($src);
+    private function getSource($src, Image $image, $type){
+       if(!$type){
+           $type = exif_imagetype($src);
+       }
 
         if ($type) {
             $image->extension = image_type_to_extension($type);
         }
+
 
         switch ($type) {
             case IMAGETYPE_GIF:
@@ -124,8 +131,8 @@ class PictureController extends Controller
         return $src_img;
     }
 
-    private  function save($src, $data, Image $image){
-        $src_img = $this->getSource($src, $image);
+    private  function save($src, $data, Image $image, $type){
+        $src_img = $this->getSource($src, $image, $type);
         if (!$src_img) {
             return Response("Failed to read the image file", 400);
         }
@@ -203,8 +210,10 @@ class PictureController extends Controller
 
         $result = imagecopyresampled($dst_img, $src_img, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
 
+        $path_orginal = $image->getDestination('','.jpg');
+        $dst_orginal = str_contains($path_orginal, 'storage') ? storage_path(str_replace('storage', 'app/public', $path_orginal)) : public_path($path_orginal);
         if ($result) {
-            if (!imagejpeg($dst_img, public_path($image->getDestination('','.jpg')))) {
+            if (!imagejpeg($dst_img, $dst_orginal)) {
                 return Response("Failed to read the image file", 400);
             }
         } else {
@@ -213,20 +222,20 @@ class PictureController extends Controller
 
         $thumb = imagecreatetruecolor($dst_img_w/2, $dst_img_h/2);
         imagecopyresampled($thumb, $dst_img, 0, 0, 0, 0, $dst_img_w/2, $dst_img_h/2, $dst_img_w, $dst_img_h);
-        imagejpeg($thumb, public_path($image->getDestination(config('constants.image.thumbnail'), '.jpg')), 90);
+        imagejpeg($thumb,  str_replace('.jpg', config('constants.image.thumbnail').'.jpg', $dst_orginal), 90);
 
         imagedestroy($thumb);
 
         $thumb = imagecreatetruecolor($dst_img_w/5, $dst_img_h/5);
         imagecopyresampled($thumb, $dst_img, 0, 0, 0, 0, $dst_img_w/5, $dst_img_h/5, $dst_img_w, $dst_img_h);
-        imagejpeg($thumb, public_path($image->getDestination(config('constants.image.small')), '.jpg'), 90);
+        imagejpeg($thumb, str_replace('.jpg', config('constants.image.small').'.jpg', $dst_orginal), 90);
 
         imagedestroy($thumb);
 
         imagedestroy($src_img);
         imagedestroy($dst_img);
 
-        return Response($image->getDestination('','.jpg'), 200);
+        return Response($path_orginal, 200);
     }
 
     private function getMessage($code){

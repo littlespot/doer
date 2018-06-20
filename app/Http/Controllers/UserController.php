@@ -3,6 +3,7 @@
 namespace Zoomov\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
+use DB;
 use Zoomov\Outsiderauthor;
 use Zoomov\ProjectTeam;
 use Zoomov\User;
@@ -16,7 +17,7 @@ class UserController extends Controller
         $users = User::join('cities', 'city_id', '=', 'cities.id')
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
-            ->selectRaw("users.id, username, concat(cities.name_".Auth::user()->locale.", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider");
+            ->selectRaw("users.id, username, concat(cities.name_".app()->getLocale().", '(', countries.name_".app()->getLocale().", ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider");
 
         if(!$outers){
             return $users->get();
@@ -29,7 +30,7 @@ class UserController extends Controller
         else{
             $team = ProjectTeam::where('project_id', $request->project_id)
                 ->join('users', 'user_id', '=', 'users.id')
-                ->selectRaw("users.id, username, concat(cities.name_".Auth::user()->locale.", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider");
+                ->selectRaw("users.id, username, concat(cities.name_".app()->getLocale().", '(', countries.sortname, ')')  as location, CONCAT('/profile/', users.id) as link, 0 as outsider");
 
             return Outsiderauthor::where('user_id', Auth::id())
                 ->selectRaw("outsiderauthors.id, outsiderauthors.name as username, email as location, outsiderauthors.link, 1 as outsider")
@@ -52,7 +53,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'link' => $request->link,
                 'email' => $email,
-                'user_id' => Auth::id()
+                'user_id' => auth()->id()
             ]);
         }
         else if($author->name == $request->name){
@@ -100,9 +101,47 @@ class UserController extends Controller
         return $author;
     }
 
+    public function contact(Request $request){
+        $this->validate($request, [
+            'first_name' =>'required|max:40',
+            'last_name' =>'required|max:40',
+            'address' => 'required|max:200',
+            'city_id' => 'required',
+            'mobile' => 'required_without:fix'
+        ]);
+
+        User::find(auth()->id())->update($request->only('title', 'first_name', 'last_name'));
+        $fix = null;
+        $mobile=null;
+        $tel = $request->input('fix');
+        if($tel['code'] && $tel['number']){
+            $fix = $tel['code'].$tel['number'];
+        }
+        $tel = $request->input('mobile');
+        if($tel['code'] && $tel['number']){
+            $mobile = $tel['code'].$tel['number'];
+        }
+        $values = [
+            'address'=>$request->input('address'),
+            'city_id'=>str_replace('number:', '', $request->input('city_id')),
+            'postal'=>$request->input('postal'),
+            'fix' => $fix,
+            'mobile' => $mobile
+        ];
+        $contact = DB::table('contacts')->where('user_id', auth()->id());
+        if($contact){
+            DB::table('contacts')->where('user_id', auth()->id())->update($values);
+        }
+        else{
+            DB::table('contacts')->insert(array_add($values, 'user_id', auth()->id()));
+        }
+
+        return back()->with('anchor', 'contact');
+    }
+
     public function projects()
     {
-        return Project::where('user_id', Auth::id())->where('active',1)->select('id', 'title')->get();
+        return Project::where('user_id', auth()->id())->where('active',1)->select('id', 'title')->get();
     }
 
     public function sendMail($id, $content, $title)

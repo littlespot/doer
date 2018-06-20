@@ -186,7 +186,7 @@ class ScriptController extends EventRelatedController
                 $newLink = "<a href='".$script->link."' target='_blank'>".$script->title ."(".str_limit($script->created_at, 10, '').")</a>";
 
                 $users = User::whereIn('id', $toRemove)->selectRaw("id, username as name, email, locale, concat('/profile/', id) as link")
-                    ->union(Outsiderauthor::whereIn('id', $toRemove)->selectRaw("id, name, email, '".Auth::user()->locale."' as locale, link"))->get();
+                    ->union(Outsiderauthor::whereIn('id', $toRemove)->selectRaw("id, name, email, '".app()->getLocale()."' as locale, link"))->get();
 
                 foreach($users as $user) {
                     $authors .= "<a class='deleted' href='".$user->link."' target='_blank'>".$user->name."</a>".",";
@@ -194,7 +194,7 @@ class ScriptController extends EventRelatedController
                 }
 
                 $users = User::whereIn('id', $toAdd)->selectRaw("id, username as name, email, locale, concat('/profile/', id) as link")
-                    ->union(Outsiderauthor::whereIn('id', $toAdd)->selectRaw("id, name, email, '".Auth::user()->locale."' as locale, link"))->get();
+                    ->union(Outsiderauthor::whereIn('id', $toAdd)->selectRaw("id, name, email, '".app()->getLocale()."' as locale, link"))->get();
 
                 foreach($users as $user) {
                     $authors .= "<a class='added' href='".$user->link."' target='_blank'>".$user->name."</a>".",";
@@ -221,7 +221,7 @@ class ScriptController extends EventRelatedController
 
                 $stillAuthor = array_diff($alreadyAuthors, $toRemove);
                 $users = User::whereIn('id', $stillAuthor)->selectRaw('id, username as name, email, locale')
-                    ->union(Outsiderauthor::whereIn('id', $stillAuthor)->selectRaw("id, name, email, '".Auth::user()->locale."' as locale"))->get();
+                    ->union(Outsiderauthor::whereIn('id', $stillAuthor)->selectRaw("id, name, email, '".app()->getLocale()."' as locale"))->get();
 
                 foreach ($users as $user){
                     $this->sendMail($project, $user, $oldTitle, $oldLink, $newLink, 'modification');
@@ -241,7 +241,7 @@ class ScriptController extends EventRelatedController
                     Event::create([
                         "project_id" => $script->project_id,
                         "title" => $newLink,
-                        "user_id" => Auth::id(),
+                        "user_id" => auth()->id(),
                         "username" => Auth::user()->username,
                         "content" => $changement["content"],
                         "related_id" => $script->id,
@@ -286,7 +286,7 @@ class ScriptController extends EventRelatedController
 
             if($project->active == 1){
                 $users = User::whereIn('id', $newAuthors)->selectRaw('id, username as name, email, locale')
-                    ->union(Outsiderauthor::whereIn('id', $newAuthors)->selectRaw("id, name, email, '".Auth::user()->locale."' as locale"))->get();
+                    ->union(Outsiderauthor::whereIn('id', $newAuthors)->selectRaw("id, name, email, '".app()->getLocale()."' as locale"))->get();
 
                 $authors = '';
 
@@ -298,7 +298,7 @@ class ScriptController extends EventRelatedController
 
                 Event::create([
                     'project_id' => $project->id,
-                    'user_id' => Auth::id(),
+                    'user_id' => auth()->id(),
                     'username' => Auth::user()->username,
                     'title' => $newLink,
                     'content' => rtrim($authors,","),
@@ -329,7 +329,7 @@ class ScriptController extends EventRelatedController
                 ->leftJoin('users', 'users.id', '=', 'user_id')
                 ->leftJoin('outsiderauthors', 'outsiderauthors.id', '=', 'author_id')
                 ->selectRaw("IFNULL(users.id, outsiderauthors.id) as id, IFNULL(username, outsiderauthors.name) as name, IFNULL(users.email, outsiderauthors.email) as email, 
-                    IFNULL(users.locale, '".Auth::user()->locale."') as locale,
+                    IFNULL(users.locale, '".app()->getLocale()."') as locale,
                     CASE WHEN users.id is null THEN outsiderauthors.link ELSE concat('/profile/', users.id) END as link")
                 ->get();
 

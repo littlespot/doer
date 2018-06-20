@@ -31,7 +31,7 @@ class Team extends Mailable
      */
     public function build()
     {
-        return $this->subject(trans('messages.team', ['name' => Auth::user()->username, 'title'=>$this->title]))
+        return $this->subject(trans('messages.team', ['name' => auth()->user()->username, 'title'=>$this->title]))
             ->markdown('emails.team');
     }
 }

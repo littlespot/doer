@@ -36,6 +36,7 @@ class Message extends Model
     public function receivers(){
         return $this->hasMany('Zoomov\MessagePlaceholder')
             ->where('placeholder_id', config('constants.messageplaceholder.inbox'))
+            ->orWhere('placeholder_id', config('constants.messageplaceholder.trash'))
             ->join('users', 'user_id', '=', 'users.id')
             ->select('message_placeholders.id', 'user_id', 'username', 'message_placeholders.message_id');
     }

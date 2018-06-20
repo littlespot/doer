@@ -10,19 +10,19 @@ use DB;
 class Project extends \Eloquent
 {
 	public $incrementing = false;
-    protected $fillable = ['id', 'user_id', 'genre_id', 'city_id', 'title', 'synopsis', 'description', 'duration', 'start_at', 'finish_at'];
+    protected $fillable = ['id', 'user_id', 'genre_id', 'city_id', 'title', 'active', 'synopsis', 'description', 'duration', 'start_at', 'finish_at'];
 
     public function city(){
         return $this->belongsTo('Zoomov\City', 'city_id')
             ->join('cities', 'projects.city_id', '=', 'cities.id')
             ->join('departments', 'department_id', '=', 'departments.id')
             ->join('countries', 'country_id', '=', 'countries.id')
-            ->select('cities.id', 'cities.name_'. Lang::locale(), 'sortname');
+            ->select('cities.id', 'cities.name_'. app()->getLocale(), 'sortname');
     }
 
     public function genre(){
         return $this->belongsTo('Zoomov\Genre')
-            ->select('genres.id', 'genres.name_'. Lang::locale() .' as genre_name');
+            ->select('genres.id', 'genres.name_'. app()->getLocale() .' as genre_name');
     }
 
     public function applications()
@@ -32,7 +32,7 @@ class Project extends \Eloquent
 
     public function lang(){
         return $this->hasMany('Zoomov\ProjectLanguage')->join('languages','language_id','=','languages.id')
-            ->select('project_id','language_id','languages.id','languages.name_'.Lang::locale().' as name', 'languages.name as code', 'languages.rank as rank');
+            ->select('project_id','language_id','languages.id','languages.name_'.app()->getLocale().' as name', 'languages.name as code', 'languages.rank as rank');
     }
 
     public function team()
@@ -53,7 +53,7 @@ class Project extends \Eloquent
                 $join->on('project_recruitments.id', '=', 'a.project_recruitment_id');
             })
             ->select('project_id','project_recruitments.id', 'quantity', 'project_recruitments.description', 'occupation_id',
-                'occupations.name_'.Lang::locale().' as name', 'applied', 'accepted');
+                'occupations.name_'.app()->getLocale().' as name', 'applied', 'accepted');
     }
 
     public function scripts()
